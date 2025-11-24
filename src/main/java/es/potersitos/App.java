@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Clase principal de la aplicación JavaFX.
  * Esta clase extiende {@link Application} y se encarga de:
@@ -23,7 +26,10 @@ import org.slf4j.LoggerFactory;
 public class App extends Application {
 
     /** Logger para esta clase */
-    private static final Logger logger = LoggerFactory.getLogger(es.potersitos.App.class);
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
+    /** Bundle del sistema de internacionalización */
+    private ResourceBundle bundle;
 
     /**
      * Metodo principal que se ejecuta al iniciar la aplicación JavaFX.
@@ -35,13 +41,21 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         try{
-            logger.debug("Intentando cargar el FXML: /fxml/visualizarCliente.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/fxml/visualizarCliente.fxml"));
+            // Detectar el idioma del sistema
+            //Locale locale = Locale.getDefault();
+            Locale locale = new Locale("es");
+
+            // Bundle del sistema de internacionalización
+            bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
+
+            logger.debug("Cargando el archivo FXML: ventana.fxml");
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventana.fxml"), bundle);
+
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
 
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
-            var archivoCSS = getClass().getResource("/css/estilo.css");
+            var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
             if(archivoCSS != null){
                 logger.info("CSS cargado correctamente");
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
