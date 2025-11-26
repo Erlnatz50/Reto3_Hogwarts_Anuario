@@ -43,7 +43,7 @@ public class App extends Application {
         try {
             // Detectar el idioma del sistema
             // Locale locale = Locale.getDefault();
-            Locale locale = new Locale("es");
+            Locale locale = Locale.of("es");
 
             // Bundle del sistema de internacionalización
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
