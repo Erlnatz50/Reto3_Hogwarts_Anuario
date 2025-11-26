@@ -1,17 +1,17 @@
-package es.potersitos.modelos;
+package es.potersitos.dao;
 
-import es.potersitos.controladores.ControladorVentana;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ResourceBundle;
 
-public class Usuarios {
+public class PersonajesDAO {
 
     /** Logger para esta clase */
-    private static final Logger logger = LoggerFactory.getLogger(Usuarios.class);
+    private static final Logger logger = LoggerFactory.getLogger(PersonajesDAO.class);
 
     /** Bundle del sistema de internacionalización */
     private ResourceBundle bundle;
+
 
 }
