@@ -74,8 +74,6 @@ public class App extends Application {
             stage.setResizable(true);
             stage.setMinWidth(400);
             stage.setMinHeight(350);
-            stage.setMaxWidth(500);
-            stage.setMaxHeight(500);
             stage.show();
 
         } catch (Exception e) {
