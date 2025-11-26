@@ -27,3 +27,14 @@
 2025-11-26 09:14:06 INFO  es.potersitos.App - FXML cargado correctamente
 2025-11-26 09:14:06 INFO  es.potersitos.App - CSS cargado correctamente
 2025-11-26 09:14:15 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-11-26 09:18:28 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-11-26 09:18:28 DEBUG es.potersitos.App - Cargando el archivo FXML: ventana.fxml
+2025-11-26 09:18:29 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-11-26 09:18:29 INFO  es.potersitos.App - FXML cargado correctamente
+2025-11-26 09:18:29 INFO  es.potersitos.App - CSS cargado correctamente
+2025-11-26 09:19:30 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-11-26 09:23:34 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-11-26 09:23:35 DEBUG es.potersitos.App - Cargando el archivo FXML: ventana.fxml
+2025-11-26 09:23:35 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-11-26 09:23:35 INFO  es.potersitos.App - FXML cargado correctamente
+2025-11-26 09:23:35 INFO  es.potersitos.App - CSS cargado correctamente

@@ -2,20 +2,20 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
    <top>
        <MenuBar styleClass="menu-bar">
            <Menu text="Archivo">
@@ -30,6 +30,10 @@
                <MenuItem text="Inglés" />
                <MenuItem text="Euskera" />
            </Menu>
+           <Menu text="Temas">
+               <MenuItem text="Claro" />
+               <MenuItem text="Oscuro" />
+           </Menu>
            <Menu text="Ayuda">
                <MenuItem text="Documentación" />
                <MenuItem text="Acerca de" />
@@ -37,66 +41,78 @@
        </MenuBar>
    </top>
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <top>
-            <GridPane BorderPane.alignment="CENTER">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
                <children>
-                  <TextField promptText="Buscar">
-                     <GridPane.margin>
-                        <Insets left="10.0" right="20.0" />
-                     </GridPane.margin>
+                  <Label text="⚡" styleClass="wand-icon">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <Label text="👓" styleClass="glasses-icon">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="searchField" promptText="BUSCAR" styleClass="search-field" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </TextField>
-                  <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Filtrar" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
-                     <GridPane.margin>
-                        <Insets right="30.0" />
-                     </GridPane.margin>
+                  <Button mnemonicParsing="false" text="Filtrar" styleClass="filter-button">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                </children>
                <padding>
-                  <Insets top="10.0" />
+                  <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
                </padding>
-            </GridPane>
-         </top>
-         <bottom>
-            <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-              <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="SELECCIONAR TODO">
-                     <GridPane.margin>
-                        <Insets bottom="20.0" left="10.0" top="10.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <Button mnemonicParsing="false" text="X" GridPane.columnIndex="1">
-                     <GridPane.margin>
-                        <Insets bottom="20.0" left="20.0" top="10.0" />
-                     </GridPane.margin>
-                  </Button>
-               </children>
-            </GridPane>
-         </bottom>
-         <center>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" fitToWidth="true">
+            </HBox>
+            
+            <!-- Character Grid -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
                <content>
-                  <TilePane fx:id="tilePanePersonajes" hgap="20.0" vgap="20.0" prefColumns="3" alignment="TOP_CENTER" style="-fx-padding: 20;">
+                  <TilePane fx:id="tilePanePersonajes" hgap="20.0" vgap="20.0" prefColumns="4" alignment="CENTER" styleClass="character-grid">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
                   </TilePane>
                </content>
             </ScrollPane>
-         </center>
-      </BorderPane>
+            
+            <!-- Pagination and Action Buttons -->
+            <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
+               <children>
+                  <Button mnemonicParsing="false" text="SELECCIONAR" styleClass="action-button">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Button>
+                  
+                  <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button mnemonicParsing="false" text="1" styleClass="page-button,page-active" />
+                        <Button mnemonicParsing="false" text="2" styleClass="page-button" />
+                        <Button mnemonicParsing="false" text="3" styleClass="page-button" />
+                        <Label text="..." styleClass="page-dots" />
+                        <Button mnemonicParsing="false" text="200" styleClass="page-button" />
+                     </children>
+                  </HBox>
+                  
+                  <Button mnemonicParsing="false" text="EXPORTAR" styleClass="action-button">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
    </center>
 </BorderPane>
