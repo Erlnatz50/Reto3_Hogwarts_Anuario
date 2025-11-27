@@ -70,9 +70,9 @@ def main():
 
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
-    csv_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "csv", "all_characters.csv")
-    xml_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "xml", "all_characters.xml")
-    bin_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "bin", "all_characters.bin")
+    csv_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "csv", "todosPersonajes.csv")
+    xml_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "xml", "todosPersonajes.xml")
+    bin_path = os.path.join(BASE_PATH, "..", "..", "..", "resources", "es", "potersitos", "bin", "todosPersonajes.bin")
 
     servicio.guardar_csv(personajes, csv_path)
     servicio.guardar_xml(personajes, xml_path)
