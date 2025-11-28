@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
  * - Registrar mensajes de log con SLF4J.
  * Contiene también el metodo {@link #main(String[])} para lanzar la aplicación.
  *
- * @author Erlantz García
+ * @author Erlantz
  * @version 1.0
  */
 public class App extends Application {
@@ -37,6 +37,8 @@ public class App extends Application {
      * Si ocurre algún error, muestra una alerta y registra el error en el Log.
      *
      * @param stage Stage principal proporcionado por JavaFX.
+     *
+     * @author Erlantz
      */
     @Override
     public void start(Stage stage) {
@@ -48,7 +50,7 @@ public class App extends Application {
             // Bundle del sistema de internacionalización
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
-            logger.debug("Cargando el archivo FXML: ventana.fxml");
+            logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
             FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"), bundle);
 
             Scene scene = new Scene(loaded.load());
@@ -61,11 +63,7 @@ public class App extends Application {
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
             } else{
                 logger.error("No se ha podido cargar el CSS");
-                Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-                alerta.setTitle("CSS no encontrado");
-                alerta.setHeaderText(null);
-                alerta.setContentText("No se ha podido cargar la hoja de estilos CSS");
-                alerta.showAndWait();
+                mandarAlertas(Alert.AlertType.INFORMATION, bundle.getString("cssNoEncontrado"), null, bundle.getString("cssNoEncontradoMensaje"));
             }
 
             stage.setTitle("Anuario de Hogwarts");
@@ -79,17 +77,15 @@ public class App extends Application {
 
         } catch (Exception e) {
             logger.error("Error al intentar cargar la aplicación {}", e.getMessage());
-            Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setTitle("Error");
-            alerta.setHeaderText("Error al iniciar la aplicación");
-            alerta.setContentText("Se ha producido un error al intentar cargar la aplicación");
-            alerta.showAndWait();
+            mandarAlertas(Alert.AlertType.ERROR, bundle.getString("error"), bundle.getString("errorIniciarAplicacion"), bundle.getString("errorIniciarAplicacionMensaje"));
         }
     }
 
     /**
      * Metodo que se ejecuta cuando cierra la aplicación.
      * Registra un mensaje de cierre en el archivo de Log.
+     *
+     * @author Erlantz
      */
     @Override
     public void stop(){
@@ -97,9 +93,30 @@ public class App extends Application {
     }
 
     /**
+     * Muestra una alerta JavaFX con los datos proporcionados.
+     *
+     * @param tipo Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo Título de la alerta
+     * @param mensajeTitulo Encabezado del mensaje
+     * @param mensaje Contenido del mensaje
+     *
+     * @author Erlantz
+     */
+    private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(mensajeTitulo);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+        logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
+    }
+
+    /**
      * Metodo principal que lanza la aplicación JavaFX
      *
      * @param args Argumentos de línea de comandos (no usados).
+     *
+     * @author Erlantz
      */
     public static void main(String[] args) {
         logger.info("Iniciando aplicación JavaFX...");
