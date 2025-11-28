@@ -3,6 +3,7 @@ package es.potersitos.controladores;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
@@ -15,6 +16,9 @@ import java.util.ResourceBundle;
 public class ControladorVisualizarPersonajes implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
+
+    @FXML
+    public TextField searchField;
 
     @FXML
     private TilePane tilePanePersonajes;

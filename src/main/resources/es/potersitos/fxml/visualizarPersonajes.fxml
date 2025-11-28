@@ -42,77 +42,67 @@
     </top>
     <center>
         <VBox BorderPane.alignment="CENTER">
-            <children>
-                <!-- Search Bar -->
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
-                    <children>
-                        <Label text="⚡" styleClass="wand-icon">
-                            <font>
-                                <Font size="20.0" />
-                            </font>
-                        </Label>
-                        <Label text="👓" styleClass="glasses-icon">
-                            <font>
-                                <Font size="18.0" />
-                            </font>
-                        </Label>
-                        <TextField fx:id="searchField" promptText="BUSCAR" styleClass="search-field" HBox.hgrow="ALWAYS">
-                            <font>
-                                <Font size="14.0" />
-                            </font>
-                        </TextField>
-                        <Button mnemonicParsing="false" text="Filtrar" styleClass="filter-button">
-                            <font>
-                                <Font size="14.0" />
-                            </font>
-                        </Button>
-                    </children>
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
+                    <Label text="⚡" styleClass="wand-icon">
+                        <font>
+                            <Font size="20.0" />
+                        </font>
+                    </Label>
+                    <Label text="👓" styleClass="glasses-icon">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="searchField" promptText="BUSCAR" styleClass="search-field" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </TextField>
+                    <Button mnemonicParsing="false" text="Filtrar" styleClass="filter-button">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Button>
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+            </HBox>
+
+            <!-- Character Grid -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                <TilePane fx:id="tilePanePersonajes" hgap="20.0" vgap="20.0" prefColumns="4" alignment="CENTER" styleClass="character-grid">
                     <padding>
-                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
+                </TilePane>
+            </ScrollPane>
+
+            <!-- Pagination and Action Buttons -->
+            <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
+                <Button mnemonicParsing="false" text="SELECCIONAR" styleClass="action-button">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+
+                <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Button mnemonicParsing="false" text="1" styleClass="page-button,page-active" />
+                        <Button mnemonicParsing="false" text="2" styleClass="page-button" />
+                        <Button mnemonicParsing="false" text="3" styleClass="page-button" />
+                        <Label text="..." styleClass="page-dots" />
+                        <Button mnemonicParsing="false" text="200" styleClass="page-button" />
                 </HBox>
 
-                <!-- Character Grid -->
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
-                    <content>
-                        <TilePane fx:id="tilePanePersonajes" hgap="20.0" vgap="20.0" prefColumns="4" alignment="CENTER" styleClass="character-grid">
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                            </padding>
-                        </TilePane>
-                    </content>
-                </ScrollPane>
-
-                <!-- Pagination and Action Buttons -->
-                <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
-                    <children>
-                        <Button mnemonicParsing="false" text="SELECCIONAR" styleClass="action-button">
-                            <font>
-                                <Font size="12.0" />
-                            </font>
-                        </Button>
-
-                        <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Button mnemonicParsing="false" text="1" styleClass="page-button,page-active" />
-                                <Button mnemonicParsing="false" text="2" styleClass="page-button" />
-                                <Button mnemonicParsing="false" text="3" styleClass="page-button" />
-                                <Label text="..." styleClass="page-dots" />
-                                <Button mnemonicParsing="false" text="200" styleClass="page-button" />
-                            </children>
-                        </HBox>
-
-                        <Button mnemonicParsing="false" text="EXPORTAR" styleClass="action-button">
-                            <font>
-                                <Font size="12.0" />
-                            </font>
-                        </Button>
-                    </children>
-                    <padding>
-                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
-                    </padding>
-                </HBox>
-            </children>
+                <Button mnemonicParsing="false" text="EXPORTAR" styleClass="action-button">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+                <padding>
+                    <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+            </HBox>
         </VBox>
     </center>
 </BorderPane>

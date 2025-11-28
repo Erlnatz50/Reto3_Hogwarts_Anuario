@@ -49,7 +49,7 @@ public class App extends Application {
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: ventana.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventana.fxml"), bundle);
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"), bundle);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
@@ -68,13 +68,13 @@ public class App extends Application {
                 alerta.showAndWait();
             }
 
-            stage.setTitle("Adding/Deleting Rows in a TableViews");
+            stage.setTitle("Anuario de Hogwarts");
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.setMinWidth(400);
-            stage.setMinHeight(350);
-            stage.setMaxWidth(500);
-            stage.setMaxHeight(500);
+            //stage.setMinWidth(400);
+            //stage.setMinHeight(350);
+            //stage.setMaxWidth(500);
+            //stage.setMaxHeight(500);
             stage.show();
 
         } catch (Exception e) {
