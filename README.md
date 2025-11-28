@@ -1,6 +1,7 @@
-# Proyecto JavaFX: Gestión de Personas
+# Reto Ethazi 3: Anuario de Hogwarts
 
 ## 📖 Descripción
+
 
 ## 📂 Archivos más importantes del proyecto
 
@@ -11,5 +12,8 @@
 ## 🚀 Instalación y ejecución
 
 
-## ✨ Autor
-- 👤 
+## ✨ Autores
+- 👤 Telmo Castillo
+- 👤 Nizam Abdelghaffar
+- 👤 Marco Muro
+- 👤 Erlantz García
