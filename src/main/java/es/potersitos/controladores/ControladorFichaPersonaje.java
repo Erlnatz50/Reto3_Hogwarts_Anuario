@@ -1,11 +1,13 @@
 package es.potersitos.controladores;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import java.util.ResourceBundle;
 
 public class ControladorFichaPersonaje {
 
@@ -21,7 +23,11 @@ public class ControladorFichaPersonaje {
     @FXML
     private Label labelCasa;
 
-    private boolean isSelected = false;
+    private ResourceBundle resources;
+
+    public void setResources(ResourceBundle resources) {
+        this.resources = resources;
+    }
 
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
@@ -38,15 +44,19 @@ public class ControladorFichaPersonaje {
 
     @FXML
     private void handleCardClick(MouseEvent event) {
-        isSelected = !isSelected;
-        updateSelectionVisuals();
-    }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
+            if (resources != null) {
+                loader.setResources(resources);
+            }
+            javafx.scene.Parent root = loader.load();
 
-    private void updateSelectionVisuals() {
-        if (isSelected) {
-            cardBox.setStyle("-fx-border-color: blue; -fx-border-width: 3; -fx-background-color: #e0e0e0;");
-        } else {
-            cardBox.setStyle("-fx-border-color: transparent; -fx-border-width: 0; -fx-background-color: white;");
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Datos del Personaje");
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.show();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
         }
-    }
-}
+    }}
+

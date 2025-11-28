@@ -19,10 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0"
-            styleClass="root" xmlns="http://javafx.com/javafx/24.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
    <top>
        <MenuBar styleClass="menu-bar">
            <Menu text="Archivo">
@@ -36,10 +33,6 @@
                <MenuItem text="Español" />
                <MenuItem text="Inglés" />
                <MenuItem text="Euskera" />
-           </Menu>
-           <Menu text="Temas">
-               <MenuItem text="Claro" />
-               <MenuItem text="Oscuro" />
            </Menu>
            <Menu text="Ayuda">
                <MenuItem text="Documentación" />
@@ -56,12 +49,12 @@
                   <!-- Search Bar -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
                      <children>
-                        <Label text="⚡" styleClass="wand-icon">
+                        <Label styleClass="wand-icon" text="⚡">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label text="👓" styleClass="glasses-icon">
+                        <Label styleClass="glasses-icon" text="👓">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -71,7 +64,7 @@
                               <Font size="14.0" />
                            </font>
                         </TextField>
-                        <Button fx:id="btnFiltrar" mnemonicParsing="false" text="Filtrar" styleClass="filter-button" onAction="#toggleFilterPanel">
+                        <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#toggleFilterPanel" styleClass="filter-button" text="Filtrar">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -83,9 +76,9 @@
                   </HBox>
                   
                   <!-- Character Grid -->
-                  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                  <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
                      <content>
-                        <TilePane fx:id="tilePanePersonajes" hgap="20.0" vgap="20.0" prefColumns="4" alignment="CENTER" styleClass="character-grid">
+                        <TilePane fx:id="tilePanePersonajes" alignment="CENTER" hgap="20.0" prefColumns="4" styleClass="character-grid" vgap="20.0">
                            <padding>
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
@@ -96,7 +89,7 @@
                   <!-- Pagination and Action Buttons -->
                   <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
                      <children>
-                        <Button mnemonicParsing="false" text="SELECCIONAR" styleClass="action-button">
+                        <Button mnemonicParsing="false" styleClass="action-button" text="SELECCIONAR">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -104,15 +97,15 @@
                         
                         <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Button mnemonicParsing="false" text="1" styleClass="page-button,page-active" />
-                              <Button mnemonicParsing="false" text="2" styleClass="page-button" />
-                              <Button mnemonicParsing="false" text="3" styleClass="page-button" />
-                              <Label text="..." styleClass="page-dots" />
-                              <Button mnemonicParsing="false" text="200" styleClass="page-button" />
+                              <Button mnemonicParsing="false" styleClass="page-button,page-active" text="1" />
+                              <Button mnemonicParsing="false" styleClass="page-button" text="2" />
+                              <Button mnemonicParsing="false" styleClass="page-button" text="3" />
+                              <Label styleClass="page-dots" text="..." />
+                              <Button mnemonicParsing="false" styleClass="page-button" text="200" />
                            </children>
                         </HBox>
                         
-                        <Button mnemonicParsing="false" text="EXPORTAR" styleClass="action-button">
+                        <Button mnemonicParsing="false" styleClass="action-button" text="EXPORTAR">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -126,20 +119,26 @@
             </VBox>
             
             <!-- Filter Panel (Right Side) -->
-            <VBox fx:id="filterPanel" visible="false" managed="false" prefWidth="300.0" maxWidth="300.0" styleClass="filter-panel" StackPane.alignment="CENTER_RIGHT">
+            <VBox fx:id="filterPanel" managed="false" maxWidth="300.0" prefWidth="300.0" styleClass="filter-panel" visible="false" StackPane.alignment="CENTER_RIGHT">
                <children>
                   <!-- Filter Header -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                      <children>
-                        <Label text="Filtrar" styleClass="filter-title" HBox.hgrow="ALWAYS">
+                        <Label styleClass="filter-title" text="Filtrar" HBox.hgrow="ALWAYS">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </Label>
-                        <Button fx:id="btnCerrarFiltro" mnemonicParsing="false" text="✕" onAction="#toggleFilterPanel" styleClass="close-filter-button">
+                        <Button fx:id="btnCerrarFiltro" alignment="CENTER" mnemonicParsing="false" onAction="#toggleFilterPanel" styleClass="close-filter-button" text="✕">
                            <font>
                               <Font size="16.0" />
                            </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <HBox.margin>
+                              <Insets left="180.0" />
+                           </HBox.margin>
                         </Button>
                      </children>
                      <VBox.margin>
@@ -148,10 +147,10 @@
                   </HBox>
                   
                   <!-- Filter Content with Accordion -->
-                  <Accordion VBox.vgrow="ALWAYS" styleClass="filter-accordion">
+                  <Accordion fx:id="accordionFiltros" styleClass="filter-accordion" VBox.vgrow="ALWAYS">
                      <!-- Casa Filter -->
                      <panes>
-                        <TitledPane text="Casa" styleClass="filter-titled-pane">
+                        <TitledPane styleClass="filter-titled-pane" text="Casa">
                            <content>
                               <VBox spacing="5.0" styleClass="filter-checkboxes">
                                  <children>
@@ -168,7 +167,7 @@
                         </TitledPane>
                         
                         <!-- Nacionalidad Filter -->
-                        <TitledPane text="Nacionalidad" styleClass="filter-titled-pane">
+                        <TitledPane styleClass="filter-titled-pane" text="Nacionalidad">
                            <content>
                               <VBox spacing="5.0" styleClass="filter-checkboxes">
                                  <children>
@@ -185,7 +184,7 @@
                         </TitledPane>
                         
                         <!-- Especie Filter -->
-                        <TitledPane text="Especie" styleClass="filter-titled-pane">
+                        <TitledPane styleClass="filter-titled-pane" text="Especie">
                            <content>
                               <VBox spacing="5.0" styleClass="filter-checkboxes">
                                  <children>
@@ -202,7 +201,7 @@
                         </TitledPane>
                         
                         <!-- Género Filter -->
-                        <TitledPane text="Género" styleClass="filter-titled-pane">
+                        <TitledPane styleClass="filter-titled-pane" text="Género">
                            <content>
                               <VBox spacing="5.0" styleClass="filter-checkboxes">
                                  <children>
@@ -215,34 +214,18 @@
                               </VBox>
                            </content>
                         </TitledPane>
-                        
-                        <!-- Color de Piel Filter -->
-                        <TitledPane text="Color de Piel" styleClass="filter-titled-pane">
-                           <content>
-                              <VBox spacing="5.0" styleClass="filter-checkboxes">
-                                 <children>
-                                    <CheckBox text="Claro" />
-                                    <CheckBox text="Medio" />
-                                    <CheckBox text="Oscuro" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                 </padding>
-                              </VBox>
-                           </content>
-                        </TitledPane>
                      </panes>
                   </Accordion>
                   
                   <!-- Filter Action Buttons -->
-                  <HBox spacing="10.0" alignment="CENTER">
+                  <HBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <Button text="Aplicar" styleClass="apply-filter-button">
+                        <Button styleClass="apply-filter-button" text="Aplicar">
                            <font>
                               <Font size="12.0" />
                            </font>
                         </Button>
-                        <Button text="Limpiar" styleClass="clear-filter-button">
+                        <Button onAction="#limpiarFiltros" styleClass="clear-filter-button" text="Limpiar">
                            <font>
                               <Font size="12.0" />
                            </font>

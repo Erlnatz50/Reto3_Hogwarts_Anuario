@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +70,13 @@ public class App extends Application {
                 alerta.showAndWait();
             }
 
-            stage.setTitle("Adding/Deleting Rows in a TableViews");
+            stage.setTitle("Anuario Hogwarts");
+            stage.getIcons()
+                    .add(new Image(getClass().getResourceAsStream("/es/potersitos/img/logo-anuario-hogwarts.png")));
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.setMinWidth(400);
-            stage.setMinHeight(350);
+            stage.setMinWidth(900);
+            stage.setMinHeight(640);
             stage.show();
 
         } catch (Exception e) {

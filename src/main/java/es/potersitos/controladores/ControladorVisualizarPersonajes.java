@@ -3,6 +3,7 @@ package es.potersitos.controladores;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
@@ -22,8 +23,14 @@ public class ControladorVisualizarPersonajes implements Initializable {
     @FXML
     private VBox filterPanel;
 
+    @FXML
+    private Accordion accordionFiltros;
+
+    private ResourceBundle resources;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.resources = resources;
         logger.info("Inicializando ControladorVisualizarPersonajes...");
         cargarPersonajes();
     }
@@ -36,6 +43,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 VBox card = loader.load();
 
                 ControladorFichaPersonaje controller = loader.getController();
+                controller.setResources(resources);
                 controller.setData("Personaje " + i, "Casa " + (i % 4 + 1), "path/to/image.png");
 
                 tilePanePersonajes.getChildren().add(card);
@@ -51,5 +59,21 @@ public class ControladorVisualizarPersonajes implements Initializable {
         filterPanel.setVisible(!isVisible);
         filterPanel.setManaged(!isVisible);
         logger.info("Panel de filtros " + (isVisible ? "ocultado" : "mostrado"));
+    }
+
+    @FXML
+    private void limpiarFiltros(javafx.event.ActionEvent event) {
+        if (accordionFiltros != null) {
+            for (javafx.scene.control.TitledPane pane : accordionFiltros.getPanes()) {
+                javafx.scene.Node content = pane.getContent();
+                if (content instanceof VBox) {
+                    for (javafx.scene.Node node : ((VBox) content).getChildren()) {
+                        if (node instanceof javafx.scene.control.CheckBox) {
+                            ((javafx.scene.control.CheckBox) node).setSelected(false);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
