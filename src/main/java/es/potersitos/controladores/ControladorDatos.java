@@ -19,10 +19,10 @@ import java.util.ResourceBundle;
  * Controlador para la ventana de datos de personajes.
  * Gestiona la interacción con los elementos del FXML.
  */
-public class ControladorVentana implements Initializable {
+public class ControladorDatos implements Initializable {
 
     /** Logger para esta clase */
-    private static final Logger logger = LoggerFactory.getLogger(ControladorVentana.class);
+    private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
     /** Bundle del sistema de internacionalización */
     private ResourceBundle bundle;
