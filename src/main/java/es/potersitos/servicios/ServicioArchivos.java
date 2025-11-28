@@ -1,4 +1,4 @@
-package es.potersitos.services;
+package es.potersitos.servicios;
 
 import es.potersitos.modelos.Personaje;
 import org.slf4j.Logger;
