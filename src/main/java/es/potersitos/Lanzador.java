@@ -1,9 +1,10 @@
 package es.potersitos;
 
+import javafx.application.Application; // Importación necesaria para usar Application.launch()
+
 /**
  * Clase lanzadora de la aplicación JavaFX.
- * Se utiliza cuando se necesita un punto de entrada separado para empaquetar
- * o ejecutar la aplicación, como: crear un JAR ejecutable.
+ * Se utiliza como punto de entrada (main) y llama directamente a Application.launch().
  *
  * @author Erlantz Garcia
  * @version 1.0
@@ -12,12 +13,13 @@ public class Lanzador {
 
     /**
      * Metodo principal de la clase lanzadora.
-     * Recibe los argumentos de línea de comandos y los pasa al
-     * {@link es.potersitos.App#main(String[])} para iniciar la aplicacion.
+     * Llama al método launch() de JavaFX para iniciar el ciclo de vida de la aplicación.
      *
      * @param args Argumentos de línea de comandos.
      */
     public static void main(String[] args){
-        App.main(args);
+        // Llamada directa al método estático launch() de la clase Application.
+        // Esto inicia el ciclo de vida de la aplicación App, evitando el error de visibilidad.
+        Application.launch(App.class, args);
     }
 }
