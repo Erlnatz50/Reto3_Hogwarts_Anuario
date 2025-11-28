@@ -19,6 +19,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
     @FXML
     private TilePane tilePanePersonajes;
 
+    @FXML
+    private VBox filterPanel;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.info("Inicializando ControladorVisualizarPersonajes...");
@@ -40,5 +43,13 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 logger.error("Error al cargar la ficha del personaje", e);
             }
         }
+    }
+
+    @FXML
+    private void toggleFilterPanel() {
+        boolean isVisible = filterPanel.isVisible();
+        filterPanel.setVisible(!isVisible);
+        filterPanel.setManaged(!isVisible);
+        logger.info("Panel de filtros " + (isVisible ? "ocultado" : "mostrado"));
     }
 }
