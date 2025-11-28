@@ -7,7 +7,7 @@ module es.potersitos {
     requires java.net.http;
 
     opens es.potersitos.controladores to javafx.fxml;
-    opens es.potersitos.modelos to javafx.base;
+
 
     opens es.potersitos to javafx.fxml;
     exports es.potersitos;

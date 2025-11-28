@@ -1,0 +1,111 @@
+/* =======================================================
+ * ESTILOS GENERALES Y FONDO DE VENTANA
+ * ======================================================= */
+
+/* Selector para el BorderPane principal (el elemento raíz: .root) */
+.root {
+    /* Fondo principal: marrón/café oscuro (#55483a) */
+    -fx-background-color: #55483a !important;
+    /* Borde exterior visible */
+    -fx-border-color: #3d3429;
+    -fx-border-width: 3;
+    -fx-padding: 5;
+}
+
+/* Forzamos la transparencia de todos los contenedores (VBox y HBox)
+ * para que el fondo del .root se vea a través.
+ */
+.vbox, .hbox {
+    -fx-background-color: transparent;
+}
+
+
+/* =======================================================
+ * ESTILOS DE DATOS Y SCROLLPANE
+ * ======================================================= */
+
+/* Estilo para todos los Labels de datos */
+.label {
+    /* Color del texto: crema/blanco apagado */
+    -fx-text-fill: #e6e6e6 !important;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* El ScrollPane debe ser transparente */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* CORRECCIÓN CRÍTICA: La vista interior del ScrollPane DEBE ser transparente */
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Forzamos el color de fondo del contenido dentro del ScrollPane a transparente */
+#datosVBox {
+    -fx-background-color: transparent;
+}
+
+
+/* =======================================================
+ * ESTILOS DE LA IMAGEN
+ * ======================================================= */
+
+/* Estilo para la imagen (añade un borde y sombra para destacarla) */
+#imageView {
+    -fx-border-color: #e6e6e6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0.0, 0, 0);
+}
+
+
+/* =======================================================
+ * ESTILOS DE BOTONES
+ * ======================================================= */
+
+.button {
+    -fx-background-color: #6d6254; /* Un marrón ligeramente más claro para el botón */
+    -fx-text-fill: #e6e6e6;
+    -fx-font-weight: bold;
+    -fx-border-color: #3d3429;
+    -fx-border-radius: 3;
+    -fx-border-width: 1.5;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Estilo al pasar el ratón por encima de los botones */
+.button:hover {
+    -fx-background-color: #8c7f70;
+}
+
+
+/* =======================================================
+ * ESTILOS DE LA BARRA DE DESPLAZAMIENTO (SCROLLBAR)
+ * ======================================================= */
+
+/* Estilo de la barra de desplazamiento (Scrollbar) para que sea oscura */
+.scroll-bar:vertical {
+    -fx-background-color: #55483a;
+    -fx-border-color: #3d3429;
+    -fx-border-width: 0 0 0 1;
+}
+
+/* La pista de la barra de desplazamiento */
+.scroll-bar:vertical .track {
+    -fx-background-color: #3d3429;
+    -fx-background-insets: 0;
+}
+
+/* La parte arrastrable de la barra (el pulgar) */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #8c7f70;
+    -fx-background-radius: 5;
+    -fx-background-insets: 2;
+}
+
+/* Esquina de la barra de desplazamiento */
+.corner {
+    -fx-background-color: #55483a;
+}

@@ -58,6 +58,7 @@ public class App extends Application {
 
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
+            var archivoCSS2 = getClass().getResource("/es/potersitos/css/estiloDatos.css");
             if(archivoCSS != null){
                 logger.info("CSS cargado correctamente");
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
