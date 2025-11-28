@@ -19,7 +19,8 @@
             <ImageView fx:id="imageView" fitHeight="250" fitWidth="200" preserveRatio="true" />
         </VBox>
     </left>
-   <center>
+
+    <center>
         <VBox BorderPane.alignment="CENTER">
             <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
                 <content>
@@ -54,16 +55,22 @@
                     </VBox>
                 </content>
             </ScrollPane>
-
-            <HBox alignment="BOTTOM_RIGHT" spacing="10">
-                <padding>
-                    <Insets bottom="10" left="10" right="10" top="10" />
-                </padding>
-                <Button fx:id="actualizarButton" onAction="#handleActualizar" text="%actualizar.button" />
-                <Button fx:id="exportarButton" onAction="#handleExportar" text="%exportar.button" />
-                <Button fx:id="eliminarButton" onAction="#handleEliminar" text="%eliminar.button" />
-            </HBox>
         </VBox>
-   </center>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+            <Button fx:id="actualizarButton" text="%actualizar.button" onAction="#handleActualizar">
+                <HBox.margin>
+                    <Insets left="220.0" />
+                </HBox.margin>
+            </Button>
+            <Button fx:id="exportarButton" text="%exportar.button" onAction="#handleExportar"/>
+            <Button fx:id="eliminarButton" text="%eliminar.button" onAction="#handleEliminar"/>
+        </HBox>
+    </bottom>
 
 </BorderPane>
