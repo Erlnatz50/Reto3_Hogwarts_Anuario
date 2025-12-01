@@ -407,11 +407,9 @@ VBox[left] {
 /* ===== Campo de búsqueda ===== */
 .search-field {
     -fx-font-family: "Times New Roman", "Georgia", serif;
-}
-
--fx-border-width: 3px;
--fx-border-radius: 0;
--fx-background-color: #f5f5f5;
+    -fx-border-width: 3px;
+    -fx-border-radius: 0;
+    -fx-background-color: #f5f5f5;
 }
 
 /* ===== Scroll y contenedor de datos ===== */
@@ -595,38 +593,26 @@ VBox[left] {
 .character-card:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.4), 15, 0, 0, 5);
     -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
-    -fx-border-color: #3498db;
-}
 
-/* ===== Campo de búsqueda ===== */
-.search-field {
-    -fx-font-family: "Times New Roman", "Georgia", serif;
-}
+    .menu-bar .label {
+        -fx-text-fill: white;
+    }
 
-/* ===== Barra de menú ===== */
-.menu-bar {
-    -fx-background-color: #272727;
-}
+    /* ===== Menú desplegable ===== */
+    .context-menu {
+        -fx-background-color: #272727;
+        -fx-border-color: #3b3b3b;
+    }
 
-.menu-bar .label {
-    -fx-text-fill: white;
-}
+    .menu-item .label {
+        -fx-text-fill: white;
+    }
 
-/* ===== Menú desplegable ===== */
-.context-menu {
-    -fx-background-color: #272727;
-    -fx-border-color: #3b3b3b;
-}
+    .menu-item:focused {
+        -fx-background-color: #403f3e;
+    }
 
-.menu-item .label {
-    -fx-text-fill: white;
-}
-
-.menu-item:focused {
-    -fx-background-color: #403f3e;
-}
-
-.menu-item:focused .label {
-    -fx-text-fill: white;
+    .menu-item:focused .label {
+        -fx-text-fill: white;
+    }
 }
