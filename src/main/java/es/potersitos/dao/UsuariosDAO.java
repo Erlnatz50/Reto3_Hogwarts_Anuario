@@ -1,6 +1,6 @@
 package es.potersitos.dao;
 
-import es.potersitos.controladores.ControladorVentana;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

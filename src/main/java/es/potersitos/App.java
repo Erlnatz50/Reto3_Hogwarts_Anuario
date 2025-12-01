@@ -49,13 +49,13 @@ public class App extends Application {
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: ventana.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventana.fxml"), bundle);
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"), bundle);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
 
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
-            var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
+            var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
             if(archivoCSS != null){
                 logger.info("CSS cargado correctamente");
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
