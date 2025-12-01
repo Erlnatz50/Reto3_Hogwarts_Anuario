@@ -4,11 +4,11 @@
 
 /* Selector para el BorderPane principal (el elemento raíz: .root) */
 .root {
-    /* Fondo principal: marrón/café oscuro (#8d8469) */
+    /* Fondo principal: marrón/café oscuro (#958c71) */
     -fx-background-color: #958c71 !important;
 
     /* BORDES REDONDEADOS */
-    -fx-background-radius: 20; /* Ajusta el valor para mayor o menor redondez */
+    -fx-background-radius: 20;
     -fx-border-radius: 20;
 
     /* Borde exterior visible */
@@ -17,9 +17,7 @@
     -fx-padding: 5;
 }
 
-/* Forzamos la transparencia de todos los contenedores (VBox y HBox)
- * para que el fondo del .root se vea a través.
- */
+/* Forzamos la transparencia de todos los contenedores (VBox y HBox) */
 .vbox, .hbox {
     -fx-background-color: transparent;
 }
@@ -31,7 +29,7 @@
 
 /* Estilo para todos los Labels de datos */
 .label {
-    /* Color del texto: crema/blanco apagado */
+    /* Color del texto: negro */
     -fx-text-fill: #000000 !important;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -80,10 +78,11 @@
     -fx-padding: 5 10 5 10;
 }
 
-/* Estilo al pasar el ratón por encima de los botones */
+/* [MODIFICADO] Estilo al pasar el ratón por encima de los botones inferiores */
+/* Usamos un color de fondo sólido más oscuro para que el cambio sea muy visible */
 .button:hover {
-    /* Tinte semi-transparente para feedback */
-    -fx-background-color: rgba(140, 127, 112, 0.3);
+    -fx-background-color: #6d6254; /* Un marrón más oscuro y sólido */
+    -fx-text-fill: #ffffff;      /* Cambiamos el texto a blanco para un mejor contraste */
 }
 
 /* =======================================================
@@ -91,17 +90,17 @@
  * ======================================================= */
 
 #closeButton {
-    -fx-background-color: transparent; /* Fondo transparente por defecto */
-    -fx-text-fill: #3d3429; /* Color del texto (la X) oscuro para contraste */
+    -fx-background-color: transparent;
+    -fx-text-fill: #3d3429;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-padding: 3 8; /* Hacemos el botón más pequeño y cuadrado */
-    -fx-border-color: transparent; /* Quitamos el borde general del .button */
+    -fx-padding: 3 8;
+    -fx-border-color: transparent;
     -fx-background-radius: 5;
 }
 
+/* [CORREGIDO] Estilo hover del botón de cierre */
 #closeButton:hover {
-    -fx-background-color: 211f1a;
     -fx-text-fill: white;
 }
 
