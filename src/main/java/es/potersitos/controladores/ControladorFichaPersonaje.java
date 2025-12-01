@@ -2,6 +2,7 @@ package es.potersitos.controladores;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
 import javafx.scene.image.ImageView;
@@ -50,8 +51,11 @@ public class ControladorFichaPersonaje {
                 loader.setResources(resources);
             }
             javafx.scene.Parent root = loader.load();
-
             javafx.stage.Stage stage = new javafx.stage.Stage();
+            var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
+            if (archivoCSS != null) {
+                root.getStylesheets().add(archivoCSS.toExternalForm());
+            }
             stage.setTitle("Datos del Personaje");
             stage.setScene(new javafx.scene.Scene(root));
             stage.show();
