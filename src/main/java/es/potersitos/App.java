@@ -71,10 +71,10 @@ public class App extends Application {
             stage.setTitle("Adding/Deleting Rows in a TableViews");
             stage.setScene(scene);
             stage.setResizable(true);
-            stage.setMinWidth(400);
-            stage.setMinHeight(350);
-            stage.setMaxWidth(500);
-            stage.setMaxHeight(500);
+            stage.setMinWidth(700);
+            stage.setMinHeight(450);
+            stage.setMaxWidth(700);
+            stage.setMaxHeight(450);
             stage.show();
 
         } catch (Exception e) {
