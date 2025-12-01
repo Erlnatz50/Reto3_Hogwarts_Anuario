@@ -5,7 +5,7 @@
 /* Selector para el BorderPane principal (el elemento raíz: .root) */
 .root {
     /* Fondo principal: marrón/café oscuro (#8d8469) */
-    -fx-background-color: #8d8469 !important;
+    -fx-background-color: #958c71 !important;
 
     /* BORDES REDONDEADOS */
     -fx-background-radius: 20; /* Ajusta el valor para mayor o menor redondez */
