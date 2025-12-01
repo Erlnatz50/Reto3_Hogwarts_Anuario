@@ -5,6 +5,7 @@ module es.potersitos {
     requires jdk.compiler;
     requires java.desktop;
     requires java.net.http;
+    requires com.fasterxml.jackson.databind;
 
     opens es.potersitos.controladores to javafx.fxml;
 

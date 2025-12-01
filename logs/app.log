@@ -358,3 +358,90 @@ java.lang.NullPointerException: Input stream must not be null
 	at javafx.graphics@24/com.sun.glass.ui.win.WinApplication.lambda$runLoop$0(WinApplication.java:168)
 	at java.base/java.lang.Thread.run(Thread.java:1447)
 2025-11-28 13:31:12 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 13:36:01 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 13:36:01 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 13:36:02 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 13:36:02 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 13:36:02 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 13:36:04 INFO  e.p.controladores.ControladorDatos - ControladorVentana inicializado correctamente.
+2025-12-01 13:36:04 DEBUG e.p.controladores.ControladorDatos - Cargando datos de prueba...
+2025-12-01 13:36:04 ERROR e.p.controladores.ControladorDatos - Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png
+java.lang.NullPointerException: Input stream must not be null
+	at javafx.graphics@24/javafx.scene.image.Image.validateInputStream(Image.java:1142)
+	at javafx.graphics@24/javafx.scene.image.Image.<init>(Image.java:709)
+	at es.potersitos/es.potersitos.controladores.ControladorDatos.cargarDatosPrueba(ControladorDatos.java:103)
+	at es.potersitos/es.potersitos.controladores.ControladorDatos.initialize(ControladorDatos.java:84)
+	at javafx.fxml@24/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2640)
+	at javafx.fxml@24/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2533)
+	at javafx.fxml@24/javafx.fxml.FXMLLoader.load(FXMLLoader.java:2503)
+	at es.potersitos/es.potersitos.controladores.ControladorFichaPersonaje.handleCardClick(ControladorFichaPersonaje.java:53)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at com.sun.javafx.reflect.Trampoline.invoke(MethodUtil.java:65)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at javafx.base@24/com.sun.javafx.reflect.MethodUtil.invoke(MethodUtil.java:112)
+	at javafx.fxml@24/com.sun.javafx.fxml.MethodHelper.invoke(MethodHelper.java:78)
+	at javafx.fxml@24/javafx.fxml.FXMLLoader$MethodHandler.invoke(FXMLLoader.java:1845)
+	at javafx.fxml@24/javafx.fxml.FXMLLoader$ControllerMethodEventHandler.handle(FXMLLoader.java:1718)
+	at javafx.base@24/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base@24/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:232)
+	at javafx.base@24/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:189)
+	at javafx.base@24/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base@24/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base@24/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@24/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@24/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@24/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@24/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@24/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@24/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@24/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@24/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@24/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base@24/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base@24/javafx.event.Event.fireEvent(Event.java:199)
+	at javafx.graphics@24/javafx.scene.Scene$ClickGenerator.postProcess(Scene.java:3709)
+	at javafx.graphics@24/javafx.scene.Scene$MouseHandler.process(Scene.java:4014)
+	at javafx.graphics@24/javafx.scene.Scene.processMouseEvent(Scene.java:1934)
+	at javafx.graphics@24/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2763)
+	at javafx.graphics@24/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.get(GlassViewEventHandler.java:352)
+	at javafx.graphics@24/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.get(GlassViewEventHandler.java:254)
+	at javafx.graphics@24/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:424)
+	at javafx.graphics@24/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:386)
+	at javafx.graphics@24/com.sun.glass.ui.View.handleMouseEvent(View.java:560)
+	at javafx.graphics@24/com.sun.glass.ui.View.notifyMouse(View.java:946)
+	at javafx.graphics@24/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@24/com.sun.glass.ui.win.WinApplication.lambda$runLoop$0(WinApplication.java:168)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+2025-12-01 13:36:10 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 13:39:47 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 13:39:47 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 13:39:48 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 13:39:48 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 13:39:48 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 13:39:52 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 13:40:57 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 13:40:57 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 13:40:57 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 13:40:57 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 13:40:57 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 13:41:09 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 14:16:39 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 14:16:40 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 14:16:40 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 14:16:40 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 14:16:40 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 14:16:46 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 14:18:46 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 14:18:46 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 14:18:46 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 14:18:46 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 14:18:46 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 14:19:42 INFO  es.potersitos.App - Aplicación finalizada correctamente
+2025-12-01 14:20:55 INFO  es.potersitos.App - Iniciando aplicación JavaFX...
+2025-12-01 14:20:55 DEBUG es.potersitos.App - Cargando el archivo FXML: visualizarPersonajes.fxml
+2025-12-01 14:20:56 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
+2025-12-01 14:20:56 INFO  es.potersitos.App - FXML cargado correctamente
+2025-12-01 14:20:56 INFO  es.potersitos.App - CSS cargado correctamente: file:/C:/Users/dm2/Documents/DEIN/Proyecto3%20(Hogwarts)/Reto3_Hogwarts_Anuario/target/classes/es/potersitos/css/estilo.css
+2025-12-01 14:21:01 INFO  es.potersitos.App - Aplicación finalizada correctamente

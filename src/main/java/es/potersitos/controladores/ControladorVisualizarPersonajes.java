@@ -1,11 +1,16 @@
 package es.potersitos.controladores;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +21,8 @@ import java.util.ResourceBundle;
 public class ControladorVisualizarPersonajes implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
+
+    public MenuItem nuevoMenuItem;
 
     @FXML
     private TilePane tilePanePersonajes;
@@ -42,9 +49,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
                 VBox card = loader.load();
 
-                ControladorFichaPersonaje controller = loader.getController();
-                controller.setResources(resources);
-                controller.setData("Personaje " + i, "Casa " + (i % 4 + 1), "path/to/image.png");
+                //ControladorFichaPersonaje controller = loader.getController();
+                //controller.setResources(resources);
+                //controller.setData("Personaje " + i, "Casa " + (i % 4 + 1), "path/to/image.png");
 
                 tilePanePersonajes.getChildren().add(card);
             } catch (IOException e) {
@@ -74,6 +81,21 @@ public class ControladorVisualizarPersonajes implements Initializable {
                     }
                 }
             }
+        }
+    }
+
+    public void onNuevo(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Nuevo Personaje");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
