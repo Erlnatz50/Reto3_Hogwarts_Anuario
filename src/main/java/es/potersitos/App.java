@@ -42,42 +42,45 @@ public class App extends Application {
      */
     @Override
     public void start(Stage stage) {
-        try{
+        try {
             // Detectar el idioma del sistema
-            //Locale locale = Locale.getDefault();
+            // Locale locale = Locale.getDefault();
             Locale locale = new Locale("es");
 
             // Bundle del sistema de internacionalización
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"), bundle);
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"),
+                    bundle);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
 
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
-            if(archivoCSS != null){
-                logger.info("CSS cargado correctamente");
+            if (archivoCSS != null) {
+                logger.info("CSS cargado correctamente: " + archivoCSS.toExternalForm());
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
-            } else{
+            } else {
                 logger.error("No se ha podido cargar el CSS");
-                mandarAlertas(Alert.AlertType.INFORMATION, bundle.getString("cssNoEncontrado"), null, bundle.getString("cssNoEncontradoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, bundle.getString("cssNoEncontrado"), null,
+                        bundle.getString("cssNoEncontradoMensaje"));
             }
 
             stage.setTitle("Anuario de Hogwarts");
             stage.setScene(scene);
             stage.setResizable(true);
-            //stage.setMinWidth(400);
-            //stage.setMinHeight(350);
-            //stage.setMaxWidth(500);
-            //stage.setMaxHeight(500);
+            // stage.setMinWidth(400);
+            // stage.setMinHeight(350);
+            // stage.setMaxWidth(500);
+            // stage.setMaxHeight(500);
             stage.show();
 
         } catch (Exception e) {
             logger.error("Error al intentar cargar la aplicación {}", e.getMessage());
-            mandarAlertas(Alert.AlertType.ERROR, bundle.getString("error"), bundle.getString("errorIniciarAplicacion"), bundle.getString("errorIniciarAplicacionMensaje"));
+            mandarAlertas(Alert.AlertType.ERROR, bundle.getString("error"), bundle.getString("errorIniciarAplicacion"),
+                    bundle.getString("errorIniciarAplicacionMensaje"));
         }
     }
 
@@ -88,17 +91,17 @@ public class App extends Application {
      * @author Erlantz
      */
     @Override
-    public void stop(){
+    public void stop() {
         logger.info("Aplicación finalizada correctamente");
     }
 
     /**
      * Muestra una alerta JavaFX con los datos proporcionados.
      *
-     * @param tipo Tipo de alerta (INFO, WARNING, ERROR...)
-     * @param titulo Título de la alerta
+     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo        Título de la alerta
      * @param mensajeTitulo Encabezado del mensaje
-     * @param mensaje Contenido del mensaje
+     * @param mensaje       Contenido del mensaje
      *
      * @author Erlantz
      */
