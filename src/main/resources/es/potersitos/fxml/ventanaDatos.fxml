@@ -8,74 +8,86 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import java.lang.String?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorDatos">
+<StackPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="es.potersitos.controladores.ControladorDatos">
 
     <stylesheets>
         <String fx:value="@/es/potersitos/css/estiloDatos.css" />
     </stylesheets>
 
-    <left>
-        <VBox alignment="CENTER" spacing="10">
-            <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
-            </padding>
-            <ImageView fx:id="imageView" fitHeight="250" fitWidth="200" preserveRatio="true" />
-        </VBox>
-    </left>
+    <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                prefHeight="400.0" prefWidth="600.0">
 
-    <center>
-        <VBox BorderPane.alignment="CENTER">
-            <ScrollPane fitToWidth="true">
-                <content>
-                    <VBox fx:id="datosVBox" spacing="8">
-                        <padding>
-                            <Insets bottom="10" left="10" right="10" top="10" />
-                        </padding>
-                        <Label fx:id="nombreLabel" text="%nombre.label" />
-                        <Label fx:id="aliasLabel" text="%alias.label" />
-                        <Label fx:id="animagusLabel" text="%animagus.label" />
-                        <Label fx:id="bloodStatusLabel" text="%bloodStatus.label" />
-                        <Label fx:id="boggartLabel" text="%boggart.label" />
-                        <Label fx:id="nacidoLabel" text="%nacido.label" />
-                        <Label fx:id="fallecidoLabel" text="%fallecido.label" />
-                        <Label fx:id="colorOjosLabel" text="%colorOjos.label" />
-                        <Label fx:id="familiaresLabel" text="%familiares.label" />
-                        <Label fx:id="generoLabel" text="%genero.label" />
-                        <Label fx:id="colorPeloLabel" text="%colorPelo.label" />
-                        <Label fx:id="alturaLabel" text="%altura.label" />
-                        <Label fx:id="casaLabel" text="%casa.label" />
-                        <Label fx:id="imagenLabel" text="%imagen.label" />
-                        <Label fx:id="trabajosLabel" text="%trabajos.label" />
-                        <Label fx:id="estadoCivilLabel" text="%estadoCivil.label" />
-                        <Label fx:id="nacionalidadLabel" text="%nacionalidad.label" />
-                        <Label fx:id="patronusLabel" text="%patronus.label" />
-                        <Label fx:id="romancesLabel" text="%romances.label" />
-                        <Label fx:id="colorPielLabel" text="%colorPiel.label" />
-                        <Label fx:id="especieLabel" text="%especie.label" />
-                        <Label fx:id="titulosLabel" text="%titulos.label" />
-                        <Label fx:id="varitasLabel" text="%varitas.label" />
-                        <Label fx:id="pesoLabel" text="%peso.label" />
-                    </VBox>
-                </content>
-            </ScrollPane>
-        </VBox>
-    </center>
+        <left>
+            <VBox alignment="CENTER" spacing="10">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10" />
+                </padding>
+                <ImageView fx:id="imageView" fitHeight="250" fitWidth="200" preserveRatio="true" />
+            </VBox>
+        </left>
 
-    <bottom>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
-            </padding>
-            <Button fx:id="actualizarButton" text="%actualizar.button" onAction="#handleActualizar">
-                <HBox.margin>
-                    <Insets left="220.0" />
-                </HBox.margin>
-            </Button>
-            <Button fx:id="exportarButton" text="%exportar.button" onAction="#handleExportar"/>
-            <Button fx:id="eliminarButton" text="%eliminar.button" onAction="#handleEliminar"/>
-        </HBox>
-    </bottom>
+        <center>
+            <VBox BorderPane.alignment="CENTER">
+                <ScrollPane fitToWidth="true">
+                    <content>
+                        <VBox fx:id="datosVBox" spacing="8">
+                            <padding>
+                                <Insets bottom="10" left="10" right="10" top="10" />
+                            </padding>
+                            <Label fx:id="nombreLabel" text="%nombre.label" />
+                            <Label fx:id="aliasLabel" text="%alias.label" />
+                            <Label fx:id="animagusLabel" text="%animagus.label" />
+                            <Label fx:id="bloodStatusLabel" text="%bloodStatus.label" />
+                            <Label fx:id="boggartLabel" text="%boggart.label" />
+                            <Label fx:id="nacidoLabel" text="%nacido.label" />
+                            <Label fx:id="fallecidoLabel" text="%fallecido.label" />
+                            <Label fx:id="colorOjosLabel" text="%colorOjos.label" />
+                            <Label fx:id="familiaresLabel" text="%familiares.label" />
+                            <Label fx:id="generoLabel" text="%genero.label" />
+                            <Label fx:id="colorPeloLabel" text="%colorPelo.label" />
+                            <Label fx:id="alturaLabel" text="%altura.label" />
+                            <Label fx:id="casaLabel" text="%casa.label" />
+                            <Label fx:id="imagenLabel" text="%imagen.label" />
+                            <Label fx:id="trabajosLabel" text="%trabajos.label" />
+                            <Label fx:id="estadoCivilLabel" text="%estadoCivil.label" />
+                            <Label fx:id="nacionalidadLabel" text="%nacionalidad.label" />
+                            <Label fx:id="patronusLabel" text="%patronus.label" />
+                            <Label fx:id="romancesLabel" text="%romances.label" />
+                            <Label fx:id="colorPielLabel" text="%colorPiel.label" />
+                            <Label fx:id="especieLabel" text="%especie.label" />
+                            <Label fx:id="titulosLabel" text="%titulos.label" />
+                            <Label fx:id="varitasLabel" text="%varitas.label" />
+                            <Label fx:id="pesoLabel" text="%peso.label" />
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </VBox>
+        </center>
 
-</BorderPane>
+        <bottom>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10" />
+                </padding>
+                <Button fx:id="actualizarButton" text="%actualizar.button" onAction="#handleActualizar">
+                    <HBox.margin>
+                        <Insets left="220.0" />
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="exportarButton" text="%exportar.button" onAction="#handleExportar"/>
+                <Button fx:id="eliminarButton" text="%eliminar.button" onAction="#handleEliminar"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
+
+    <Button text="X" fx:id="closeButton" onAction="#cerrarVentana" StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets top="8" right="8"/>
+        </StackPane.margin>
+    </Button>
+
+</StackPane>

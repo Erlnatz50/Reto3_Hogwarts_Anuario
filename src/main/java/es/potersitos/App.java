@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.paint.Color; // NECESARIO
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,10 @@ public class App extends Application {
      */
     @Override
     public void start(Stage stage) {
+        // Declarar FXMLLoader fuera del try para que sea accesible, aunque no es estrictamente
+        // necesario para tu código actual, es buena práctica si lo necesitaras después.
+        FXMLLoader loaded = null;
+
         try{
             // Detectar el idioma del sistema
             //Locale locale = Locale.getDefault();
@@ -49,10 +55,15 @@ public class App extends Application {
             bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: ventana.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"), bundle);
+            loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"), bundle);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
+
+            // ===================================================================
+            // [CORRECCIÓN CLAVE]: Hace el fondo de la Scene transparente.
+            // ===================================================================
+            scene.setFill(Color.TRANSPARENT);
 
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
@@ -75,10 +86,14 @@ public class App extends Application {
             stage.setMinHeight(450);
             stage.setMaxWidth(700);
             stage.setMaxHeight(450);
+
+            // [MANTENIDO]: Elimina los bordes nativos del sistema.
+            stage.initStyle(StageStyle.TRANSPARENT);
+
             stage.show();
 
         } catch (Exception e) {
-            logger.error("Error al intentar cargar la aplicación {}", e.getMessage());
+            logger.error("Error al intentar cargar la aplicación {}", e.getMessage(), e); // Añadida 'e' para log completo
             Alert alerta = new Alert(Alert.AlertType.ERROR);
             alerta.setTitle("Error");
             alerta.setHeaderText("Error al iniciar la aplicación");
@@ -105,5 +120,4 @@ public class App extends Application {
         logger.info("Iniciando aplicación JavaFX...");
         launch();
     }
-
 }

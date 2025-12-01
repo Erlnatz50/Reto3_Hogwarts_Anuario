@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage; // NECESARIO para obtener la ventana
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +31,14 @@ public class ControladorDatos implements Initializable {
     // =======================================================
     // Elementos FXML (Deben coincidir con fx:id del FXML)
     // =======================================================
+
     @FXML
     private ImageView imageView;
 
     @FXML
     private VBox datosVBox;
 
-    // Elementos inyectados para mostrar datos
+    // Elementos inyectados para mostrar datos (Labels)
     @FXML private Label nombreLabel;
     @FXML private Label aliasLabel;
     @FXML private Label animagusLabel;
@@ -62,14 +64,13 @@ public class ControladorDatos implements Initializable {
     @FXML private Label varitasLabel;
     @FXML private Label pesoLabel;
 
-    @FXML
-    private Button actualizarButton;
+    // Botones de acción inferior
+    @FXML private Button actualizarButton;
+    @FXML private Button exportarButton;
+    @FXML private Button eliminarButton;
 
-    @FXML
-    private Button exportarButton;
-
-    @FXML
-    private Button eliminarButton;
+    // [NUEVO] Inyección del botón de cierre (fx:id="closeButton")
+    @FXML private Button closeButton;
 
     /**
      * Método de inicialización.
@@ -97,22 +98,21 @@ public class ControladorDatos implements Initializable {
         try {
             // La ruta es relativa al classpath. Nota que la ruta empieza con '/'
             // y luego sigue la estructura de paquetes/carpetas que creaste.
-            String rutaImagen = "/es/potersitos/img/aamir_loonat.jpg";
+            String rutaImagen = "/es/potersitos/img/foto.png"; // Usando foto.png
 
-            Image image = new Image(getClass().getResourceAsStream("/es/potersitos/img/foto.png"));
+            Image image = new Image(getClass().getResourceAsStream(rutaImagen));
             imageView.setImage(image);
 
             logger.info("Imagen cargada con éxito desde: " + rutaImagen);
 
         } catch (Exception e) {
             // Si la imagen no se encuentra, esto registrará un error útil.
-            logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/aamir_loonat.jpg", e);
-            // Opcional: Cargar una imagen de "No disponible"
-            // imageView.setImage(new Image(getClass().getResourceAsStream("/ruta/a/no_disponible.png")));
+            logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png", e);
         }
 
         // 2. Actualizar los Labels con datos de ejemplo
         // Se concatena la etiqueta traducida (%nombre.label) con el valor real.
+        // Se asume que el bundle existe y contiene las claves.
 
         nombreLabel.setText(bundle.getString("nombre.label") + ": Harry James Potter");
         aliasLabel.setText(bundle.getString("alias.label") + ": El Niño que Vivió");
@@ -143,6 +143,19 @@ public class ControladorDatos implements Initializable {
     // =======================================================
     // Métodos de Acción
     // =======================================================
+
+    /**
+     * [NUEVO] Maneja el clic en el botón de cierre ('X').
+     * Cierra la ventana (Stage) actual.
+     */
+    @FXML
+    private void cerrarVentana(ActionEvent event) {
+        logger.info("Botón de cierre ('X') presionado. Cerrando ventana.");
+
+        // Obtener la Stage (ventana) a partir del elemento que disparó el evento
+        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+        stage.close();
+    }
 
     /**
      * Maneja el clic en el botón Actualizar.
