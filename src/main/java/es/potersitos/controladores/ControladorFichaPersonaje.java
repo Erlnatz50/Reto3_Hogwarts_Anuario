@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.StageStyle;
+
 import java.util.ResourceBundle;
 
 public class ControladorFichaPersonaje {
@@ -58,6 +60,7 @@ public class ControladorFichaPersonaje {
             }
             stage.setTitle("Datos del Personaje");
             stage.setScene(new javafx.scene.Scene(root));
+            stage.initStyle(StageStyle.TRANSPARENT);
             stage.show();
         } catch (java.io.IOException e) {
             e.printStackTrace();
