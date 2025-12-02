@@ -1,0 +1,102 @@
+Jasper<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61d56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ficha_personaje" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+	<parameter name="Nombre" class="java.lang.String"/>
+	<parameter name="Alias" class="java.lang.String"/>
+	<parameter name="Casa" class="java.lang.String"/>
+	<parameter name="Genero" class="java.lang.String"/>
+	<parameter name="Especie" class="java.lang.String"/>
+	<parameter name="Ojos" class="java.lang.String"/>
+	<parameter name="Pelo" class="java.lang.String"/>
+	<parameter name="Piel" class="java.lang.String"/>
+	<parameter name="Patronus" class="java.lang.String"/>
+	<parameter name="Imagen" class="java.io.InputStream"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="79" uuid="1a33f6a9-0b0e-4017-952a-1b53a5b36dd4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ficha de Personaje - Hogwarts]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="400" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="10" width="150" height="150" uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef"/>
+				<imageExpression><![CDATA[$P{Imagen}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="170" y="10" width="380" height="30" uuid="b2c3d4e5-f678-9012-3456-7890abcdef12"/>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nombre: " + $P{Nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="50" width="380" height="20" uuid="c3d4e5f6-7890-1234-5678-90abcdef1234"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Alias: " + $P{Alias}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="80" width="380" height="20" uuid="d4e5f678-9012-3456-7890-abcdef123456"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Casa: " + $P{Casa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="110" width="380" height="20" uuid="e5f67890-1234-5678-90ab-cdef12345678"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Género: " + $P{Genero}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="140" width="380" height="20" uuid="f6789012-3456-7890-abcd-ef1234567890"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Especie: " + $P{Especie}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="180" width="270" height="20" uuid="01234567-890a-bcde-f012-34567890abcd"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Color de Ojos: " + $P{Ojos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="180" width="270" height="20" uuid="12345678-90ab-cdef-0123-4567890abcde"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Color de Pelo: " + $P{Pelo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="210" width="270" height="20" uuid="23456789-0abc-def0-1234-567890abcdef"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Color de Piel: " + $P{Piel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="210" width="270" height="20" uuid="34567890-abcd-ef01-2345-67890abcdef0"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Patronus: " + $P{Patronus}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

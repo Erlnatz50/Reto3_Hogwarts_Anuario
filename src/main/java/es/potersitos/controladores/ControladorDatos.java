@@ -15,6 +15,16 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Controlador para la ventana de datos de personajes.
@@ -39,38 +49,66 @@ public class ControladorDatos implements Initializable {
     private VBox datosVBox;
 
     // Elementos inyectados para mostrar datos (Labels)
-    @FXML private Label nombreLabel;
-    @FXML private Label aliasLabel;
-    @FXML private Label animagusLabel;
-    @FXML private Label bloodStatusLabel;
-    @FXML private Label boggartLabel;
-    @FXML private Label nacidoLabel;
-    @FXML private Label fallecidoLabel;
-    @FXML private Label colorOjosLabel;
-    @FXML private Label familiaresLabel;
-    @FXML private Label generoLabel;
-    @FXML private Label colorPeloLabel;
-    @FXML private Label alturaLabel;
-    @FXML private Label casaLabel;
-    @FXML private Label imagenLabel;
-    @FXML private Label trabajosLabel;
-    @FXML private Label estadoCivilLabel;
-    @FXML private Label nacionalidadLabel;
-    @FXML private Label patronusLabel;
-    @FXML private Label romancesLabel;
-    @FXML private Label colorPielLabel;
-    @FXML private Label especieLabel;
-    @FXML private Label titulosLabel;
-    @FXML private Label varitasLabel;
-    @FXML private Label pesoLabel;
+    @FXML
+    private Label nombreLabel;
+    @FXML
+    private Label aliasLabel;
+    @FXML
+    private Label animagusLabel;
+    @FXML
+    private Label bloodStatusLabel;
+    @FXML
+    private Label boggartLabel;
+    @FXML
+    private Label nacidoLabel;
+    @FXML
+    private Label fallecidoLabel;
+    @FXML
+    private Label colorOjosLabel;
+    @FXML
+    private Label familiaresLabel;
+    @FXML
+    private Label generoLabel;
+    @FXML
+    private Label colorPeloLabel;
+    @FXML
+    private Label alturaLabel;
+    @FXML
+    private Label casaLabel;
+    @FXML
+    private Label imagenLabel;
+    @FXML
+    private Label trabajosLabel;
+    @FXML
+    private Label estadoCivilLabel;
+    @FXML
+    private Label nacionalidadLabel;
+    @FXML
+    private Label patronusLabel;
+    @FXML
+    private Label romancesLabel;
+    @FXML
+    private Label colorPielLabel;
+    @FXML
+    private Label especieLabel;
+    @FXML
+    private Label titulosLabel;
+    @FXML
+    private Label varitasLabel;
+    @FXML
+    private Label pesoLabel;
 
     // Botones de acción inferior
-    @FXML private Button actualizarButton;
-    @FXML private Button exportarButton;
-    @FXML private Button eliminarButton;
+    @FXML
+    private Button actualizarButton;
+    @FXML
+    private Button exportarButton;
+    @FXML
+    private Button eliminarButton;
 
     // [NUEVO] Inyección del botón de cierre (fx:id="closeButton")
-    @FXML private Button closeButton;
+    @FXML
+    private Button closeButton;
 
     /**
      * Método de inicialización.
@@ -107,7 +145,9 @@ public class ControladorDatos implements Initializable {
 
         } catch (Exception e) {
             // Si la imagen no se encuentra, esto registrará un error útil.
-            logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png", e);
+            logger.error(
+                    "Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png",
+                    e);
         }
 
         // 2. Actualizar los Labels con datos de ejemplo
@@ -176,7 +216,41 @@ public class ControladorDatos implements Initializable {
     @FXML
     public void handleExportar(ActionEvent event) {
         logger.info("Botón Exportar presionado");
-        mostrarAlerta("Exportar", "Funcionalidad de exportar ejecutada.");
+        try {
+            // 1. Cargar el reporte
+            InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml");
+            if (reportStream == null) {
+                mostrarAlerta("Error", "No se encuentra el archivo del reporte.");
+                return;
+            }
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+            // 2. Preparar parámetros
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("Nombre", obtenerValor(nombreLabel));
+            parameters.put("Alias", obtenerValor(aliasLabel));
+            parameters.put("Casa", obtenerValor(casaLabel));
+            parameters.put("Genero", obtenerValor(generoLabel));
+            parameters.put("Especie", obtenerValor(especieLabel));
+            parameters.put("Ojos", obtenerValor(colorOjosLabel));
+            parameters.put("Pelo", obtenerValor(colorPeloLabel));
+            parameters.put("Piel", obtenerValor(colorPielLabel));
+            parameters.put("Patronus", obtenerValor(patronusLabel));
+
+            // Imagen
+            InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/foto.png");
+            parameters.put("Imagen", imagenStream);
+
+            // 3. Llenar el reporte
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+
+            // 4. Mostrar visor
+            JasperViewer.viewReport(jasperPrint, false);
+
+        } catch (JRException e) {
+            logger.error("Error al exportar el reporte", e);
+            mostrarAlerta("Error", "Falló la exportación: " + e.getMessage());
+        }
     }
 
     /**
@@ -197,5 +271,15 @@ public class ControladorDatos implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(contenido);
         alert.showAndWait();
+    }
+
+    private String obtenerValor(Label label) {
+        if (label == null || label.getText() == null)
+            return "";
+        String text = label.getText();
+        if (text.contains(": ")) {
+            return text.split(": ", 2)[1];
+        }
+        return text;
     }
 }
