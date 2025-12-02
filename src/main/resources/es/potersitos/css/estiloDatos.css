@@ -1,23 +1,21 @@
 /* =======================================================
- * ESTILOS GENERALES Y FONDO DE VENTANA
+ * FONDO DE VENTANA (antes .root, ahora SOLO mainRoot)
  * ======================================================= */
 
-/* Selector para el BorderPane principal (el elemento raíz: .root) */
-.root {
-    /* Fondo principal: marrón/café oscuro (#958c71) */
-    -fx-background-color: #958c71 !important;
-
-    /* BORDES REDONDEADOS */
+#mainRoot {
+    -fx-background-color: #958c71;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
-
-    /* Borde exterior visible */
     -fx-border-color: #3d3429;
     -fx-border-width: 3;
     -fx-padding: 5;
 }
 
-/* Forzamos la transparencia de todos los contenedores (VBox y HBox) */
+
+/* =======================================================
+ * VBOX y HBOX transparentes
+ * ======================================================= */
+
 .vbox, .hbox {
     -fx-background-color: transparent;
 }
@@ -27,26 +25,21 @@
  * ESTILOS DE DATOS Y SCROLLPANE
  * ======================================================= */
 
-/* Estilo para todos los Labels de datos */
 .label {
-    /* Color del texto: negro */
     -fx-text-fill: #000000 !important;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
-/* El ScrollPane debe ser transparente */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
 
-/* CORRECCIÓN CRÍTICA: La vista interior del ScrollPane DEBE ser transparente */
 .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 
-/* Forzamos el color de fondo del contenido dentro del ScrollPane a transparente */
 #datosVBox {
     -fx-background-color: transparent;
 }
@@ -56,7 +49,6 @@
  * ESTILOS DE LA IMAGEN
  * ======================================================= */
 
-/* Estilo para la imagen (añade un borde y sombra para destacarla) */
 #imageView {
     -fx-border-color: #e6e6e6;
     -fx-border-width: 2;
@@ -65,28 +57,27 @@
 
 
 /* =======================================================
- * ESTILOS DE BOTONES
+ * BOTONES
  * ======================================================= */
 
 .button {
-    -fx-background-color: transparent; /* Fondo transparente */
-    -fx-text-fill: #000000; /* Texto oscuro */
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
     -fx-font-weight: bold;
-    -fx-border-color: #000000; /* Borde negro */
+    -fx-border-color: #000000;
     -fx-border-radius: 3;
     -fx-border-width: 1.5;
     -fx-padding: 5 10 5 10;
 }
 
-/* [MODIFICADO] Estilo al pasar el ratón por encima de los botones inferiores */
-/* Usamos un color de fondo sólido más oscuro para que el cambio sea muy visible */
 .button:hover {
-    -fx-background-color: #6d6254; /* Un marrón más oscuro y sólido */
-    -fx-text-fill: #ffffff;      /* Cambiamos el texto a blanco para un mejor contraste */
+    -fx-background-color: #6d6254;
+    -fx-text-fill: #ffffff;
 }
 
+
 /* =======================================================
- * ESTILOS DEL BOTÓN DE CIERRE ('X')
+ * BOTÓN DE CIERRE ('X')
  * ======================================================= */
 
 #closeButton {
@@ -99,37 +90,30 @@
     -fx-background-radius: 5;
 }
 
-/* [CORREGIDO] Estilo hover del botón de cierre */
 #closeButton:hover {
     -fx-text-fill: white;
 }
 
 
 /* =======================================================
- * ESTILOS DE LA BARRA DE DESPLAZAMIENTO (SCROLLBAR)
+ * SCROLLBARS
  * ======================================================= */
 
-/* Estilo de la barra de desplazamiento (Scrollbar) para que sea oscura */
 .scroll-bar:vertical {
     -fx-background-color: #55483a;
     -fx-border-color: #211f1a;
     -fx-border-width: 0 0 0 1;
 }
 
-/* La pista de la barra de desplazamiento */
 .scroll-bar:vertical .track {
     -fx-background-color: #ffffff;
-    -fx-background-insets: 0;
 }
 
-/* La parte arrastrable de la barra (el pulgar) */
 .scroll-bar:vertical .thumb {
     -fx-background-color: #55483a;
     -fx-background-radius: 5;
-    -fx-background-insets: 2;
 }
 
-/* Esquina de la barra de desplazamiento */
 .corner {
     -fx-background-color: #55483a;
 }
