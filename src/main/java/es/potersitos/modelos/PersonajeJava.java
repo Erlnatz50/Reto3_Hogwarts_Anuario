@@ -4,32 +4,41 @@ import java.util.List;
 
 public class PersonajeJava {
 
-    public String id;
-    public String type;
-    public String slug;
     public String name;
+
     public List<String> alias_names;
-    public String animagus;
-    public String blood_status;
-    public String boggart;
-    public String born;
-    public String died;
-    public String eye_color;
     public List<String> family_members;
-    public String gender;
-    public String hair_color;
-    public String height;
-    public String house;
-    public List<String> jobs;
-    public String marital_status;
-    public String nationality;
-    public String patronus;
     public List<String> romances;
-    public String skin_color;
-    public String species;
+    public List<String> jobs;
     public List<String> titles;
+
+    public String description;
+
     public List<String> wands;
-    public String weight;
-    public String wiki;
-    public String image_blob; // Base64
+    public String school_ship;
+
+    public String image;
+    public String image_blob;
+
+    // Campos opcionales (si los necesitas después)
+    public String animagus;
+    public String bloodStatus;
+    public String boggart;
+    public String nacido;
+    public String fallecido;
+    public String colorOjos;
+    public String familiares;
+    public String genero;
+    public String colorPelo;
+    public String altura;
+    public String casa;
+    public String imagen;
+    public String trabajos;
+    public String estadoCivil;
+    public String nacionalidad;
+    public String patronus;
+    public String colorPiel;
+    public String especie;
+    public String varitas;
+    public String peso;
 }
