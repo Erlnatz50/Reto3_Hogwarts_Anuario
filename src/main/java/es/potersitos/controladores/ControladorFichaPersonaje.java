@@ -4,12 +4,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-
+import javafx.scene.image.Image; // Añadido para la carga de imagen en setData (aunque sea comentado)
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
+import javafx.scene.paint.Color; // Necesario para la transparencia de la Scene
 
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 public class ControladorFichaPersonaje {
@@ -49,21 +51,46 @@ public class ControladorFichaPersonaje {
     private void handleCardClick(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
-            if (resources != null) {
-                loader.setResources(resources);
+
+            // ===================================================================
+            // [CORRECCIÓN CLAVE]: Asegurar que el ResourceBundle esté cargado
+            // ===================================================================
+            if (resources == null) {
+                // Si el Bundle es nulo, lo cargamos manualmente.
+                // "es.potersitos.mensaje" es el nombre base de tus archivos .properties
+                resources = ResourceBundle.getBundle("es.potersitos.mensaje");
             }
+            loader.setResources(resources);
+
+            // Cargar el FXML
             javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = new javafx.stage.Stage();
+
+            // Configurar la Scene ANTES de añadirla al Stage
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+
+            // [CORRECCIÓN]: Establecer el fondo de la Scene a transparente para que
+            // las esquinas redondeadas del CSS se vean correctamente.
+            scene.setFill(Color.TRANSPARENT);
+
+            // Cargar CSS
             var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
             if (archivoCSS != null) {
-                root.getStylesheets().add(archivoCSS.toExternalForm());
+                scene.getStylesheets().add(archivoCSS.toExternalForm());
             }
+
+            // Configurar el Stage
+            javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setTitle("Datos del Personaje");
-            stage.setScene(new javafx.scene.Scene(root));
+            stage.setScene(scene);
+
+            // Eliminar los bordes nativos del sistema
             stage.initStyle(StageStyle.TRANSPARENT);
+
             stage.show();
-        } catch (java.io.IOException e) {
+
+        } catch (IOException e) {
+            System.err.println("Error al cargar la ventana de datos: " + e.getMessage());
             e.printStackTrace();
         }
-    }}
-
+    }
+}
