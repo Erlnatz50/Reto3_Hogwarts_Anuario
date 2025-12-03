@@ -63,8 +63,15 @@ public class ControladorVisualizarPersonajes implements Initializable {
         // Load all characters initially
         cargarPersonajes(listaPersonajes);
 
-        // Set up search field listener (Enter key)
-        searchField.setOnAction(event -> filtrarPersonajes());
+        // =======================================================================================
+        // [MODIFICACIÓN] 1. Eliminar el listener de Enter (searchField.setOnAction)
+        // [MODIFICACIÓN] 2. Añadir el listener a la propiedad de texto para filtrar en tiempo real
+        // =======================================================================================
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrarPersonajes();
+        });
+
+        // El método searchField.setOnAction(event -> filtrarPersonajes()); se ha eliminado.
     }
 
     private void inicializarDatosPrueba() {
@@ -88,10 +95,13 @@ public class ControladorVisualizarPersonajes implements Initializable {
         for (Personaje p : personajes) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
+                // Pasamos el ResourceBundle al FXMLLoader antes de cargarlo
+                loader.setResources(resources);
                 VBox card = loader.load();
 
                 ControladorFichaPersonaje controller = loader.getController();
-                controller.setResources(resources);
+                // Ya no es necesario setResources en el controlador si se pasa al loader
+                // controller.setResources(resources);
                 controller.setData(p.nombre, p.casa, p.imagePath);
 
                 tilePanePersonajes.getChildren().add(card);
@@ -129,6 +139,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
     @FXML
     private void aplicarFiltros() {
+        // Este método aún es útil para aplicar los filtros de CheckBox después de seleccionarlos
         filtrarPersonajes();
     }
 
@@ -160,6 +171,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.casa))
                 .collect(Collectors.toList());
 
+        logger.debug("Filtro aplicado. Coincidencias encontradas: " + filtrados.size());
         cargarPersonajes(filtrados);
     }
 }
