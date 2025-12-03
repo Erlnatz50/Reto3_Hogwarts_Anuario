@@ -2,12 +2,18 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <VBox fx:id="cardBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#handleCardClick" prefHeight="200.0" prefWidth="180.0" styleClass="character-card" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorFichaPersonaje">
    <children>
+      <CheckBox fx:id="checkBoxSeleccionar" visible="false" mnemonicParsing="false" text="" StackPane.alignment="TOP_RIGHT">
+         <VBox.margin>
+            <Insets right="5.0" top="5.0" />
+         </VBox.margin>
+      </CheckBox>
       <ImageView fx:id="imagePersonaje" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true">
          <VBox.margin>
             <Insets bottom="10.0" top="10.0" />
