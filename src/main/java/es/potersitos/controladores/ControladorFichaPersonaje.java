@@ -2,8 +2,8 @@ package es.potersitos.controladores;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -27,23 +27,20 @@ public class ControladorFichaPersonaje {
     @FXML
     private Label labelCasa;
 
-    // [NUEVO CAMPO] Almacena el identificador único
-    private String personajeSlug;
+    @FXML
+    private CheckBox checkBoxSeleccionar;
 
     private ResourceBundle resources;
+    private String personajeSlug;
+    private boolean isSelectionMode = false;
 
     public void setResources(ResourceBundle resources) {
         this.resources = resources;
     }
 
-    /**
-     * [NUEVO MÉTODO] Setter para recibir y almacenar el SLUG.
-     * Es llamado desde ControladorVisualizarPersonajes.
-     */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
     }
-
 
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
@@ -51,7 +48,8 @@ public class ControladorFichaPersonaje {
         // Placeholder for image loading logic
         try {
             // In a real app, load from resource or URL
-            // imagePersonaje.setImage(new Image(getClass().getResourceAsStream(imagePath)));
+            // imagePersonaje.setImage(new
+            // Image(getClass().getResourceAsStream(imagePath)));
         } catch (Exception e) {
             System.err.println("Error loading image: " + e.getMessage());
         }
@@ -59,48 +57,50 @@ public class ControladorFichaPersonaje {
 
     @FXML
     private void handleCardClick(MouseEvent event) {
+        if (isSelectionMode) {
+            checkBoxSeleccionar.setSelected(!checkBoxSeleccionar.isSelected());
+            return;
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
 
-            // ===================================================================
-            // [CORRECCIÓN CLAVE]: Asegurar que el ResourceBundle esté cargado
-            // ===================================================================
             if (resources == null) {
-                // Carga de respaldo si el bundle no fue inyectado
-                resources = ResourceBundle.getBundle("es.potersitos.mensaje");
+                try {
+                    resources = ResourceBundle.getBundle("es.potersitos.mensaje");
+                } catch (Exception e) {
+                    // Ignore if bundle not found
+                }
             }
-            loader.setResources(resources);
+            if (resources != null) {
+                loader.setResources(resources);
+            }
 
-            // Cargar el FXML
             javafx.scene.Parent root = loader.load();
 
-            // [NUEVO] Obtener el controlador de la ventana de datos
+            // Pass slug to ControladorDatos
             ControladorDatos controladorDatos = loader.getController();
-
-            // [CRÍTICO] Pasar el SLUG almacenado a la ventana de destino
             if (this.personajeSlug != null) {
                 controladorDatos.setPersonajeSlug(this.personajeSlug);
             }
-            // ===================================================================
 
-            // Configurar la Scene ANTES de añadirla al Stage
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
 
-            // Establecer el fondo de la Scene a transparente
-            scene.setFill(Color.TRANSPARENT);
-
-            // Cargar CSS
-            var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
-            if (archivoCSS != null) {
-                scene.getStylesheets().add(archivoCSS.toExternalForm());
+            // Try to load CSS if it exists
+            try {
+                var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
+                if (archivoCSS != null) {
+                    scene.getStylesheets().add(archivoCSS.toExternalForm());
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading CSS: " + e.getMessage());
             }
 
-            // Configurar el Stage
             javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setTitle("Datos del Personaje");
             stage.setScene(scene);
 
-            // Eliminar los bordes nativos del sistema
+            // Remove system borders
             stage.initStyle(StageStyle.TRANSPARENT);
 
             stage.show();
@@ -109,5 +109,23 @@ public class ControladorFichaPersonaje {
             System.err.println("Error al cargar la ventana de datos: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void setSelectionMode(boolean active) {
+        this.isSelectionMode = active;
+        if (checkBoxSeleccionar != null) {
+            checkBoxSeleccionar.setVisible(active);
+            if (!active) {
+                checkBoxSeleccionar.setSelected(false);
+            }
+        }
+    }
+
+    public boolean isSelected() {
+        return checkBoxSeleccionar != null && checkBoxSeleccionar.isSelected();
+    }
+
+    public String getNombre() {
+        return labelNombre.getText();
     }
 }

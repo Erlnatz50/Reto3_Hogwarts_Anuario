@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -35,6 +37,14 @@ public class ControladorVisualizarPersonajes implements Initializable {
     @FXML
     private TextField searchField;
 
+    @FXML
+    private Button btnSeleccionar;
+
+    @FXML
+    private Button btnExportar;
+
+    private List<ControladorFichaPersonaje> listaControladores = new ArrayList<>();
+
     private ResourceBundle resources;
 
     // Inner class to represent a character
@@ -44,7 +54,8 @@ public class ControladorVisualizarPersonajes implements Initializable {
         String imagePath;
         String slug; // <--- CAMBIO 1: Añadido SLUG
 
-        public Personaje(String nombre, String casa, String imagePath, String slug) { // <--- CAMBIO 2: Constructor con SLUG
+        public Personaje(String nombre, String casa, String imagePath, String slug) { // <--- CAMBIO 2: Constructor con
+                                                                                      // SLUG
             this.nombre = nombre;
             this.casa = casa;
             this.imagePath = imagePath;
@@ -65,7 +76,8 @@ public class ControladorVisualizarPersonajes implements Initializable {
         // Load all characters initially
         cargarPersonajes(listaPersonajes);
 
-        // 1. Configurar el listener de texto para filtrar en tiempo real (manteniendo el cambio)
+        // 1. Configurar el listener de texto para filtrar en tiempo real (manteniendo
+        // el cambio)
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filtrarPersonajes();
         });
@@ -93,6 +105,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
     private void cargarPersonajes(List<Personaje> personajes) {
         tilePanePersonajes.getChildren().clear();
+        listaControladores.clear();
         for (Personaje p : personajes) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
@@ -104,9 +117,11 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 // [MODIFICADO] Pasamos el SLUG. Asumo que setData en el controlador de ficha
                 // o un método similar puede manejar el slug.
                 controller.setData(p.nombre, p.casa, p.imagePath);
-                // [IMPORTANTE] Llamamos a setPersonajeSlug para asegurar que el slug llega al controlador
+                // [IMPORTANTE] Llamamos a setPersonajeSlug para asegurar que el slug llega al
+                // controlador
                 controller.setPersonajeSlug(p.slug);
 
+                listaControladores.add(controller);
                 tilePanePersonajes.getChildren().add(card);
             } catch (IOException e) {
                 logger.error("Error al cargar la ficha del personaje", e);
@@ -137,7 +152,6 @@ public class ControladorVisualizarPersonajes implements Initializable {
             }
         }
     }
-
 
     @FXML
     private void toggleFilterPanel() {
@@ -200,5 +214,50 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
         logger.debug("Filtro aplicado. Coincidencias encontradas: " + filtrados.size());
         cargarPersonajes(filtrados);
+    }
+
+    @FXML
+    private void toggleSelectionMode() {
+        boolean isSelectionMode = btnExportar.isVisible();
+        // Toggle state
+        isSelectionMode = !isSelectionMode;
+
+        btnExportar.setVisible(isSelectionMode);
+        btnExportar.setManaged(isSelectionMode);
+
+        if (isSelectionMode) {
+            btnSeleccionar.setText("CANCELAR");
+        } else {
+            btnSeleccionar.setText("SELECCIONAR");
+        }
+
+        for (ControladorFichaPersonaje controller : listaControladores) {
+            controller.setSelectionMode(isSelectionMode);
+        }
+    }
+
+    @FXML
+    private void exportarSeleccionados() {
+        List<String> seleccionados = new ArrayList<>();
+        for (ControladorFichaPersonaje controller : listaControladores) {
+            if (controller.isSelected()) {
+                seleccionados.add(controller.getNombre());
+            }
+        }
+
+        if (seleccionados.isEmpty()) {
+            mostrarAlerta("Exportar", "No has seleccionado ningún personaje.");
+        } else {
+            mostrarAlerta("Exportar", "Exportando: " + String.join(", ", seleccionados));
+            // Aquí iría la lógica real de exportación (JasperReports, CSV, etc.)
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String contenido) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(contenido);
+        alert.showAndWait();
     }
 }
