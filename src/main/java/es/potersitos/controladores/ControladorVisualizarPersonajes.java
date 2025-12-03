@@ -42,11 +42,13 @@ public class ControladorVisualizarPersonajes implements Initializable {
         String nombre;
         String casa;
         String imagePath;
+        String slug; // <--- CAMBIO 1: Añadido SLUG
 
-        public Personaje(String nombre, String casa, String imagePath) {
+        public Personaje(String nombre, String casa, String imagePath, String slug) { // <--- CAMBIO 2: Constructor con SLUG
             this.nombre = nombre;
             this.casa = casa;
             this.imagePath = imagePath;
+            this.slug = slug;
         }
     }
 
@@ -63,15 +65,13 @@ public class ControladorVisualizarPersonajes implements Initializable {
         // Load all characters initially
         cargarPersonajes(listaPersonajes);
 
-        // =======================================================================================
-        // [MODIFICACIÓN] 1. Eliminar el listener de Enter (searchField.setOnAction)
-        // [MODIFICACIÓN] 2. Añadir el listener a la propiedad de texto para filtrar en tiempo real
-        // =======================================================================================
+        // 1. Configurar el listener de texto para filtrar en tiempo real (manteniendo el cambio)
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filtrarPersonajes();
         });
 
-        // El método searchField.setOnAction(event -> filtrarPersonajes()); se ha eliminado.
+        // 2. Configurar listeners para los CheckBoxes (manteniendo el cambio)
+        configurarListenersFiltros();
     }
 
     private void inicializarDatosPrueba() {
@@ -84,10 +84,11 @@ public class ControladorVisualizarPersonajes implements Initializable {
             else if (i % 4 == 3)
                 casa = "Ravenclaw";
 
-            listaPersonajes.add(new Personaje("Personaje " + i, casa, "path/to/image.png"));
+            // [MODIFICADO]: Pasamos un SLUG de prueba
+            listaPersonajes.add(new Personaje("Personaje " + i, casa, "path/to/image.png", "personaje-" + i));
         }
         // Add a specific one for testing search
-        listaPersonajes.add(new Personaje("Harry Potter", "Gryffindor", "path/to/image.png"));
+        listaPersonajes.add(new Personaje("Harry Potter", "Gryffindor", "path/to/image.png", "harry-potter"));
     }
 
     private void cargarPersonajes(List<Personaje> personajes) {
@@ -95,14 +96,16 @@ public class ControladorVisualizarPersonajes implements Initializable {
         for (Personaje p : personajes) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
-                // Pasamos el ResourceBundle al FXMLLoader antes de cargarlo
                 loader.setResources(resources);
                 VBox card = loader.load();
 
                 ControladorFichaPersonaje controller = loader.getController();
-                // Ya no es necesario setResources en el controlador si se pasa al loader
-                // controller.setResources(resources);
+
+                // [MODIFICADO] Pasamos el SLUG. Asumo que setData en el controlador de ficha
+                // o un método similar puede manejar el slug.
                 controller.setData(p.nombre, p.casa, p.imagePath);
+                // [IMPORTANTE] Llamamos a setPersonajeSlug para asegurar que el slug llega al controlador
+                controller.setPersonajeSlug(p.slug);
 
                 tilePanePersonajes.getChildren().add(card);
             } catch (IOException e) {
@@ -110,6 +113,31 @@ public class ControladorVisualizarPersonajes implements Initializable {
             }
         }
     }
+
+    /**
+     * Configura un listener para la propiedad 'selected' de cada CheckBox
+     * dentro del Accordion para aplicar el filtro inmediatamente.
+     */
+    private void configurarListenersFiltros() {
+        if (accordionFiltros != null) {
+            for (TitledPane pane : accordionFiltros.getPanes()) {
+                if ("Casa".equals(pane.getText())) {
+                    javafx.scene.Node content = pane.getContent();
+                    if (content instanceof VBox) {
+                        for (javafx.scene.Node node : ((VBox) content).getChildren()) {
+                            if (node instanceof CheckBox) {
+                                CheckBox cb = (CheckBox) node;
+                                cb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                                    filtrarPersonajes();
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @FXML
     private void toggleFilterPanel() {
@@ -139,7 +167,6 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
     @FXML
     private void aplicarFiltros() {
-        // Este método aún es útil para aplicar los filtros de CheckBox después de seleccionarlos
         filtrarPersonajes();
     }
 

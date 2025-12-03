@@ -2,14 +2,13 @@ package es.potersitos.controladores;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image; // Añadido para la carga de imagen en setData (aunque sea comentado)
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
-import javafx.scene.paint.Color; // Necesario para la transparencia de la Scene
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
@@ -28,11 +27,23 @@ public class ControladorFichaPersonaje {
     @FXML
     private Label labelCasa;
 
+    // [NUEVO CAMPO] Almacena el identificador único
+    private String personajeSlug;
+
     private ResourceBundle resources;
 
     public void setResources(ResourceBundle resources) {
         this.resources = resources;
     }
+
+    /**
+     * [NUEVO MÉTODO] Setter para recibir y almacenar el SLUG.
+     * Es llamado desde ControladorVisualizarPersonajes.
+     */
+    public void setPersonajeSlug(String slug) {
+        this.personajeSlug = slug;
+    }
+
 
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
@@ -40,8 +51,7 @@ public class ControladorFichaPersonaje {
         // Placeholder for image loading logic
         try {
             // In a real app, load from resource or URL
-            // imagePersonaje.setImage(new
-            // Image(getClass().getResourceAsStream(imagePath)));
+            // imagePersonaje.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         } catch (Exception e) {
             System.err.println("Error loading image: " + e.getMessage());
         }
@@ -56,8 +66,7 @@ public class ControladorFichaPersonaje {
             // [CORRECCIÓN CLAVE]: Asegurar que el ResourceBundle esté cargado
             // ===================================================================
             if (resources == null) {
-                // Si el Bundle es nulo, lo cargamos manualmente.
-                // "es.potersitos.mensaje" es el nombre base de tus archivos .properties
+                // Carga de respaldo si el bundle no fue inyectado
                 resources = ResourceBundle.getBundle("es.potersitos.mensaje");
             }
             loader.setResources(resources);
@@ -65,11 +74,19 @@ public class ControladorFichaPersonaje {
             // Cargar el FXML
             javafx.scene.Parent root = loader.load();
 
+            // [NUEVO] Obtener el controlador de la ventana de datos
+            ControladorDatos controladorDatos = loader.getController();
+
+            // [CRÍTICO] Pasar el SLUG almacenado a la ventana de destino
+            if (this.personajeSlug != null) {
+                controladorDatos.setPersonajeSlug(this.personajeSlug);
+            }
+            // ===================================================================
+
             // Configurar la Scene ANTES de añadirla al Stage
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
 
-            // [CORRECCIÓN]: Establecer el fondo de la Scene a transparente para que
-            // las esquinas redondeadas del CSS se vean correctamente.
+            // Establecer el fondo de la Scene a transparente
             scene.setFill(Color.TRANSPARENT);
 
             // Cargar CSS

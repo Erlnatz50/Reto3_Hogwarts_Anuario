@@ -5,16 +5,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage; // NECESARIO para obtener la ventana
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
+
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -23,8 +28,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+
+import es.potersitos.util.PersonajeCSVManager;
 
 /**
  * Controlador para la ventana de datos de personajes.
@@ -38,77 +43,43 @@ public class ControladorDatos implements Initializable {
     /** Bundle del sistema de internacionalización */
     private ResourceBundle bundle;
 
+    /** SLUG del personaje actual (necesario para la eliminación) */
+    private String personajeSlug;
+
     // =======================================================
     // Elementos FXML (Deben coincidir con fx:id del FXML)
     // =======================================================
 
-    @FXML
-    private ImageView imageView;
-
-    @FXML
-    private VBox datosVBox;
-
-    // Elementos inyectados para mostrar datos (Labels)
-    @FXML
-    private Label nombreLabel;
-    @FXML
-    private Label aliasLabel;
-    @FXML
-    private Label animagusLabel;
-    @FXML
-    private Label bloodStatusLabel;
-    @FXML
-    private Label boggartLabel;
-    @FXML
-    private Label nacidoLabel;
-    @FXML
-    private Label fallecidoLabel;
-    @FXML
-    private Label colorOjosLabel;
-    @FXML
-    private Label familiaresLabel;
-    @FXML
-    private Label generoLabel;
-    @FXML
-    private Label colorPeloLabel;
-    @FXML
-    private Label alturaLabel;
-    @FXML
-    private Label casaLabel;
-    @FXML
-    private Label imagenLabel;
-    @FXML
-    private Label trabajosLabel;
-    @FXML
-    private Label estadoCivilLabel;
-    @FXML
-    private Label nacionalidadLabel;
-    @FXML
-    private Label patronusLabel;
-    @FXML
-    private Label romancesLabel;
-    @FXML
-    private Label colorPielLabel;
-    @FXML
-    private Label especieLabel;
-    @FXML
-    private Label titulosLabel;
-    @FXML
-    private Label varitasLabel;
-    @FXML
-    private Label pesoLabel;
-
-    // Botones de acción inferior
-    @FXML
-    private Button actualizarButton;
-    @FXML
-    private Button exportarButton;
-    @FXML
-    private Button eliminarButton;
-
-    // [NUEVO] Inyección del botón de cierre (fx:id="closeButton")
-    @FXML
-    private Button closeButton;
+    @FXML private ImageView imageView;
+    @FXML private VBox datosVBox;
+    @FXML private Label nombreLabel;
+    @FXML private Label aliasLabel;
+    @FXML private Label animagusLabel;
+    @FXML private Label bloodStatusLabel;
+    @FXML private Label boggartLabel;
+    @FXML private Label nacidoLabel;
+    @FXML private Label fallecidoLabel;
+    @FXML private Label colorOjosLabel;
+    @FXML private Label familiaresLabel;
+    @FXML private Label generoLabel;
+    @FXML private Label colorPeloLabel;
+    @FXML private Label alturaLabel;
+    @FXML private Label casaLabel;
+    @FXML private Label imagenLabel;
+    @FXML private Label trabajosLabel;
+    @FXML private Label estadoCivilLabel;
+    @FXML private Label nacionalidadLabel;
+    @FXML private Label patronusLabel;
+    @FXML private Label romancesLabel;
+    @FXML private Label colorPielLabel;
+    @FXML private Label especieLabel;
+    @FXML private Label titulosLabel;
+    @FXML private Label varitasLabel;
+    @FXML private Label pesoLabel;
+    @FXML private Button actualizarButton;
+    @FXML private Button exportarButton;
+    @FXML private Button eliminarButton;
+    @FXML private Button closeButton;
 
     /**
      * Método de inicialización.
@@ -122,6 +93,11 @@ public class ControladorDatos implements Initializable {
         cargarDatosPrueba();
     }
 
+    // [MANTENIDO] Setter para recibir el SLUG
+    public void setPersonajeSlug(String slug) {
+        this.personajeSlug = slug;
+    }
+
     // =======================================================
     // Métodos de Lógica
     // =======================================================
@@ -131,30 +107,19 @@ public class ControladorDatos implements Initializable {
      */
     public void cargarDatosPrueba() {
         logger.debug("Cargando datos de prueba...");
-
-        // 1. Cargar imagen del personaje
         try {
-            // La ruta es relativa al classpath. Nota que la ruta empieza con '/'
-            // y luego sigue la estructura de paquetes/carpetas que creaste.
-            String rutaImagen = "/es/potersitos/img/foto.png"; // Usando foto.png
-
+            String rutaImagen = "/es/potersitos/img/foto.png";
             Image image = new Image(getClass().getResourceAsStream(rutaImagen));
             imageView.setImage(image);
-
             logger.info("Imagen cargada con éxito desde: " + rutaImagen);
-
         } catch (Exception e) {
-            // Si la imagen no se encuentra, esto registrará un error útil.
             logger.error(
                     "Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png",
                     e);
         }
 
-        // 2. Actualizar los Labels con datos de ejemplo
-        // Se concatena la etiqueta traducida (%nombre.label) con el valor real.
-        // Se asume que el bundle existe y contiene las claves.
-
         nombreLabel.setText(bundle.getString("nombre.label") + ": Harry James Potter");
+        this.personajeSlug = "harry-potter";
         aliasLabel.setText(bundle.getString("alias.label") + ": El Niño que Vivió");
         animagusLabel.setText(bundle.getString("animagus.label") + ": No");
         bloodStatusLabel.setText(bundle.getString("bloodStatus.label") + ": Mestizo");
@@ -184,22 +149,13 @@ public class ControladorDatos implements Initializable {
     // Métodos de Acción
     // =======================================================
 
-    /**
-     * [NUEVO] Maneja el clic en el botón de cierre ('X').
-     * Cierra la ventana (Stage) actual.
-     */
     @FXML
     private void cerrarVentana(ActionEvent event) {
         logger.info("Botón de cierre ('X') presionado. Cerrando ventana.");
-
-        // Obtener la Stage (ventana) a partir del elemento que disparó el evento
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.close();
     }
 
-    /**
-     * Maneja el clic en el botón Actualizar.
-     */
     @FXML
     public void handleActualizar(ActionEvent event) {
         logger.info("Botón Actualizar presionado");
@@ -210,9 +166,6 @@ public class ControladorDatos implements Initializable {
         mostrarAlerta("Actualizar", mensaje);
     }
 
-    /**
-     * Maneja el clic en el botón Exportar.
-     */
     @FXML
     public void handleExportar(ActionEvent event) {
         logger.info("Botón Exportar presionado");
@@ -227,8 +180,7 @@ public class ControladorDatos implements Initializable {
 
             // 2. Preparar parámetros
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put("Nombre", obtenerValor(nombreLabel));
-            parameters.put("Alias", obtenerValor(aliasLabel));
+            // Las llamadas a obtenerValor() que daban error
             parameters.put("Casa", obtenerValor(casaLabel));
             parameters.put("Genero", obtenerValor(generoLabel));
             parameters.put("Especie", obtenerValor(especieLabel));
@@ -253,13 +205,35 @@ public class ControladorDatos implements Initializable {
         }
     }
 
-    /**
-     * Maneja el clic en el botón Eliminar.
-     */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        logger.info("Botón Eliminar presionado");
-        mostrarAlerta("Eliminar", "Funcionalidad de eliminar ejecutada.");
+        if (personajeSlug == null || personajeSlug.isEmpty()) {
+            mostrarAlerta("Error", "No se ha cargado el identificador del personaje (slug) para eliminar.");
+            return;
+        }
+
+        logger.info("Botón Eliminar presionado para SLUG: {}", personajeSlug);
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle(bundle.getString("eliminar.confirm.titulo"));
+        confirmAlert.setHeaderText(bundle.getString("eliminar.confirm.header"));
+        confirmAlert.setContentText(bundle.getString("eliminar.confirm.contenido"));
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+
+            if (exito) {
+                mostrarAlerta("Éxito", "El personaje ha sido eliminado del registro.");
+                Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                stage.close();
+            } else {
+                mostrarAlerta("Error", "No se pudo eliminar el personaje del archivo CSV. Verifique logs.");
+            }
+        } else {
+            logger.info("Eliminación cancelada por el usuario.");
+        }
     }
 
     /**
@@ -273,13 +247,31 @@ public class ControladorDatos implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * [MEJORADO] Extrae el valor de la etiqueta asumiendo el formato "Clave: Valor".
+     */
     private String obtenerValor(Label label) {
-        if (label == null || label.getText() == null)
+        // Validación robusta: verifica si la etiqueta o su texto son nulos.
+        if (label == null) {
+            logger.warn("Se intentó obtener el valor de una etiqueta nula.");
             return "";
-        String text = label.getText();
-        if (text.contains(": ")) {
-            return text.split(": ", 2)[1];
         }
-        return text;
+        String text = label.getText();
+        if (text == null || text.trim().isEmpty()) {
+            logger.warn("La etiqueta {} no contiene texto.", label.getId());
+            return "";
+        }
+
+        // Verifica si el texto contiene el delimitador esperado
+        int separatorIndex = text.indexOf(": ");
+
+        if (separatorIndex != -1) {
+            // Devuelve la parte después de ": "
+            // Usamos substring para mayor eficiencia que split en este caso
+            return text.substring(separatorIndex + 2).trim();
+        }
+
+        // Si no hay delimitador, devuelve el texto completo (o vacío si solo hay espacios)
+        return text.trim();
     }
 }
