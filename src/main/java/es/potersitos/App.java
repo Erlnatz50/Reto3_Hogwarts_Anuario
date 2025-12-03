@@ -23,8 +23,8 @@ public class App extends Application {
         String ERROR_INIT_CONTENT = "Se ha producido un error al intentar cargar la aplicaci\u00f3n";
 
         try{
-            logger.debug("Cargando el archivo FXML: ventana.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventana.fxml"));
+            logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"));
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
