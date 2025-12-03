@@ -1,84 +1,327 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<StackPane xmlns="http://javafx.com/javafx/24.0.1"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="es.potersitos.controladores.ControladorDatos">
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorNuevoPersonaje">
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
-
-    <BorderPane prefWidth="800" prefHeight="600">
-
-        <!-- Imagen a la izquierda -->
-        <left>
-            <VBox alignment="CENTER" spacing="10">
-                <ImageView fx:id="imageView" fitWidth="200" fitHeight="250" preserveRatio="true"/>
-            </VBox>
-        </left>
-
-        <!-- Datos en el centro con ScrollPane -->
-        <center>
-            <ScrollPane fitToWidth="true" fitToHeight="true">
-                <content>
-                    <VBox fx:id="datosVBox" spacing="8">
-                        <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
-                        </padding>
-
-                        <Label fx:id="nombreLabel" text="Nombre:"/>
-                        <Label fx:id="aliasLabel" text="Alias:"/>
-                        <Label fx:id="animagusLabel" text="Animagus:"/>
-                        <Label fx:id="bloodStatusLabel" text="Blood Status:"/>
-                        <Label fx:id="boggartLabel" text="Boggart:"/>
-                        <Label fx:id="nacidoLabel" text="Nacido:"/>
-                        <Label fx:id="fallecidoLabel" text="Fallecido:"/>
-                        <Label fx:id="colorOjosLabel" text="Color de ojos:"/>
-                        <Label fx:id="familiaresLabel" text="Familiares:"/>
-                        <Label fx:id="generoLabel" text="Género:"/>
-                        <Label fx:id="colorPeloLabel" text="Color de pelo:"/>
-                        <Label fx:id="alturaLabel" text="Altura:"/>
-                        <Label fx:id="casaLabel" text="Casa:"/>
-                        <Label fx:id="imagenLabel" text="Imagen:"/>
-                        <Label fx:id="trabajosLabel" text="Trabajos:"/>
-                        <Label fx:id="estadoCivilLabel" text="Estado civil:"/>
-                        <Label fx:id="nacionalidadLabel" text="Nacionalidad:"/>
-                        <Label fx:id="patronusLabel" text="Patronus:"/>
-                        <Label fx:id="romancesLabel" text="Romances:"/>
-                        <Label fx:id="colorPielLabel" text="Color de piel:"/>
-                        <Label fx:id="especieLabel" text="Especie:"/>
-                        <Label fx:id="titulosLabel" text="Títulos:"/>
-                        <Label fx:id="varitasLabel" text="Varitas:"/>
-                        <Label fx:id="pesoLabel" text="Peso:"/>
-                    </VBox>
-                </content>
-            </ScrollPane>
-        </center>
-
-        <!-- Botones en la parte inferior -->
-        <bottom>
-            <HBox spacing="10">
+    <center>
+        <ScrollPane fitToWidth="true">
+            <GridPane hgap="15" prefHeight="380.0" prefWidth="740.0" vgap="10">
                 <padding>
-                    <Insets top="10" right="10" bottom="10" left="10"/>
+                    <Insets bottom="20" left="20" right="20" top="20" />
                 </padding>
-                <Button fx:id="actualizarButton" text="Actualizar" onAction="#handleActualizar"/>
-                <Button fx:id="exportarButton" text="Exportar" onAction="#handleExportar"/>
-                <Button fx:id="eliminarButton" text="Eliminar" onAction="#handleEliminar"/>
-            </HBox>
-        </bottom>
 
-    </BorderPane>
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20.0" />
+                    <ColumnConstraints percentWidth="50.0" />
+               <ColumnConstraints minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+               <ColumnConstraints minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                </columnConstraints>
 
-    <!-- Botón de cerrar en la esquina superior derecha -->
-    <Button fx:id="closeButton" text="X" onAction="#cerrarVentana" StackPane.alignment="TOP_RIGHT">
-        <StackPane.margin>
-            <Insets top="8" right="8"/>
-        </StackPane.margin>
-    </Button>
+                <!-- COLUMNA IZQUIERDA (10 campos) -->
+                <Label text="ID" />
+                <TextField fx:id="idField" promptText="f5a1e23b-2519-406b-8ca3-593262654410" GridPane.columnIndex="1">
+                   <tooltip>
+                      <Tooltip text="Introduce el identificador único" />
+                   </tooltip>
+                </TextField>
 
-</StackPane>
+                <Label text="Tipo" GridPane.rowIndex="1" />
+                <TextField fx:id="typeField" promptText="personaje" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                   <tooltip>
+                      <Tooltip text="Introduce el tipo" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Slug" GridPane.rowIndex="2" />
+                <TextField fx:id="slugField" promptText="aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                   <tooltip>
+                      <Tooltip text="Introduce el slug" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Alias" GridPane.rowIndex="3" />
+                <TextField fx:id="aliasNamesField" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                   <tooltip>
+                      <Tooltip text="Introduce el alias" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Animago" GridPane.rowIndex="4" />
+                <TextField fx:id="animagusField" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                   <tooltip>
+                      <Tooltip text="Introduce el animago" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Estado de sangre" GridPane.rowIndex="5" />
+                <TextField fx:id="bloodStatusField" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                   <tooltip>
+                      <Tooltip text="Introduce el estado de la sangre" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Boggart" GridPane.rowIndex="6" />
+                <TextField fx:id="boggartField" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                   <tooltip>
+                      <Tooltip text="Introduce el boggart" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Año nacimiento" GridPane.rowIndex="7" />
+                <TextField fx:id="bornField" promptText="31 August 1982 or earlier" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                   <tooltip>
+                      <Tooltip text="Introduce el año de nacimiento" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Año de fallecimiento" GridPane.rowIndex="8" />
+                <TextField fx:id="diedField" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                   <tooltip>
+                      <Tooltip text="Introduce la fecha de fallecimiento" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Color de ojos" GridPane.rowIndex="9" />
+                <TextField fx:id="eyeColorField" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                   <tooltip>
+                      <Tooltip text="Introduce el color de ojos" />
+                   </tooltip>
+                </TextField>
+
+                <!-- COLUMNA DERECHA (10 campos) -->
+                <Label text="Genero" GridPane.columnIndex="2" GridPane.columnSpan="1">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="genderField" promptText="Hombre" GridPane.columnIndex="3" GridPane.columnSpan="1">
+                   <tooltip>
+                      <Tooltip text="Introduce el genero" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Color de pelo" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="hairColorField" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                   <tooltip>
+                      <Tooltip text="Introduce el color de pelo" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Altura" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="heightField" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                   <tooltip>
+                      <Tooltip text="Introduce la altura" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Casa" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="houseField" promptText="Gryffindor" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                   <tooltip>
+                      <Tooltip text="Introduce la casa" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="URL imagen" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="imageField" promptText="https://static.wikia.nocookie.net/harrypotter/images/c/cd/Aamir_Loonat.png" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                   <tooltip>
+                      <Tooltip text="Introduce la URL de la imagen" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Estado civil" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="maritalStatusField" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                   <tooltip>
+                      <Tooltip text="Introduce el estado civil" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Nombre" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="nameField" promptText="Aamir Loonat" GridPane.columnIndex="3" GridPane.rowIndex="6">
+                   <tooltip>
+                      <Tooltip text="Introduce el nombre del personaje" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Nacionalidad" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="nationalityField" promptText="British or Irish" GridPane.columnIndex="3" GridPane.rowIndex="7">
+                   <tooltip>
+                      <Tooltip text="Introduce su nacionalidad" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Patronus" GridPane.columnIndex="2" GridPane.rowIndex="8">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="patronusField" GridPane.columnIndex="3" GridPane.rowIndex="8">
+                   <tooltip>
+                      <Tooltip text="Introduce el patronus" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Especie" GridPane.columnIndex="2" GridPane.rowIndex="9">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="speciesField" GridPane.columnIndex="3" GridPane.rowIndex="9">
+                   <tooltip>
+                      <Tooltip text="Introduce la especie" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Trabajo" GridPane.rowIndex="10" />
+                <TextField fx:id="trabajoField" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                   <tooltip>
+                      <Tooltip text="Introduce el trabajo" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Wikipedia" GridPane.columnIndex="2" GridPane.rowIndex="10" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="wikipediaField" GridPane.columnIndex="3" GridPane.rowIndex="10">
+                   <tooltip>
+                      <Tooltip text="Introduce la URL de la wikipedia" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="Miembros de familia" GridPane.rowIndex="11" />
+                <TextField fx:id="miembrosFamiliaField" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                    <tooltip>
+                        <Tooltip text="Introduce los miembros de familia" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="Romances" GridPane.columnIndex="2" GridPane.rowIndex="11" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="romancesField" GridPane.columnIndex="3" GridPane.rowIndex="11">
+                    <tooltip>
+                        <Tooltip text="Introduce los romances" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="Color de piel" GridPane.rowIndex="12" />
+                <TextField fx:id="colorPielField" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                    <tooltip>
+                        <Tooltip text="Introduce el color de piel" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="Titulos" GridPane.columnIndex="2" GridPane.rowIndex="12" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="titulosField" GridPane.columnIndex="3" GridPane.rowIndex="12">
+                    <tooltip>
+                        <Tooltip text="Introduce los titulos" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="Varita" GridPane.rowIndex="13" />
+                <TextField fx:id="varitaField" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                    <tooltip>
+                        <Tooltip text="Introduce el nombre de la varita" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="Peso" GridPane.columnIndex="2" GridPane.rowIndex="13" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="pesoField" GridPane.columnIndex="3" GridPane.rowIndex="13">
+                    <tooltip>
+                        <Tooltip text="Introduce el peso" />
+                    </tooltip>
+                </TextField>
+
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
+            </GridPane>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="10">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <Button fx:id="cancelarButton" onAction="#onCancelar" text="Cancelar">
+            <tooltip>
+               <Tooltip text="Para cancelar el agregado del personaje" />
+            </tooltip></Button>
+            <Button fx:id="agregarButton" onAction="#onAgregar" text="Agregar">
+            <tooltip>
+               <Tooltip text="Para agregar el personaje" />
+            </tooltip></Button>
+        </HBox>
+    </bottom>
+</BorderPane>

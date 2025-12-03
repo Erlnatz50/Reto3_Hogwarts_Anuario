@@ -90,7 +90,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
             Parent root = loader.load();
 
             Stage stage = new Stage();
-            stage.setTitle("Nuevo Personaje");
+            stage.setTitle("Crear Nuevo Personaje");
             stage.setScene(new Scene(root));
             stage.show();
 
