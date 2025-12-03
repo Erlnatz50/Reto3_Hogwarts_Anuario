@@ -24,9 +24,9 @@
        <MenuBar styleClass="menu-bar">
            <Menu text="Archivo">
                <MenuItem text="Nuevo"
-                         fx:id="nuevoMenuItem"
                          onAction="#onNuevo"/>
-               <MenuItem text="Abrir" />
+               <MenuItem text="Abrir"
+                         onAction="#crearArchivos"/>
                <MenuItem text="Guardar" />
                <SeparatorMenuItem />
                <MenuItem text="Salir" />

@@ -23,8 +23,6 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
 
-    public MenuItem nuevoMenuItem;
-
     @FXML
     private TilePane tilePanePersonajes;
 
@@ -85,7 +83,7 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
-    public void onNuevo(ActionEvent actionEvent) {
+    public void onNuevo() {
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", new Locale("es"));
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
@@ -99,5 +97,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void crearArchivos(ActionEvent actionEvent) {
+
     }
 }
