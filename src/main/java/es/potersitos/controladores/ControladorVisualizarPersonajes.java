@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ControladorVisualizarPersonajes implements Initializable {
@@ -86,7 +87,8 @@ public class ControladorVisualizarPersonajes implements Initializable {
 
     public void onNuevo(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"));
+            ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", new Locale("es"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
             Parent root = loader.load();
 
             Stage stage = new Stage();
