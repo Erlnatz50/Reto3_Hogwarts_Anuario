@@ -23,8 +23,9 @@ public class App extends Application {
         String ERROR_INIT_CONTENT = "Se ha producido un error al intentar cargar la aplicaci\u00f3n";
 
         try{
-            logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"));
+            // CORRECCIÓN FINAL: Carga el FXML principal que sí existe: ventana.fxml
+            logger.debug("Cargando el archivo FXML: ventana.fxml");
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventana.fxml"));
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
@@ -45,6 +46,7 @@ public class App extends Application {
             stage.setTitle(APP_TITLE);
             stage.setScene(scene);
             stage.setResizable(true);
+
             stage.setMinWidth(900);
             stage.setMinHeight(700);
             stage.setMaxWidth(1200);
