@@ -13,8 +13,8 @@
     <top>
         <MenuBar styleClass="menu-bar">
             <Menu text="Archivo">
-                    <MenuItem text="Nuevo"/>
-                    <MenuItem text="Abrir"/>
+                    <MenuItem text="Nuevo" onAction="#onNuevo"/>
+                    <MenuItem text="Importar" onAction="#crearArchivos"/>
                     <MenuItem text="Guardar"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Salir"/>
@@ -33,85 +33,71 @@
 
     <center>
         <StackPane BorderPane.alignment="CENTER">
-            <children>
                 <!-- Main Content -->
                 <VBox VBox.vgrow="ALWAYS">
-                    <children>
                         <!-- Search Bar -->
                         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
-                            <children>
-                                <Label styleClass="wand-icon" text="⚡">
-                                    <font><Font size="20.0"/></font>
-                                </Label>
-                                <Label styleClass="glasses-icon" text="👓">
-                                    <font><Font size="18.0"/></font>
-                                </Label>
-                                <TextField fx:id="searchField" promptText="BUSCAR" styleClass="search-field" HBox.hgrow="ALWAYS">
-                                    <tooltip><Tooltip text="Escribe aquí para buscar personajes por nombre u otros datos"/></tooltip>
-                                    <font><Font size="14.0"/></font>
-                                </TextField>
-                                <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#toggleFilterPanel"
-                                        styleClass="filter-button" text="Filtrar">
-                                    <tooltip><Tooltip text="Mostrar u ocultar el panel de filtros avanzados"/></tooltip>
-                                    <font><Font size="14.0"/></font>
-                                </Button>
-                            </children>
+                            <Label styleClass="wand-icon" text="⚡">
+                                <font><Font size="20.0"/></font>
+                            </Label>
+                            <Label styleClass="glasses-icon" text="👓">
+                                <font><Font size="18.0"/></font>
+                            </Label>
+                            <TextField fx:id="searchField" promptText="BUSCAR" styleClass="search-field" HBox.hgrow="ALWAYS">
+                                <tooltip><Tooltip text="Escribe aquí para buscar personajes por nombre u otros datos"/></tooltip>
+                                <font><Font size="14.0"/></font>
+                            </TextField>
+                            <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#toggleFilterPanel"
+                                    styleClass="filter-button" text="Filtrar">
+                                <tooltip><Tooltip text="Mostrar u ocultar el panel de filtros avanzados"/></tooltip>
+                                <font><Font size="14.0"/></font>
+                            </Button>
                             <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0"/></padding>
                         </HBox>
 
                         <!-- Character Grid -->
                         <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
-
-                            <content>
                                 <TilePane fx:id="tilePanePersonajes" alignment="CENTER" hgap="20.0" vgap="20.0"
                                           prefColumns="4" styleClass="character-grid">
                                     <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/></padding>
                                 </TilePane>
-                            </content>
                         </ScrollPane>
 
                         <!-- Pagination and Action Buttons -->
                         <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
-                            <children>
-                                <Button fx:id="btnSeleccionar" mnemonicParsing="false" onAction="#toggleSelectionMode" styleClass="action-button" text="SELECCIONAR">
-                                    <tooltip><Tooltip text="Seleccionar los personajes marcados para trabajar con ellos"/></tooltip>
-                                    <font><Font size="12.0"/></font>
+                            <Button fx:id="btnSeleccionar" mnemonicParsing="false" onAction="#toggleSelectionMode" styleClass="action-button" text="SELECCIONAR">
+                                <tooltip><Tooltip text="Seleccionar los personajes marcados para trabajar con ellos"/></tooltip>
+                                <font><Font size="12.0"/></font>
+                            </Button>
+                            <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                                <Button mnemonicParsing="false" styleClass="page-button page-active" text="1">
+                                    <tooltip><Tooltip text="Ir a la página 1 de personajes"/></tooltip>
                                 </Button>
-                                <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
-                                    <children>
-                                        <Button mnemonicParsing="false" styleClass="page-button page-active" text="1">
-                                            <tooltip><Tooltip text="Ir a la página 1 de personajes"/></tooltip>
-                                        </Button>
-                                        <Button mnemonicParsing="false" styleClass="page-button" text="2">
-                                            <tooltip><Tooltip text="Ir a la página 2 de personajes"/></tooltip>
-                                        </Button>
-                                        <Button mnemonicParsing="false" styleClass="page-button" text="3">
-                                            <tooltip><Tooltip text="Ir a la página 3 de personajes"/></tooltip>
-                                        </Button>
-                                        <Label styleClass="page-dots" text="...">
-                                        </Label>
-                                        <Button mnemonicParsing="false" styleClass="page-button" text="200">
-                                            <tooltip><Tooltip text="Ir a la última página de personajes"/></tooltip>
-                                        </Button>
-                                    </children>
-                                </HBox>
-                                <Button fx:id="btnExportar" mnemonicParsing="false" onAction="#exportarSeleccionados" styleClass="action-button" text="EXPORTAR" visible="false" managed="false">
-                                    <tooltip><Tooltip text="Exportar los personajes seleccionados a un archivo externo"/></tooltip>
-                                    <font><Font size="12.0"/></font>
+                                <Button mnemonicParsing="false" styleClass="page-button" text="2">
+                                    <tooltip><Tooltip text="Ir a la página 2 de personajes"/></tooltip>
                                 </Button>
-                            </children>
-                            <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0"/></padding>
+                                <Button mnemonicParsing="false" styleClass="page-button" text="3">
+                                    <tooltip><Tooltip text="Ir a la página 3 de personajes"/></tooltip>
+                                </Button>
+                                <Label styleClass="page-dots" text="...">
+                                </Label>
+                                <Button mnemonicParsing="false" styleClass="page-button" text="200">
+                                    <tooltip><Tooltip text="Ir a la última página de personajes"/></tooltip>
+                                </Button>
+                            </HBox>
+                            <Button fx:id="btnExportar" mnemonicParsing="false" onAction="#exportarSeleccionados" styleClass="action-button" text="EXPORTAR" visible="false" managed="false">
+                                <tooltip><Tooltip text="Exportar los personajes seleccionados a un archivo externo"/></tooltip>
+                                <font><Font size="12.0"/></font>
+                            </Button>
+                        <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0"/></padding>
                         </HBox>
-                    </children>
                 </VBox>
 
                 <!-- Filter Panel (Right Side) -->
                 <VBox fx:id="filterPanel" managed="false" maxWidth="300.0" prefWidth="300.0"
                       styleClass="filter-panel" visible="false" StackPane.alignment="CENTER_RIGHT">
-                    <children>
                         <!-- Filter Header -->
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
                                 <Label styleClass="filter-title" text="Filtrar" HBox.hgrow="ALWAYS">
                                     <tooltip><Tooltip text="Panel lateral para aplicar filtros a la lista de personajes"/></tooltip>
                                     <font><Font name="System Bold" size="18.0"/></font>
@@ -123,7 +109,6 @@
                                     <opaqueInsets><Insets/></opaqueInsets>
                                     <HBox.margin><Insets left="180.0"/></HBox.margin>
                                 </Button>
-                            </children>
                             <VBox.margin><Insets bottom="10.0"/></VBox.margin>
                         </HBox>
 
@@ -133,92 +118,75 @@
                             <panes>
                                 <TitledPane styleClass="filter-titled-pane" text="Casa">
                                     <tooltip><Tooltip text="Filtrar personajes según su casa de Hogwarts"/></tooltip>
-                                    <content>
                                         <VBox spacing="5.0" styleClass="filter-checkboxes">
-                                            <children>
-                                                <CheckBox text="Gryffindor">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes de Gryffindor"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Slytherin">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes de Slytherin"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Hufflepuff">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes de Hufflepuff"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Ravenclaw">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes de Ravenclaw"/></tooltip>
-                                                </CheckBox>
-                                            </children>
+                                            <CheckBox text="Gryffindor">
+                                                <tooltip><Tooltip text="Mostrar solo personajes de Gryffindor"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Slytherin">
+                                                <tooltip><Tooltip text="Mostrar solo personajes de Slytherin"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Hufflepuff">
+                                                <tooltip><Tooltip text="Mostrar solo personajes de Hufflepuff"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Ravenclaw">
+                                                <tooltip><Tooltip text="Mostrar solo personajes de Ravenclaw"/></tooltip>
+                                            </CheckBox>
                                             <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
                                         </VBox>
-                                    </content>
                                 </TitledPane>
                                 <TitledPane styleClass="filter-titled-pane" text="Nacionalidad">
                                     <tooltip><Tooltip text="Filtrar personajes por su nacionalidad"/></tooltip>
-                                    <content>
                                         <VBox spacing="5.0" styleClass="filter-checkboxes">
-                                            <children>
-                                                <CheckBox text="Británico">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes británicos"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Irlandés">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes irlandeses"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Francés">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes franceses"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Búlgaro">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes búlgaros"/></tooltip>
-                                                </CheckBox>
-                                            </children>
-                                            <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
+                                            <CheckBox text="Británico">
+                                                <tooltip><Tooltip text="Mostrar solo personajes británicos"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Irlandés">
+                                                <tooltip><Tooltip text="Mostrar solo personajes irlandeses"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Francés">
+                                                <tooltip><Tooltip text="Mostrar solo personajes franceses"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Búlgaro">
+                                                <tooltip><Tooltip text="Mostrar solo personajes búlgaros"/></tooltip>
+                                            </CheckBox>
+                                        <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
                                         </VBox>
-                                    </content>
                                 </TitledPane>
                                 <TitledPane styleClass="filter-titled-pane" text="Especie">
                                     <tooltip><Tooltip text="Filtrar personajes según su especie"/></tooltip>
-                                    <content>
                                         <VBox spacing="5.0" styleClass="filter-checkboxes">
-                                            <children>
-                                                <CheckBox text="Humano">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes humanos"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Mestizo">
-                                                    <tooltip><Tooltip text="Mostrar solo personajes mestizos"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Elfo">
-                                                    <tooltip><Tooltip text="Mostrar solo elfos"/></tooltip>
-                                                </CheckBox>
-                                                <CheckBox text="Gigante">
-                                                    <tooltip><Tooltip text="Mostrar solo gigantes"/></tooltip>
-                                                </CheckBox>
-                                            </children>
-                                            <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
+                                            <CheckBox text="Humano">
+                                                <tooltip><Tooltip text="Mostrar solo personajes humanos"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Mestizo">
+                                                <tooltip><Tooltip text="Mostrar solo personajes mestizos"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Elfo">
+                                                <tooltip><Tooltip text="Mostrar solo elfos"/></tooltip>
+                                            </CheckBox>
+                                            <CheckBox text="Gigante">
+                                                <tooltip><Tooltip text="Mostrar solo gigantes"/></tooltip>
+                                            </CheckBox>
+                                        <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
                                         </VBox>
-                                    </content>
                                 </TitledPane>
                                 <TitledPane styleClass="filter-titled-pane" text="Género">
                                     <tooltip><Tooltip text="Filtrar personajes por género"/></tooltip>
-                                    <content>
                                         <VBox spacing="5.0" styleClass="filter-checkboxes">
-                                            <children>
                                                 <CheckBox text="Masculino">
                                                     <tooltip><Tooltip text="Mostrar solo personajes masculinos"/></tooltip>
                                                 </CheckBox>
                                                 <CheckBox text="Femenino">
                                                     <tooltip><Tooltip text="Mostrar solo personajes femeninos"/></tooltip>
                                                 </CheckBox>
-                                            </children>
                                             <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/></padding>
                                         </VBox>
-                                    </content>
                                 </TitledPane>
                             </panes>
                         </Accordion>
 
                         <!-- Filter Action Buttons -->
                         <HBox alignment="CENTER" spacing="10.0">
-                            <children>
                                 <Button onAction="#aplicarFiltros" styleClass="apply-filter-button" text="Aplicar">
                                     <tooltip><Tooltip text="Aplicar los filtros seleccionados a la lista de personajes"/></tooltip>
                                     <font><Font size="12.0"/></font>
@@ -227,13 +195,10 @@
                                     <tooltip><Tooltip text="Quitar todos los filtros y mostrar todos los personajes"/></tooltip>
                                     <font><Font size="12.0"/></font>
                                 </Button>
-                            </children>
                             <VBox.margin><Insets top="10.0"/></VBox.margin>
                         </HBox>
-                    </children>
                     <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/></padding>
                 </VBox>
-            </children>
         </StackPane>
     </center>
 </BorderPane>

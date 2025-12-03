@@ -31,7 +31,6 @@
         <center>
             <VBox BorderPane.alignment="CENTER">
                 <ScrollPane fitToWidth="true">
-                    <content>
                         <VBox fx:id="datosVBox" spacing="8">
                             <padding>
                                 <Insets bottom="10" left="10" right="10" top="10" />
@@ -61,7 +60,6 @@
                             <Label fx:id="varitasLabel" text="%varitas.label" />
                             <Label fx:id="pesoLabel" text="%peso.label" />
                         </VBox>
-                    </content>
                 </ScrollPane>
             </VBox>
         </center>
