@@ -194,7 +194,7 @@ public class ControladorDatos implements Initializable {
             parameters.put("Imagen", imagenStream);
 
             // 3. Llenar el reporte
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
 
             // 4. Mostrar visor
             JasperViewer.viewReport(jasperPrint, false);

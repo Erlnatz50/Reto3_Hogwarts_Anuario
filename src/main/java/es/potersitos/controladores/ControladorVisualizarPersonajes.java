@@ -3,6 +3,8 @@ package es.potersitos.controladores;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -11,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +21,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class ControladorVisualizarPersonajes implements Initializable {
 
+    /**  */
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
+
+    @FXML
+    public Button btnFiltrar;
+
+    @FXML
+    public Button btnCerrarFiltro;
 
     @FXML
     private TilePane tilePanePersonajes;
@@ -246,18 +257,48 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
 
         if (seleccionados.isEmpty()) {
-            mostrarAlerta("Exportar", "No has seleccionado ningún personaje.");
+            mandarAlertas(Alert.AlertType.INFORMATION, "Exportar", "", "No has seleccionado ningún personaje");
         } else {
-            mostrarAlerta("Exportar", "Exportando: " + String.join(", ", seleccionados));
+            mandarAlertas(Alert.AlertType.INFORMATION, "Exportar", "", "Exportando: " + String.join(", ", seleccionados));
             // Aquí iría la lógica real de exportación (JasperReports, CSV, etc.)
         }
     }
 
-    private void mostrarAlerta(String titulo, String contenido) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
+    public void onNuevo() {
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", new Locale("es"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Crear Nuevo Personaje");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void crearArchivos() {
+
+    }
+
+    /**
+     * Muestra una alerta JavaFX con los datos proporcionados.
+     *
+     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo        Título de la alerta
+     * @param mensajeTitulo Encabezado del mensaje
+     * @param mensaje       Contenido del mensaje
+     * @author Erlantz
+     */
+    private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(mensajeTitulo);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+        logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
     }
 }
