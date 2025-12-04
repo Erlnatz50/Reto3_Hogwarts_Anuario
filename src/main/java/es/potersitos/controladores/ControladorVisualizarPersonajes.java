@@ -25,48 +25,55 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * @author Telmo
+ * @version 1.0
+ */
 public class ControladorVisualizarPersonajes implements Initializable {
 
     /**  */
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
 
+    /**  */
     @FXML
-    public Button btnFiltrar;
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar;
 
-    @FXML
-    public Button btnCerrarFiltro;
-
+    /**  */
     @FXML
     private TilePane tilePanePersonajes;
 
+    /**  */
     @FXML
     private VBox filterPanel;
 
+    /**  */
     @FXML
     private Accordion accordionFiltros;
 
+    /**  */
     @FXML
     private TextField searchField;
 
-    @FXML
-    private Button btnSeleccionar;
-
-    @FXML
-    private Button btnExportar;
-
+    /**  */
     private List<ControladorFichaPersonaje> listaControladores = new ArrayList<>();
 
+    /**  */
+    private List<Personaje> listaPersonajes = new ArrayList<>();
+
+    /**  */
     private ResourceBundle resources;
 
-    // Inner class to represent a character
+    /**
+     *
+     */
     private static class Personaje {
         String nombre;
         String casa;
         String imagePath;
         String slug; // <--- CAMBIO 1: Añadido SLUG
 
-        public Personaje(String nombre, String casa, String imagePath, String slug) { // <--- CAMBIO 2: Constructor con
-                                                                                      // SLUG
+        public Personaje(String nombre, String casa, String imagePath, String slug) {
             this.nombre = nombre;
             this.casa = casa;
             this.imagePath = imagePath;
@@ -74,8 +81,12 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
-    private List<Personaje> listaPersonajes = new ArrayList<>();
-
+    /**
+     *
+     *
+     * @param location
+     * @param resources
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
@@ -97,6 +108,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
         configurarListenersFiltros();
     }
 
+    /**
+     *
+     */
     private void inicializarDatosPrueba() {
         for (int i = 1; i <= 9; i++) {
             String casa = "Gryffindor";
@@ -114,6 +128,11 @@ public class ControladorVisualizarPersonajes implements Initializable {
         listaPersonajes.add(new Personaje("Harry Potter", "Gryffindor", "path/to/image.png", "harry-potter"));
     }
 
+    /**
+     *
+     *
+     * @param personajes
+     */
     private void cargarPersonajes(List<Personaje> personajes) {
         tilePanePersonajes.getChildren().clear();
         listaControladores.clear();
@@ -164,14 +183,22 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
+    /**
+     *
+     */
     @FXML
     private void toggleFilterPanel() {
         boolean isVisible = filterPanel.isVisible();
         filterPanel.setVisible(!isVisible);
         filterPanel.setManaged(!isVisible);
-        logger.info("Panel de filtros " + (isVisible ? "ocultado" : "mostrado"));
+        logger.info("Panel de filtros {}", isVisible ? "ocultado" : "mostrado");
     }
 
+    /**
+     *
+     *
+     * @param event
+     */
     @FXML
     private void limpiarFiltros(javafx.event.ActionEvent event) {
         if (accordionFiltros != null) {
@@ -190,11 +217,17 @@ public class ControladorVisualizarPersonajes implements Initializable {
         cargarPersonajes(listaPersonajes);
     }
 
+    /**
+     *
+     */
     @FXML
     private void aplicarFiltros() {
         filtrarPersonajes();
     }
 
+    /**
+     *
+     */
     private void filtrarPersonajes() {
         String searchText = searchField.getText().toLowerCase();
         List<String> selectedCasas = new ArrayList<>();
@@ -223,10 +256,13 @@ public class ControladorVisualizarPersonajes implements Initializable {
                 .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.casa))
                 .collect(Collectors.toList());
 
-        logger.debug("Filtro aplicado. Coincidencias encontradas: " + filtrados.size());
+        logger.debug("Filtro aplicado. Coincidencias encontradas: {}", filtrados.size());
         cargarPersonajes(filtrados);
     }
 
+    /**
+     *
+     */
     @FXML
     private void toggleSelectionMode() {
         boolean isSelectionMode = btnExportar.isVisible();
@@ -247,6 +283,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
+    /**
+     *
+     */
     @FXML
     private void exportarSeleccionados() {
         List<String> seleccionados = new ArrayList<>();
@@ -264,6 +303,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
+    /**
+     *
+     */
     public void onNuevo() {
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", new Locale("es"));
@@ -280,6 +322,9 @@ public class ControladorVisualizarPersonajes implements Initializable {
         }
     }
 
+    /**
+     *
+     */
     public void crearArchivos() {
 
     }

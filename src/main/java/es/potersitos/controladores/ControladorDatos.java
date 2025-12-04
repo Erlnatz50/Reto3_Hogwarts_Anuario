@@ -14,11 +14,9 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -34,6 +32,9 @@ import es.potersitos.util.PersonajeCSVManager;
 /**
  * Controlador para la ventana de datos de personajes.
  * Gestiona la interacción con los elementos del FXML.
+ *
+ * @author Marco
+ * @version 1.0
  */
 public class ControladorDatos implements Initializable {
 
@@ -46,76 +47,63 @@ public class ControladorDatos implements Initializable {
     /** SLUG del personaje actual (necesario para la eliminación) */
     private String personajeSlug;
 
-    // =======================================================
-    // Elementos FXML (Deben coincidir con fx:id del FXML)
-    // =======================================================
+    /** Imagen del personaje */
+    @FXML
+    private ImageView imageView;
 
-    @FXML private ImageView imageView;
-    @FXML private VBox datosVBox;
-    @FXML private Label nombreLabel;
-    @FXML private Label aliasLabel;
-    @FXML private Label animagusLabel;
-    @FXML private Label bloodStatusLabel;
-    @FXML private Label boggartLabel;
-    @FXML private Label nacidoLabel;
-    @FXML private Label fallecidoLabel;
-    @FXML private Label colorOjosLabel;
-    @FXML private Label familiaresLabel;
-    @FXML private Label generoLabel;
-    @FXML private Label colorPeloLabel;
-    @FXML private Label alturaLabel;
-    @FXML private Label casaLabel;
-    @FXML private Label imagenLabel;
-    @FXML private Label trabajosLabel;
-    @FXML private Label estadoCivilLabel;
-    @FXML private Label nacionalidadLabel;
-    @FXML private Label patronusLabel;
-    @FXML private Label romancesLabel;
-    @FXML private Label colorPielLabel;
-    @FXML private Label especieLabel;
-    @FXML private Label titulosLabel;
-    @FXML private Label varitasLabel;
-    @FXML private Label pesoLabel;
-    @FXML private Button actualizarButton;
-    @FXML private Button exportarButton;
-    @FXML private Button eliminarButton;
-    @FXML private Button closeButton;
+    /** Contenedor principal de etiquetas de datos */
+    @FXML
+    private VBox datosVBox;
+
+    /** Etiquetas FXML que muestran los datos del personaje */
+    @FXML
+    private Label nombreLabel, aliasLabel, animagusLabel, bloodStatusLabel, boggartLabel, nacidoLabel,
+            fallecidoLabel, colorOjosLabel, familiaresLabel, generoLabel, colorPeloLabel, alturaLabel,
+            casaLabel, imagenLabel, trabajosLabel, estadoCivilLabel, nacionalidadLabel, patronusLabel,
+            romancesLabel, colorPielLabel, especieLabel, titulosLabel, varitasLabel, pesoLabel;
+
+    /** Botones principales de acción */
+    @FXML
+    private Button actualizarButton, exportarButton, eliminarButton, closeButton;
 
     /**
-     * Método de inicialización.
+     * Metodo de inicialización del controlador.
+     *
+     * @param location URL de localización del recurso FXML.
+     * @param resources Bundle con los recursos de localización.
+     * @author Marco
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.bundle = resources;
-        logger.info("ControladorVentana inicializado correctamente.");
-
-        // Simulación: Cargar datos de prueba al iniciar la ventana
+        logger.info("ControladorDatos inicializado correctamente.");
         cargarDatosPrueba();
     }
 
-    // [MANTENIDO] Setter para recibir el SLUG
+    /**
+     * Asigna el identificador único (slug) del personaje actual.
+     *
+     * @param slug Identificador del personaje.
+     * @author Marco
+     */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
     }
 
-    // =======================================================
-    // Métodos de Lógica
-    // =======================================================
-
     /**
      * Simula la carga de datos de un personaje de prueba en la interfaz.
+     *
+     * @author Marco
      */
     public void cargarDatosPrueba() {
         logger.debug("Cargando datos de prueba...");
         try {
             String rutaImagen = "/es/potersitos/img/foto.png";
-            Image image = new Image(getClass().getResourceAsStream(rutaImagen));
+            Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(rutaImagen)));
             imageView.setImage(image);
-            logger.info("Imagen cargada con éxito desde: " + rutaImagen);
+            logger.info("Imagen cargada con éxito desde: {}", rutaImagen);
         } catch (Exception e) {
-            logger.error(
-                    "Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png",
-                    e);
+            logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png", e);
         }
 
         nombreLabel.setText(bundle.getString("nombre.label") + ": Harry James Potter");
@@ -145,37 +133,49 @@ public class ControladorDatos implements Initializable {
         pesoLabel.setText(bundle.getString("peso.label") + ": Aproximado");
     }
 
-    // =======================================================
-    // Métodos de Acción
-    // =======================================================
-
+    /**
+     * Cierra la ventana actual de la aplicación.
+     *
+     * @param event Evento de acción generado por el botón de cierre.
+     * @author Marco
+     */
     @FXML
     private void cerrarVentana(ActionEvent event) {
-        logger.info("Botón de cierre ('X') presionado. Cerrando ventana.");
+        logger.info("Cerrando ventana mediante botón.");
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.close();
     }
 
+    /**
+     * Maneja la acción del botón de actualización.
+     *
+     * @author Marco
+     */
     @FXML
-    public void handleActualizar(ActionEvent event) {
-        logger.info("Botón Actualizar presionado");
+    public void handleActualizar() {
+        logger.info("Botón 'Actualizar' presionado");
         String mensaje = (bundle != null && bundle.containsKey("actualizar.msg"))
                 ? bundle.getString("actualizar.msg")
                 : "Funcionalidad de actualizar ejecutada.";
 
-        mostrarAlerta("Actualizar", mensaje);
+        mandarAlertas(Alert.AlertType.INFORMATION, "Actualizar", "", mensaje);
     }
 
+    /**
+     * Maneja la acción del botón de exportación de datos del personaje.
+     *
+     * @author Marco
+     */
     @FXML
-    public void handleExportar(ActionEvent event) {
-        logger.info("Botón Exportar presionado");
-        try {
+    public void handleExportar() {
+        logger.info("Botón 'Exportar' presionado");
+        try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             // 1. Cargar el reporte
-            InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml");
             if (reportStream == null) {
-                mostrarAlerta("Error", "No se encuentra el archivo del reporte.");
+                mandarAlertas(Alert.AlertType.ERROR, "Error", "", "No se encuentra el archivo del reporte.");
                 return;
             }
+
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
             // 2. Preparar parámetros
@@ -200,19 +200,27 @@ public class ControladorDatos implements Initializable {
             JasperViewer.viewReport(jasperPrint, false);
 
         } catch (JRException e) {
-            logger.error("Error al exportar el reporte", e);
-            mostrarAlerta("Error", "Falló la exportación: " + e.getMessage());
+            logger.error("Error al exportar el reporte Jasper.", e);
+            mandarAlertas(Alert.AlertType.ERROR, "Error", "", "Falló la exportación: " + e.getMessage());
+        } catch (IOException e) {
+            logger.error("Error general durante la exportación del informe.", e);
         }
     }
 
+    /**
+     * Maneja la acción del botón de eliminación de un personaje.
+     *
+     * @param event Evento de acción generado por el botón.
+     * @author Marco
+     */
     @FXML
     public void handleEliminar(ActionEvent event) {
         if (personajeSlug == null || personajeSlug.isEmpty()) {
-            mostrarAlerta("Error", "No se ha cargado el identificador del personaje (slug) para eliminar.");
+            mandarAlertas(Alert.AlertType.ERROR, "Error", "", "No se ha cargado el identificador del personaje (slug) para eliminar.");
             return;
         }
 
-        logger.info("Botón Eliminar presionado para SLUG: {}", personajeSlug);
+        logger.info("Botón 'Eliminar' presionado para SLUG: {}", personajeSlug);
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle(bundle.getString("eliminar.confirm.titulo"));
@@ -225,11 +233,11 @@ public class ControladorDatos implements Initializable {
             boolean exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
 
             if (exito) {
-                mostrarAlerta("Éxito", "El personaje ha sido eliminado del registro.");
+                mandarAlertas(Alert.AlertType.INFORMATION, "Éxito", "", "El personaje ha sido eliminado del registro.");
                 Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
                 stage.close();
             } else {
-                mostrarAlerta("Error", "No se pudo eliminar el personaje del archivo CSV. Verifique logs.");
+                mandarAlertas(Alert.AlertType.ERROR, "Error", "", "No se pudo eliminar el personaje del archivo CSV. Verifique logs.");
             }
         } else {
             logger.info("Eliminación cancelada por el usuario.");
@@ -237,18 +245,29 @@ public class ControladorDatos implements Initializable {
     }
 
     /**
-     * Método auxiliar para mostrar alertas simples.
+     * Muestra una alerta JavaFX con los datos proporcionados.
+     *
+     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo        Título de la alerta
+     * @param mensajeTitulo Encabezado del mensaje
+     * @param mensaje       Contenido del mensaje
+     * @author Erlantz
      */
-    private void mostrarAlerta(String titulo, String contenido) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
+    private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(mensajeTitulo);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+        logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
     }
 
     /**
-     * [MEJORADO] Extrae el valor de la etiqueta asumiendo el formato "Clave: Valor".
+     * Obtiene el valor textual de una etiqueta con formato "Clave: Valor".
+     *
+     * @param label Etiqueta desde la que se obtiene el texto.
+     * @return Texto posterior al delimitador “: ” o el texto completo si no existe.
+     * @author Marco
      */
     private String obtenerValor(Label label) {
         // Validación robusta: verifica si la etiqueta o su texto son nulos.
@@ -266,7 +285,7 @@ public class ControladorDatos implements Initializable {
         int separatorIndex = text.indexOf(": ");
 
         if (separatorIndex != -1) {
-            // Devuelve la parte después de ": "
+            // Devuelve la parte después de":"
             // Usamos substring para mayor eficiencia que split en este caso
             return text.substring(separatorIndex + 2).trim();
         }

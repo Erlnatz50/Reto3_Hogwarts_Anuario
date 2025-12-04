@@ -8,40 +8,72 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+/**
+ *
+ *
+ * @author Telmo
+ * @version 1.0
+ */
 public class ControladorFichaPersonaje {
 
+    /**  */
     @FXML
     private VBox cardBox;
 
+    /**  */
     @FXML
     private ImageView imagePersonaje;
 
+    /**  */
     @FXML
     private Label labelNombre;
 
+    /**  */
     @FXML
     private Label labelCasa;
 
+    /**  */
     @FXML
     private CheckBox checkBoxSeleccionar;
 
+    /**  */
     private ResourceBundle resources;
+
+    /**  */
     private String personajeSlug;
+
+    /**  */
     private boolean isSelectionMode = false;
 
+    /**
+     *
+     *
+     * @param resources
+     */
     public void setResources(ResourceBundle resources) {
         this.resources = resources;
     }
 
+    /**
+     *
+     *
+     * @param slug
+     */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
     }
 
+    /**
+     *
+     *
+     * @param nombre
+     * @param casa
+     * @param imagePath
+     */
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
         labelCasa.setText(casa);
@@ -55,6 +87,11 @@ public class ControladorFichaPersonaje {
         }
     }
 
+    /**
+     *
+     *
+     * @param event
+     */
     @FXML
     private void handleCardClick(MouseEvent event) {
         if (isSelectionMode) {
@@ -111,6 +148,11 @@ public class ControladorFichaPersonaje {
         }
     }
 
+    /**
+     *
+     *
+     * @param active
+     */
     public void setSelectionMode(boolean active) {
         this.isSelectionMode = active;
         if (checkBoxSeleccionar != null) {
@@ -121,10 +163,20 @@ public class ControladorFichaPersonaje {
         }
     }
 
+    /**
+     *
+     *
+     * @return
+     */
     public boolean isSelected() {
         return checkBoxSeleccionar != null && checkBoxSeleccionar.isSelected();
     }
 
+    /**
+     *
+     *
+     * @return
+     */
     public String getNombre() {
         return labelNombre.getText();
     }
