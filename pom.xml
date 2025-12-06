@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>es.potersitos</groupId>
     <artifactId>Reto3_Hogwarts_Anuario</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <!-- Tipo de empaquetado (para fatjar) -->
     <packaging>jar</packaging>
     <name>Hogwarts Anuario</name>
@@ -50,12 +50,20 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>6.21.0</version>
+            <version>6.20.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.20.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-functions</artifactId>
+            <version>6.20.6</version>
         </dependency>
 
     </dependencies>
-
-
 
     <build>
         <plugins>
@@ -70,9 +78,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.13.0</version>
                 <configuration>
-                    <release>11</release>
+                    <release>22</release>
                 </configuration>
             </plugin>
 
@@ -80,7 +88,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <!-- modificación para jar -->
                     <archive>
@@ -97,7 +105,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
