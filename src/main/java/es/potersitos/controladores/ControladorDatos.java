@@ -2,7 +2,6 @@ package es.potersitos.controladores;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 import net.sf.jasperreports.engine.JREmptyDataSource;
@@ -36,13 +34,13 @@ import es.potersitos.util.PersonajeCSVManager;
  * @author Marco
  * @version 1.0
  */
-public class ControladorDatos implements Initializable {
+public class ControladorDatos {
 
     /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
     /** Bundle del sistema de internacionalización */
-    private ResourceBundle bundle;
+    private ResourceBundle resources;
 
     /** SLUG del personaje actual (necesario para la eliminación) */
     private String personajeSlug;
@@ -69,13 +67,11 @@ public class ControladorDatos implements Initializable {
     /**
      * Metodo de inicialización del controlador.
      *
-     * @param location URL de localización del recurso FXML.
-     * @param resources Bundle con los recursos de localización.
      * @author Marco
      */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        this.bundle = resources;
+    @FXML
+    public void initialize() {
+        this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
         logger.info("ControladorDatos inicializado correctamente.");
         cargarDatosPrueba();
     }
@@ -106,31 +102,31 @@ public class ControladorDatos implements Initializable {
             logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png", e);
         }
 
-        nombreLabel.setText(bundle.getString("nombre.label") + ": Harry James Potter");
-        this.personajeSlug = "harry-potter";
-        aliasLabel.setText(bundle.getString("alias.label") + ": El Niño que Vivió");
-        animagusLabel.setText(bundle.getString("animagus.label") + ": No");
-        bloodStatusLabel.setText(bundle.getString("bloodStatus.label") + ": Mestizo");
-        boggartLabel.setText(bundle.getString("boggart.label") + ": Dementor");
-        nacidoLabel.setText(bundle.getString("nacido.label") + ": 31 de Julio de 1980");
-        fallecidoLabel.setText(bundle.getString("fallecido.label") + ": N/A");
-        colorOjosLabel.setText(bundle.getString("colorOjos.label") + ": Verde");
-        familiaresLabel.setText(bundle.getString("familiares.label") + ": Ginny Weasley (Esposa)");
-        generoLabel.setText(bundle.getString("genero.label") + ": Masculino");
-        colorPeloLabel.setText(bundle.getString("colorPelo.label") + ": Negro");
-        alturaLabel.setText(bundle.getString("altura.label") + ": 1.75m");
-        casaLabel.setText(bundle.getString("casa.label") + ": Gryffindor");
-        imagenLabel.setText(bundle.getString("imagen.label") + ": (Ruta a la imagen de Harry)");
-        trabajosLabel.setText(bundle.getString("trabajos.label") + ": Jefe de Aurores");
-        estadoCivilLabel.setText(bundle.getString("estadoCivil.label") + ": Casado");
-        nacionalidadLabel.setText(bundle.getString("nacionalidad.label") + ": Británica");
-        patronusLabel.setText(bundle.getString("patronus.label") + ": Ciervo");
-        romancesLabel.setText(bundle.getString("romances.label") + ": Ginny Weasley, Cho Chang");
-        colorPielLabel.setText(bundle.getString("colorPiel.label") + ": Clara");
-        especieLabel.setText(bundle.getString("especie.label") + ": Humano");
-        titulosLabel.setText(bundle.getString("titulos.label") + ": Maestro de la Muerte");
-        varitasLabel.setText(bundle.getString("varitas.label") + ": Acebo y pluma de fénix");
-        pesoLabel.setText(bundle.getString("peso.label") + ": Aproximado");
+        nombreLabel.setText(resources.getString("nombre.label") + ": Harry James Potter");
+        personajeSlug = "harry-potter";
+        aliasLabel.setText(resources.getString("alias.label") + ": El Niño que Vivió");
+        animagusLabel.setText(resources.getString("animagus.label") + ": No");
+        bloodStatusLabel.setText(resources.getString("bloodStatus.label") + ": Mestizo");
+        boggartLabel.setText(resources.getString("boggart.label") + ": Dementor");
+        nacidoLabel.setText(resources.getString("nacido.label") + ": 31 de Julio de 1980");
+        fallecidoLabel.setText(resources.getString("fallecido.label") + ": N/A");
+        colorOjosLabel.setText(resources.getString("colorOjos.label") + ": Verde");
+        familiaresLabel.setText(resources.getString("familiares.label") + ": Ginny Weasley (Esposa)");
+        generoLabel.setText(resources.getString("genero.label") + ": Masculino");
+        colorPeloLabel.setText(resources.getString("colorPelo.label") + ": Negro");
+        alturaLabel.setText(resources.getString("altura.label") + ": 1.75m");
+        casaLabel.setText(resources.getString("casa.label") + ": Gryffindor");
+        imagenLabel.setText(resources.getString("imagen.label") + ": (Ruta a la imagen de Harry)");
+        trabajosLabel.setText(resources.getString("trabajos.label") + ": Jefe de Aurores");
+        estadoCivilLabel.setText(resources.getString("estadoCivil.label") + ": Casado");
+        nacionalidadLabel.setText(resources.getString("nacionalidad.label") + ": Británica");
+        patronusLabel.setText(resources.getString("patronus.label") + ": Ciervo");
+        romancesLabel.setText(resources.getString("romances.label") + ": Ginny Weasley, Cho Chang");
+        colorPielLabel.setText(resources.getString("colorPiel.label") + ": Clara");
+        especieLabel.setText(resources.getString("especie.label") + ": Humano");
+        titulosLabel.setText(resources.getString("titulos.label") + ": Maestro de la Muerte");
+        varitasLabel.setText(resources.getString("varitas.label") + ": Acebo y pluma de fénix");
+        pesoLabel.setText(resources.getString("peso.label") + ": Aproximado");
     }
 
     /**
@@ -154,8 +150,8 @@ public class ControladorDatos implements Initializable {
     @FXML
     public void handleActualizar() {
         logger.info("Botón 'Actualizar' presionado");
-        String mensaje = (bundle != null && bundle.containsKey("actualizar.msg"))
-                ? bundle.getString("actualizar.msg")
+        String mensaje = (resources != null && resources.containsKey("actualizar.msg"))
+                ? resources.getString("actualizar.msg")
                 : "Funcionalidad de actualizar ejecutada.";
 
         mandarAlertas(Alert.AlertType.INFORMATION, "Actualizar", "", mensaje);
@@ -170,7 +166,6 @@ public class ControladorDatos implements Initializable {
     public void handleExportar() {
         logger.info("Botón 'Exportar' presionado");
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
-            // 1. Cargar el reporte
             if (reportStream == null) {
                 mandarAlertas(Alert.AlertType.ERROR, "Error", "", "No se encuentra el archivo del reporte.");
                 return;
@@ -178,9 +173,7 @@ public class ControladorDatos implements Initializable {
 
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
-            // 2. Preparar parámetros
             Map<String, Object> parameters = new HashMap<>();
-            // Las llamadas a obtenerValor() que daban error
             parameters.put("Casa", obtenerValor(casaLabel));
             parameters.put("Genero", obtenerValor(generoLabel));
             parameters.put("Especie", obtenerValor(especieLabel));
@@ -189,14 +182,11 @@ public class ControladorDatos implements Initializable {
             parameters.put("Piel", obtenerValor(colorPielLabel));
             parameters.put("Patronus", obtenerValor(patronusLabel));
 
-            // Imagen
             InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/foto.png");
             parameters.put("Imagen", imagenStream);
 
-            // 3. Llenar el reporte
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
 
-            // 4. Mostrar visor
             JasperViewer.viewReport(jasperPrint, false);
 
         } catch (JRException e) {
@@ -223,9 +213,9 @@ public class ControladorDatos implements Initializable {
         logger.info("Botón 'Eliminar' presionado para SLUG: {}", personajeSlug);
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle(bundle.getString("eliminar.confirm.titulo"));
-        confirmAlert.setHeaderText(bundle.getString("eliminar.confirm.header"));
-        confirmAlert.setContentText(bundle.getString("eliminar.confirm.contenido"));
+        confirmAlert.setTitle(resources.getString("eliminar.confirm.titulo"));
+        confirmAlert.setHeaderText(resources.getString("eliminar.confirm.header"));
+        confirmAlert.setContentText(resources.getString("eliminar.confirm.contenido"));
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
@@ -270,7 +260,6 @@ public class ControladorDatos implements Initializable {
      * @author Marco
      */
     private String obtenerValor(Label label) {
-        // Validación robusta: verifica si la etiqueta o su texto son nulos.
         if (label == null) {
             logger.warn("Se intentó obtener el valor de una etiqueta nula.");
             return "";
@@ -281,16 +270,12 @@ public class ControladorDatos implements Initializable {
             return "";
         }
 
-        // Verifica si el texto contiene el delimitador esperado
         int separatorIndex = text.indexOf(": ");
 
         if (separatorIndex != -1) {
-            // Devuelve la parte después de":"
-            // Usamos substring para mayor eficiencia que split en este caso
             return text.substring(separatorIndex + 2).trim();
         }
 
-        // Si no hay delimitador, devuelve el texto completo (o vacío si solo hay espacios)
         return text.trim();
     }
 }

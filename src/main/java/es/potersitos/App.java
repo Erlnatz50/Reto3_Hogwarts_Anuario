@@ -29,7 +29,7 @@ public class App extends Application {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     /** Bundle del sistema de internacionalización */
-    private ResourceBundle bundle;
+    private ResourceBundle resources;
 
     /**
      * Metodo principal que se ejecuta al iniciar la aplicación JavaFX.
@@ -47,12 +47,10 @@ public class App extends Application {
             // Locale locale = Locale.getDefault();
             Locale locale = new Locale("es");
 
-            // Bundle del sistema de internacionalización
-            bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
+            resources = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"),
-                    bundle);
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"), resources);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
@@ -60,12 +58,11 @@ public class App extends Application {
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
             if (archivoCSS != null) {
-                logger.info("CSS cargado correctamente: " + archivoCSS.toExternalForm());
+                logger.info("CSS cargado correctamente: {}", archivoCSS.toExternalForm());
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
             } else {
                 logger.error("No se ha podido cargar el CSS");
-                mandarAlertas(Alert.AlertType.INFORMATION, bundle.getString("cssNoEncontrado"), null,
-                        bundle.getString("cssNoEncontradoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("cssNoEncontrado"), null, resources.getString("cssNoEncontradoMensaje"));
             }
 
             stage.setTitle("Anuario de Hogwarts");
@@ -79,8 +76,7 @@ public class App extends Application {
 
         } catch (Exception e) {
             logger.error("Error al intentar cargar la aplicación {}", e.getMessage());
-            mandarAlertas(Alert.AlertType.ERROR, bundle.getString("error"), bundle.getString("errorIniciarAplicacion"),
-                    bundle.getString("errorIniciarAplicacionMensaje"));
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("errorIniciarAplicacion"), resources.getString("errorIniciarAplicacionMensaje"));
         }
     }
 
