@@ -45,7 +45,7 @@ public class App extends Application {
         try {
             // Detectar el idioma del sistema
             // Locale locale = Locale.getDefault();
-            Locale locale = new Locale("es");
+            Locale locale = Locale.of("es");
 
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 

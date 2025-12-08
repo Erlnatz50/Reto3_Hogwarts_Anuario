@@ -1,23 +1,24 @@
 package es.potersitos.controladores;
 
+import es.potersitos.App;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.sql.Statement;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -36,6 +37,14 @@ public class ControladorVisualizarPersonajes {
     /** Botones principales del panel */
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar;
+
+    /** Barra de menús principal de la aplicación */
+    @FXML
+    public MenuBar menuBar;
+
+    /** Elementos del menú Archivo **/
+    @FXML
+    public MenuItem menuSalir, menuNuevo, menuImportar, menuGuardar;
 
     /** Contenedor de las fichas de personajes */
     @FXML
@@ -88,6 +97,12 @@ public class ControladorVisualizarPersonajes {
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
         logger.info("Inicializando ControladorVisualizarPersonajes...");
 
+        // atajos de teclado
+        menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
+        menuImportar.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
+        menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
+        menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
+
         this.listaPersonajes = new ArrayList<>();
         this.listaControladores = new ArrayList<>();
 
@@ -105,7 +120,7 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     void idiomaEspaniol() {
-        cambiarIdioma(new Locale("es"));
+        cambiarIdioma(Locale.of("es"));
     }
 
     /**
@@ -115,7 +130,7 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     void idiomaEuskera() {
-        cambiarIdioma(new Locale("eu"));
+        cambiarIdioma(Locale.of("eu"));
     }
 
     /**
@@ -136,8 +151,11 @@ public class ControladorVisualizarPersonajes {
      */
     private void cambiarIdioma(Locale nuevoLocale) {
         try {
-            this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
+            resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
             logger.info("Idioma cambiado a: {}", nuevoLocale);
+
+            menuSalir.setText(resources.getString("menu.archivo.salir"));
+
         } catch (Exception e) {
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, "No se pudo cambiar el idioma: " + e.getMessage());
         }
@@ -203,8 +221,7 @@ public class ControladorVisualizarPersonajes {
                     Node content = pane.getContent();
                     if (content instanceof VBox) {
                         for (Node node : ((VBox) content).getChildren()) {
-                            if (node instanceof CheckBox) {
-                                CheckBox cb = (CheckBox) node;
+                            if (node instanceof CheckBox cb) {
                                 cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
                             }
                         }
@@ -274,8 +291,7 @@ public class ControladorVisualizarPersonajes {
                     Node content = pane.getContent();
                     if (content instanceof VBox) {
                         for (Node node : ((VBox) content).getChildren()) {
-                            if (node instanceof CheckBox) {
-                                CheckBox cb = (CheckBox) node;
+                            if (node instanceof CheckBox cb) {
                                 if (cb.isSelected()) {
                                     selectedCasas.add(cb.getText());
                                 }
@@ -346,14 +362,31 @@ public class ControladorVisualizarPersonajes {
      */
     public void onNuevo() {
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", new Locale("es"));
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
+            var fxmlResource = getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml");
+            if (fxmlResource == null) {
+                logger.error("FXML no encontrado: /es/potersitos/fxml/nuevoPersonaje.fxml");
+                return;
+            }
+
+            ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.of("es"));
+            FXMLLoader loader = new FXMLLoader(fxmlResource, bundle);
 
             Parent root = loader.load();
 
+            Scene scene = new Scene(root);
+            try {
+                var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
+                if (archivoCSS != null) {
+                    scene.getStylesheets().add(archivoCSS.toExternalForm());
+                    logger.debug("Hoja de estilo CSS aplicada correctamente.");
+                }
+            } catch (Exception e) {
+                logger.warn("Error al aplicar CSS: {}", e.getMessage());
+            }
+
             Stage stage = new Stage();
             stage.setTitle("Crear Nuevo Personaje");
-            stage.setScene(new Scene(root));
+            stage.setScene(scene);
             stage.show();
 
         } catch (Exception e) {
@@ -368,6 +401,31 @@ public class ControladorVisualizarPersonajes {
      */
     public void crearArchivos() {
         // Implementación futura.
+    }
+
+    /**
+     * Exporta los alumnos seleccionados a PDF.
+     *
+     * @author Telmo
+     */
+    public void exportarPersonajes() {
+        // Implementación futura.
+    }
+
+    /**
+     * Cierra la ventana principal de la aplicación.
+     *
+     * @author Erlantz
+     */
+    @FXML
+    private void salir() {
+        if (menuBar != null && menuBar.getScene() != null) {
+            Stage stage = (Stage) menuBar.getScene().getWindow();
+            logger.info("Cerrando aplicación desde menú Archivo → Salir...");
+            stage.close();
+        } else {
+            logger.error("No se pudo obtener el Stage para cerrar la ventana.");
+        }
     }
 
     /**
