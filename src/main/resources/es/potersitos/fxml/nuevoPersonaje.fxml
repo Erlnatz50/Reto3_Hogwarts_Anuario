@@ -69,35 +69,35 @@
                 </TextField>
 
                 <Label text="%slug.label" GridPane.rowIndex="2" />
-                <TextField fx:id="slugField" promptText="aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <TextField fx:id="slugField" promptText="Aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
                    <tooltip>
                       <Tooltip text="%slug.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%alias.label" GridPane.rowIndex="3" />
-                <TextField fx:id="aliasNamesField" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <TextField fx:id="aliasNamesField" promptText="Aamir" GridPane.columnIndex="1" GridPane.rowIndex="3">
                    <tooltip>
                       <Tooltip text="%alias.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%animagus.label" GridPane.rowIndex="4" />
-                <TextField fx:id="animagusField" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                <TextField fx:id="animagusField" promptText="Gato" GridPane.columnIndex="1" GridPane.rowIndex="4">
                    <tooltip>
                       <Tooltip text="%animagus.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%bloodStatus.label" GridPane.rowIndex="5" />
-                <TextField fx:id="bloodStatusField" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                <TextField fx:id="bloodStatusField" promptText="Sangre Mestiza" GridPane.columnIndex="1" GridPane.rowIndex="5">
                    <tooltip>
                       <Tooltip text="%bloodStatus.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%boggart.label" GridPane.rowIndex="6" />
-                <TextField fx:id="boggartField" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                <TextField fx:id="boggartField" promptText="Dementor" GridPane.columnIndex="1" GridPane.rowIndex="6">
                    <tooltip>
                       <Tooltip text="%boggart.textfield.tooltip" />
                    </tooltip>
@@ -111,42 +111,42 @@
                 </TextField>
 
                 <Label text="%fallecido.label" GridPane.rowIndex="8" />
-                <TextField fx:id="diedField" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                <TextField fx:id="diedField" promptText="24 July 2024" GridPane.columnIndex="1" GridPane.rowIndex="8">
                    <tooltip>
                       <Tooltip text="%fallecido.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%colorOjos.label" GridPane.rowIndex="9" />
-                <TextField fx:id="eyeColorField" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                <TextField fx:id="eyeColorField" promptText="Azul" GridPane.columnIndex="1" GridPane.rowIndex="9">
                    <tooltip>
                       <Tooltip text="%colorOjos.textfield.tooltip" />
                    </tooltip>
                 </TextField>
 
                 <Label text="%trabajos.label" GridPane.rowIndex="10" />
-                <TextField fx:id="trabajoField" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                <TextField fx:id="trabajoField" promptText="Estudiante" GridPane.columnIndex="1" GridPane.rowIndex="10">
                     <tooltip>
                         <Tooltip text="%trabajos.textfield.tooltip" />
                     </tooltip>
                 </TextField>
 
                 <Label text="%familiares.label" GridPane.rowIndex="11" />
-                <TextField fx:id="miembrosFamiliaField" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                <TextField fx:id="miembrosFamiliaField" promptText="Noemi" GridPane.columnIndex="1" GridPane.rowIndex="11">
                     <tooltip>
                         <Tooltip text="%familiares.textfield.tooltip" />
                     </tooltip>
                 </TextField>
 
                 <Label text="%colorPiel.label" GridPane.rowIndex="12" />
-                <TextField fx:id="colorPielField" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                <TextField fx:id="colorPielField" promptText="Clara" GridPane.columnIndex="1" GridPane.rowIndex="12">
                     <tooltip>
                         <Tooltip text="%colorPiel.textfield.tooltip" />
                     </tooltip>
                 </TextField>
 
                 <Label text="%varitas.label" GridPane.rowIndex="13" />
-                <TextField fx:id="varitaField" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                <TextField fx:id="varitaField" promptText="Endrino" GridPane.columnIndex="1" GridPane.rowIndex="13">
                     <tooltip>
                         <Tooltip text="%varitas.textfield.tooltip" />
                     </tooltip>
@@ -169,7 +169,7 @@
                       <Insets left="10.0" />
                    </GridPane.margin>
                 </Label>
-                <TextField fx:id="hairColorField" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                <TextField fx:id="hairColorField" promptText="Negro" GridPane.columnIndex="3" GridPane.rowIndex="1">
                    <tooltip>
                       <Tooltip text="%colorPelo.textfield.tooltip" />
                    </tooltip>
@@ -180,7 +180,7 @@
                       <Insets left="10.0" />
                    </GridPane.margin>
                 </Label>
-                <TextField fx:id="heightField" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                <TextField fx:id="heightField" promptText="1,80m" GridPane.columnIndex="3" GridPane.rowIndex="2">
                    <tooltip>
                       <Tooltip text="%altura.textfield.tooltip" />
                    </tooltip>
@@ -213,7 +213,7 @@
                       <Insets left="10.0" />
                    </GridPane.margin>
                 </Label>
-                <TextField fx:id="maritalStatusField" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                <TextField fx:id="maritalStatusField" promptText="Casado" GridPane.columnIndex="3" GridPane.rowIndex="5">
                    <tooltip>
                       <Tooltip text="%estadoCivil.textfield.tooltip" />
                    </tooltip>
@@ -246,7 +246,7 @@
                       <Insets left="10.0" />
                    </GridPane.margin>
                 </Label>
-                <TextField fx:id="patronusField" GridPane.columnIndex="3" GridPane.rowIndex="8">
+                <TextField fx:id="patronusField" promptText="Ciervo" GridPane.columnIndex="3" GridPane.rowIndex="8">
                    <tooltip>
                       <Tooltip text="%patronus.textfield.tooltip" />
                    </tooltip>
@@ -257,7 +257,7 @@
                       <Insets left="10.0" />
                    </GridPane.margin>
                 </Label>
-                <TextField fx:id="speciesField" GridPane.columnIndex="3" GridPane.rowIndex="9">
+                <TextField fx:id="speciesField" promptText="Humano" GridPane.columnIndex="3" GridPane.rowIndex="9">
                    <tooltip>
                       <Tooltip text="%especie.textfield.tooltip" />
                    </tooltip>
@@ -268,7 +268,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Label>
-                <TextField fx:id="wikipediaField" GridPane.columnIndex="3" GridPane.rowIndex="10">
+                <TextField fx:id="wikipediaField" promptText="https://es.wikipedia.org/wiki/Harry_Potter" GridPane.columnIndex="3" GridPane.rowIndex="10">
                    <tooltip>
                       <Tooltip text="%wikipedia.textfield.tooltip" />
                    </tooltip>
@@ -279,7 +279,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Label>
-                <TextField fx:id="romancesField" GridPane.columnIndex="3" GridPane.rowIndex="11">
+                <TextField fx:id="romancesField" promptText="Ginny" GridPane.columnIndex="3" GridPane.rowIndex="11">
                     <tooltip>
                         <Tooltip text="%romances.textfield.tooltip" />
                     </tooltip>
@@ -290,7 +290,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Label>
-                <TextField fx:id="titulosField" GridPane.columnIndex="3" GridPane.rowIndex="12">
+                <TextField fx:id="titulosField" promptText="Campeón del Torneo de los Tres Magos" GridPane.columnIndex="3" GridPane.rowIndex="12">
                     <tooltip>
                         <Tooltip text="%titulos.textfield.tooltip" />
                     </tooltip>
@@ -301,7 +301,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Label>
-                <TextField fx:id="pesoField" GridPane.columnIndex="3" GridPane.rowIndex="13">
+                <TextField fx:id="pesoField" promptText="70kg" GridPane.columnIndex="3" GridPane.rowIndex="13">
                     <tooltip>
                         <Tooltip text="%peso.textfield.tooltip" />
                     </tooltip>

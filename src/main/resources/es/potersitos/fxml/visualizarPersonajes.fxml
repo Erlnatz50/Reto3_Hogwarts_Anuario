@@ -13,13 +13,13 @@
             fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
 
     <top>
-        <MenuBar styleClass="menu-bar">
+        <MenuBar fx:id="menuBar" styleClass="menu-bar">
             <Menu text="%menu.archivo">
-                    <MenuItem text="%menu.archivo.nuevo" onAction="#onNuevo"/>
-                    <MenuItem text="%menu.archivo.importar" onAction="#crearArchivos"/>
-                    <MenuItem text="%menu.archivo.guardar"/>
+                    <MenuItem text="%menu.archivo.nuevo" fx:id="menuNuevo" onAction="#onNuevo"/>
+                    <MenuItem text="%menu.archivo.importar" fx:id="menuImportar" onAction="#crearArchivos"/>
+                    <MenuItem text="%menu.archivo.guardar" fx:id="menuGuardar" onAction="#exportarPersonajes"/>
                     <SeparatorMenuItem/>
-                    <MenuItem text="%menu.archivo.salir"/>
+                    <MenuItem text="%menu.archivo.salir" fx:id="menuSalir" onAction="#salir"/>
             </Menu>
             <Menu text="%menu.idioma">
                 <MenuItem text="%menu.idioma.espanol" onAction="#idiomaEspaniol">
