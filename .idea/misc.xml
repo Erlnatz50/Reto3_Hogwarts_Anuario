@@ -4,6 +4,11 @@
     <option name="pathToExecutable" value="C:\Users\Usuario\AppData\Local\Programs\Python\Python313\Scripts\black.exe" />
     <option name="sdkName" value="Python 3.13" />
   </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="javafx.fxml.FXML" />
+    </list>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">
     <option name="originalFiles">
