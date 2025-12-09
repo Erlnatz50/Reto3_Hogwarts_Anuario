@@ -45,8 +45,8 @@
                 </MenuItem>
             </Menu>
             <Menu text="%menu.ayuda">
-                    <MenuItem text="%menu.ayuda.documentacion"/>
-                    <MenuItem text="%menu.ayuda.acercade"/>
+                    <MenuItem text="%menu.ayuda.documentacion" onAction="#documentacion"/>
+                    <MenuItem text="%menu.ayuda.acercade" onAction="#acercaDe"/>
             </Menu>
         </MenuBar>
     </top>

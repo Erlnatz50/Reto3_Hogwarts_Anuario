@@ -1,13 +1,15 @@
 package es.potersitos.controladores;
 
-import es.potersitos.App;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -15,10 +17,13 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.event.ActionEvent;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.sql.Statement;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -360,6 +365,7 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Erlantz
      */
+    @FXML
     public void onNuevo() {
         try {
             var fxmlResource = getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml");
@@ -399,8 +405,52 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Erlantz
      */
+    @FXML
     public void crearArchivos() {
-        // Implementación futura.
+        try {
+            String userHome = System.getProperty("user.home");
+            String proyectoPath = userHome + "\\Reto3_Hogwarts_Anuario";
+            new File(proyectoPath).mkdirs();
+
+            String csvPath = proyectoPath + "\\todosPersonajes.csv";
+            String xmlPath = proyectoPath + "\\todosPersonajes.xml";
+            String binPath = proyectoPath + "\\todosPersonajes.bin";
+
+            String exePath = "lib\\CrearArchivosPotter.exe";
+            File exeFile = new File(exePath);
+            if (!exeFile.exists()) {
+                mandarAlertas(Alert.AlertType.ERROR, "ERROR", "", "EXE no encontrado:\n" + exeFile.getAbsolutePath());
+                return;
+            }
+
+            ProcessBuilder pb = new ProcessBuilder(exePath, csvPath, xmlPath, binPath);
+            pb.redirectErrorStream(true);
+            Process proceso = pb.start();
+
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(proceso.getInputStream()))) {
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    output.append(linea).append("\n");
+                }
+            }
+
+            int exitCode = proceso.waitFor();
+            logger.info("PYTHON OUTPUT: {}", output);
+
+            boolean csvOk = new File(csvPath).exists();
+            boolean xmlOk = new File(xmlPath).exists();
+            boolean binOk = new File(binPath).exists();
+
+            if (csvOk && xmlOk && binOk) {
+                mandarAlertas(Alert.AlertType.INFORMATION, "ÉXITO", "", "3 Archivos creados:\n" + proyectoPath);
+            } else {
+                mandarAlertas(Alert.AlertType.ERROR, "FALLÓ", "", String.format("ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
+            }
+        } catch (Exception e) {
+            mandarAlertas(Alert.AlertType.ERROR, "Error", "", e.getMessage());
+        }
     }
 
     /**
@@ -408,8 +458,41 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Telmo
      */
+    @FXML
     public void exportarPersonajes() {
         // Implementación futura.
+    }
+
+    /**
+     *
+     */
+    @FXML
+    public void documentacion() throws IOException {
+
+    }
+
+    /**
+     *
+     */
+    @FXML
+    public void acercaDe() {
+        String mensaje = """
+        🎓 RETO3 HOGWARTS ANUARIO
+        
+        📚 Creado por:
+        • Erlantz García
+        • Telmo Castillo
+        • Marco Muro
+        • Nizam Abdel-Ghaffar
+        
+        🏫 DEIN - Desarrollo de Interfaces
+        🔮 Universo Harry Potter API
+        
+        🚀 Python + JavaFX + PyInstaller
+        
+        💻 Ultima modificación: 19 de Diciembre de 2025
+        """;
+        mandarAlertas(Alert.AlertType.INFORMATION, "Acerca de Hogwarts Anuario", null, mensaje);
     }
 
     /**
