@@ -13,18 +13,27 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Clase estática para gestionar la lectura y eliminación de personajes en el archivo CSV.
+ *
+ * @author Marco
+ * @version 1.0
  */
 public class PersonajeCSVManager {
 
+    /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(PersonajeCSVManager.class);
-    // Ruta donde se encuentra el archivo CSV dentro de tu proyecto (puede variar)
+
+    /**  */
     private static final String RUTA_CSV = "src/main/resources/es/potersitos/csv/todosPersonajes.csv";
-    private static final int INDICE_SLUG = 2; // El SLUG está en la columna 3 (índice 2) del CSV
+
+    /**  */
+    private static final int INDICE_SLUG = 2;
 
     /**
      * Elimina una línea del CSV basándose en el SLUG del personaje.
-     * * @param slug El SLUG (identificador) del personaje a eliminar.
+     *
+     * @param slug El SLUG (identificador) del personaje a eliminar.
      * @return true si la eliminación fue exitosa, false en caso contrario.
+     * @author Marco
      */
     public static boolean eliminarPersonajePorSlug(String slug) {
         File inputFile = new File(RUTA_CSV);
@@ -50,7 +59,7 @@ public class PersonajeCSVManager {
                     }
                 }
                 // Escribimos la línea si no es la que queremos eliminar
-                writer.write(lineaActual + System.getProperty("line.separator"));
+                writer.write(lineaActual + System.lineSeparator());
             }
 
             writer.flush();

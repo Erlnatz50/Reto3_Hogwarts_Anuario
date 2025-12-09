@@ -94,7 +94,7 @@ public class ControladorDatos {
     public void cargarDatosPrueba() {
         logger.debug("Cargando datos de prueba...");
         try {
-            String rutaImagen = "/es/potersitos/img/foto.png";
+            String rutaImagen = "/es/potersitos/img/persona_predeterminado.png";
             Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(rutaImagen)));
             imageView.setImage(image);
             logger.info("Imagen cargada con éxito desde: {}", rutaImagen);

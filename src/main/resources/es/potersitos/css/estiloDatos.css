@@ -101,7 +101,7 @@
 }
 
 #closeButton:hover {
-    -fx-background-color: 211f1a;
+    -fx-background-color: #211f1a;
     -fx-text-fill: white;
 }
 
