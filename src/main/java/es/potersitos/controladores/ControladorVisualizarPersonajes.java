@@ -17,13 +17,11 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -41,7 +39,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Botones principales del panel */
     @FXML
-    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar;
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
 
     /** Barra de menús principal de la aplicación */
     @FXML
@@ -99,10 +97,11 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void initialize() {
+        // Cargar recurso por defecto
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
         logger.info("Inicializando ControladorVisualizarPersonajes...");
 
-        // atajos de teclado
+        // Configurar atajos de teclado
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         menuImportar.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
@@ -112,10 +111,14 @@ public class ControladorVisualizarPersonajes {
         this.listaControladores = new ArrayList<>();
 
         inicializarDatosPrueba();
-        cargarPersonajes(listaPersonajes);
 
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+        // Carga inicial de textos y personajes
+        actualizarTextosUI();
+        cargarPersonajes(listaPersonajes);
         configurarListenersFiltros();
+
+        // Listener de búsqueda
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
     }
 
     /**
@@ -149,7 +152,7 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Cambia el idioma actual de la interfaz gráfica.
+     * Cambia el idioma actual de la interfaz gráfica y actualiza todos los textos.
      *
      * @param nuevoLocale Nueva configuración regional (Locale) que se va a aplicar.
      * @author Erlantz
@@ -159,10 +162,111 @@ public class ControladorVisualizarPersonajes {
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
             logger.info("Idioma cambiado a: {}", nuevoLocale);
 
-            menuSalir.setText(resources.getString("menu.archivo.salir"));
+            // 1. Actualizar textos estáticos de la interfaz
+            actualizarTextosUI();
+
+            // 2. Recargar las cartas de personajes para que se traduzcan sus etiquetas internas
+            cargarPersonajes(listaPersonajes);
+
+            // 3. Re-aplicar filtros si fuera necesario para mantener coherencia
+            filtrarPersonajes();
 
         } catch (Exception e) {
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, "No se pudo cambiar el idioma: " + e.getMessage());
+            logger.error("Error cambiando idioma", e);
+        }
+    }
+
+    /**
+     * Actualiza los textos de todos los controles de la interfaz según el ResourceBundle actual.
+     */
+    private void actualizarTextosUI() {
+        // --- Barra de Menú (Títulos Principales) ---
+        // Asumiendo el orden: 0=Archivo, 1=Idioma, 2=Ayuda
+        if (menuBar.getMenus().size() >= 3) {
+            menuBar.getMenus().get(0).setText(resources.getString("menu.archivo"));
+            menuBar.getMenus().get(1).setText(resources.getString("menu.idioma"));
+            menuBar.getMenus().get(2).setText(resources.getString("menu.ayuda"));
+        }
+
+        // --- Items del Menú ---
+        menuNuevo.setText(resources.getString("menu.archivo.nuevo"));
+        menuImportar.setText(resources.getString("menu.archivo.importar"));
+        menuGuardar.setText(resources.getString("menu.archivo.guardar"));
+        menuSalir.setText(resources.getString("menu.archivo.salir"));
+
+        // --- Botones y Campos Principales ---
+        searchField.setPromptText(resources.getString("visualizar.search.prompt"));
+        btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
+
+        // Logica para botón seleccionar (depende si está activo o no)
+        if (btnExportar.isVisible()) {
+            btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
+        } else {
+            btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+        }
+
+        btnExportar.setText(resources.getString("visualizar.btn.exportar"));
+
+        // Botones dentro del panel de filtros (si tienen fx:id asignado en el controlador,
+        // si no los tienes inyectados, deberías agregarlos con @FXML o buscarlos dinámicamente)
+        // btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
+        // btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
+
+        // --- Acordeón de Filtros ---
+        if (accordionFiltros != null && !accordionFiltros.getPanes().isEmpty()) {
+            // Actualizar Títulos de los Paneles
+            // Asumiendo orden: 0=Casa, 1=Nacionalidad, 2=Especie, 3=Género
+            List<TitledPane> panes = accordionFiltros.getPanes();
+
+            if (panes.size() > 0) panes.get(0).setText(resources.getString("filtro.titulo.casa"));
+            if (panes.size() > 1) panes.get(1).setText(resources.getString("filtro.titulo.nacionalidad"));
+            if (panes.size() > 2) panes.get(2).setText(resources.getString("filtro.titulo.especie"));
+            if (panes.size() > 3) panes.get(3).setText(resources.getString("filtro.titulo.genero"));
+
+            // Actualizar CheckBoxes dentro de Casa (Panel 0)
+            actualizarCheckBoxesDelPanel(panes.get(0), new String[]{
+                    "filtro.valor.gryffindor", "filtro.valor.slytherin",
+                    "filtro.valor.hufflepuff", "filtro.valor.ravenclaw"
+            });
+
+            // Actualizar CheckBoxes dentro de Nacionalidad (Panel 1)
+            if (panes.size() > 1) {
+                actualizarCheckBoxesDelPanel(panes.get(1), new String[]{
+                        "filtro.valor.britanico", "filtro.valor.irlandes",
+                        "filtro.valor.frances", "filtro.valor.bulgaro"
+                });
+            }
+
+            // Actualizar CheckBoxes dentro de Especie (Panel 2)
+            if (panes.size() > 2) {
+                actualizarCheckBoxesDelPanel(panes.get(2), new String[]{
+                        "filtro.valor.humano", "filtro.valor.mestizo",
+                        "filtro.valor.elfo", "filtro.valor.gigante"
+                });
+            }
+            // Actualizar CheckBoxes dentro de Genero (Panel 3)
+            if (panes.size() > 3) {
+                actualizarCheckBoxesDelPanel(panes.get(3), new String[]{
+                        "filtro.valor.masculino", "filtro.valor.femenino"
+                });
+            }
+        }
+    }
+
+    /**
+     * Método auxiliar para actualizar los textos de los CheckBoxes dentro de un TitledPane
+     */
+    private void actualizarCheckBoxesDelPanel(TitledPane pane, String[] keys) {
+        Node content = pane.getContent();
+        if (content instanceof VBox) {
+            int index = 0;
+            for (Node node : ((VBox) content).getChildren()) {
+                if (node instanceof CheckBox && index < keys.length) {
+                    ((CheckBox) node).setText(resources.getString(keys[index]));
+                    index++;
+                }
+            }
         }
     }
 
@@ -198,12 +302,18 @@ public class ControladorVisualizarPersonajes {
         for (Personaje p : personajes) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
+                // Importante: Pasar el ResourceBundle actual al loader
                 loader.setResources(resources);
                 VBox card = loader.load();
 
                 ControladorFichaPersonaje controller = loader.getController();
                 controller.setData(p.nombre, p.casa, p.imagePath);
                 controller.setPersonajeSlug(p.slug);
+
+                // Si estamos en modo selección, mantener el estado visual
+                if (btnExportar.isVisible()) {
+                    controller.setSelectionMode(true);
+                }
 
                 listaControladores.add(controller);
                 tilePanePersonajes.getChildren().add(card);
@@ -221,14 +331,13 @@ public class ControladorVisualizarPersonajes {
      */
     private void configurarListenersFiltros() {
         if (accordionFiltros != null) {
+            // Iteramos sobre todos los paneles
             for (TitledPane pane : accordionFiltros.getPanes()) {
-                if ("Casa".equals(pane.getText())) {
-                    Node content = pane.getContent();
-                    if (content instanceof VBox) {
-                        for (Node node : ((VBox) content).getChildren()) {
-                            if (node instanceof CheckBox cb) {
-                                cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
-                            }
+                Node content = pane.getContent();
+                if (content instanceof VBox) {
+                    for (Node node : ((VBox) content).getChildren()) {
+                        if (node instanceof CheckBox cb) {
+                            cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
                         }
                     }
                 }
@@ -292,12 +401,18 @@ public class ControladorVisualizarPersonajes {
 
         if (accordionFiltros != null) {
             for (TitledPane pane : accordionFiltros.getPanes()) {
-                if ("Casa".equals(pane.getText())) {
+                // CORRECCIÓN: Usar la clave del recurso en lugar del texto fijo "Casa"
+                // para que funcione en cualquier idioma.
+                if (pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
                     Node content = pane.getContent();
                     if (content instanceof VBox) {
                         for (Node node : ((VBox) content).getChildren()) {
                             if (node instanceof CheckBox cb) {
                                 if (cb.isSelected()) {
+                                    // Aquí comparamos el texto del checkbox.
+                                    // OJO: Si el filtro depende del valor interno ("Gryffindor")
+                                    // pero el texto visible cambia ("Gryffindor" suele ser igual),
+                                    // asegúrate de que la lógica de filtrado coincida con el dato del personaje.
                                     selectedCasas.add(cb.getText());
                                 }
                             }
@@ -309,6 +424,9 @@ public class ControladorVisualizarPersonajes {
 
         List<Personaje> filtrados = listaPersonajes.stream()
                 .filter(p -> p.nombre.toLowerCase().contains(searchText))
+                // Adaptamos el filtro de casa para que coincida aunque esté traducido
+                // (Para simplificar, en HP las casas no suelen traducirse mucho, pero si pasara,
+                // habría que mapear el texto visible al valor interno).
                 .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.casa))
                 .collect(Collectors.toList());
 
@@ -327,10 +445,12 @@ public class ControladorVisualizarPersonajes {
 
         btnExportar.setVisible(isSelectionMode);
         btnExportar.setManaged(isSelectionMode);
+
+        // Usamos recursos para los textos de los botones
         if (isSelectionMode) {
-            btnSeleccionar.setText("CANCELAR");
+            btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
         } else {
-            btnSeleccionar.setText("SELECCIONAR");
+            btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
         }
 
         for (ControladorFichaPersonaje controller : listaControladores) {
@@ -353,9 +473,15 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (seleccionados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.INFORMATION, "Exportar", "", "No has seleccionado ningún personaje");
+            mandarAlertas(Alert.AlertType.INFORMATION,
+                    resources.getString("menu.archivo.guardar"),
+                    resources.getString("visualizar.alerta.seleccion.titulo"),
+                    resources.getString("visualizar.alerta.seleccion.mensaje"));
         } else {
-            mandarAlertas(Alert.AlertType.INFORMATION, "Exportar", "", "Exportando: " + String.join(", ", seleccionados));
+            mandarAlertas(Alert.AlertType.INFORMATION,
+                    resources.getString("menu.archivo.guardar"),
+                    "",
+                    "Exportando: " + String.join(", ", seleccionados));
             // Lógica de exportación real (JasperReports)
         }
     }
@@ -374,8 +500,8 @@ public class ControladorVisualizarPersonajes {
                 return;
             }
 
-            ResourceBundle bundle = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.of("es"));
-            FXMLLoader loader = new FXMLLoader(fxmlResource, bundle);
+            // Usar el idioma actual seleccionado para la nueva ventana
+            FXMLLoader loader = new FXMLLoader(fxmlResource, this.resources);
 
             Parent root = loader.load();
 
@@ -391,7 +517,7 @@ public class ControladorVisualizarPersonajes {
             }
 
             Stage stage = new Stage();
-            stage.setTitle("Crear Nuevo Personaje");
+            stage.setTitle(resources.getString("menu.archivo.nuevo")); // Título traducido
             stage.setScene(scene);
             stage.show();
 
@@ -444,12 +570,12 @@ public class ControladorVisualizarPersonajes {
             boolean binOk = new File(binPath).exists();
 
             if (csvOk && xmlOk && binOk) {
-                mandarAlertas(Alert.AlertType.INFORMATION, "ÉXITO", "", "3 Archivos creados:\n" + proyectoPath);
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "3 Archivos creados:\n" + proyectoPath);
             } else {
                 mandarAlertas(Alert.AlertType.ERROR, "FALLÓ", "", String.format("ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
             }
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error", "", e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage());
         }
     }
 
@@ -492,7 +618,7 @@ public class ControladorVisualizarPersonajes {
         
         💻 Ultima modificación: 19 de Diciembre de 2025
         """;
-        mandarAlertas(Alert.AlertType.INFORMATION, "Acerca de Hogwarts Anuario", null, mensaje);
+        mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("menu.ayuda.acercade"), null, mensaje);
     }
 
     /**
