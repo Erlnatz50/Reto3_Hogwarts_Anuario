@@ -1,32 +1,26 @@
 package es.potersitos.controladores;
 
-import es.potersitos.util.PersonajeCSVManager; // Importar el gestor para buscar datos
+import es.potersitos.util.PersonajeCSVManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.*;
 
-// SI NO TIENES JASPER REPORTS, BORRA O COMENTA ESTOS IMPORTS
-import net.sf.jasperreports.engine.JREmptyDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * Controlador para la ventana de datos de personajes.
  * Gestiona la interacción con los elementos del FXML y soporta multiidioma.
  *
- * @author Marco / Modificado por Gemini (Carga dinámica de datos y i18n)
+ * @author Marco
  * @version 1.1
  */
 public class ControladorDatos {
@@ -34,9 +28,7 @@ public class ControladorDatos {
     /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
-    /** Bundle del sistema de internacionalización.
-     * LA ETIQUETA @FXML ES NECESARIA PARA RECIBIR EL IDIOMA DEL CONTROLADOR ANTERIOR.
-     */
+    /** Bundle del sistema de internacionalización. */
     @FXML
     private ResourceBundle resources;
 
@@ -64,7 +56,6 @@ public class ControladorDatos {
      */
     @FXML
     public void initialize() {
-        // Si resources es null aquí, es que no se puso el @FXML o hubo un error en el loader.
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -77,7 +68,6 @@ public class ControladorDatos {
                 resources != null ? resources.getLocale() : "Desconocido");
 
         configurarTextosBotones();
-        // cargarDatosPrueba(); // Ya no llamamos a datos de prueba
     }
 
     /**
@@ -87,7 +77,6 @@ public class ControladorDatos {
         if (resources == null) return;
 
         try {
-            // Textos de botones (traducidos)
             if(actualizarButton != null) {
                 actualizarButton.setText(getStringSafe("actualizar.button"));
                 actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
@@ -110,7 +99,7 @@ public class ControladorDatos {
      */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
-        cargarDatosPersonaje(slug); // Llamar a la carga real
+        cargarDatosPersonaje(slug);
     }
 
     /**
@@ -132,7 +121,6 @@ public class ControladorDatos {
             rellenarInterfaz(personajeEncontrado.get());
         } else {
             logger.error("Personaje con SLUG '{}' no encontrado.", slug);
-            // Mostrar un mensaje de error o datos por defecto
             establecerTexto(nombreLabel, "nombre.label", getStringSafe("error.nodatos"));
         }
     }
@@ -141,7 +129,6 @@ public class ControladorDatos {
      * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la traducción de etiquetas.
      */
     private void rellenarInterfaz(Map<String, String> p) {
-        // --- Carga de Imagen (Lógica copiada de ControladorFichaPersonaje) ---
         String imagePath = p.getOrDefault("image", "");
         if (!imagePath.isEmpty()) {
             try {
@@ -156,7 +143,6 @@ public class ControladorDatos {
             }
         } else {
             try {
-                // Cargar imagen por defecto si no hay ruta
                 InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
                 if (imgStream != null) {
                     imageView.setImage(new Image(imgStream));
@@ -166,8 +152,6 @@ public class ControladorDatos {
             }
         }
 
-        // --- Carga de Etiquetas (usando las claves del modelo Python) ---
-        // El prefijo se traduce vía getStringSafe, el valor es el del CSV.
         establecerTexto(nombreLabel, "nombre.label", p.getOrDefault("name", "N/A"));
         establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
         establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
@@ -197,8 +181,8 @@ public class ControladorDatos {
     }
 
     /**
-     * Método auxiliar para establecer texto en Labels de forma segura y traducida.
-     * Formato: "Traducción: Valor" (Ej: "Izena: Harry Potter")
+     * Metodo auxiliar para establecer texto en Labels de forma segura y traducida.
+     * Formato: "Traducción: Valor" (Ej.: "Izena: Harry Potter")
      */
     private void establecerTexto(Label label, String key, String valor) {
         if (label != null) {
@@ -214,7 +198,7 @@ public class ControladorDatos {
         try {
             return resources.getString(key);
         } catch (Exception e) {
-            return key; // Devuelve la clave si falla la traducción
+            return key;
         }
     }
 
@@ -242,27 +226,20 @@ public class ControladorDatos {
     public void handleExportar() {
         logger.info("Botón 'Exportar' presionado");
 
-        // --- INICIO BLOQUE JASPER ---
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
                 mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "No se encuentra el archivo .jrxml");
                 return;
             }
 
-            // Descomente y modifique si tiene las librerías de JasperReports configuradas
-            /*
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = new HashMap<>();
 
-            // Ejemplo de cómo pasar datos traducidos al reporte
             parameters.put("Nombre", obtenerValor(nombreLabel));
             parameters.put("Casa", obtenerValor(casaLabel));
-            // ... otros
 
-            // Asumiendo que la ruta del archivo Jasper es correcta
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
             JasperViewer.viewReport(jasperPrint, false);
-            */
 
             mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exportar.button"), "", "Funcionalidad JasperReports comentada. Verifique la implementación en el código.");
 
@@ -272,7 +249,6 @@ public class ControladorDatos {
             logger.error("Error Jasper", e);
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
         }
-        // --- FIN BLOQUE JASPER ---
     }
 
     /**
@@ -280,9 +256,6 @@ public class ControladorDatos {
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        // Asumiendo que PersonajeCSVManager está disponible para eliminar
-        // Debe asegurarse de que PersonajeCSVManager.eliminarPersonajePorSlug exista
-
         if (personajeSlug == null || personajeSlug.isEmpty()) {
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Slug vacío.");
             return;
@@ -299,14 +272,12 @@ public class ControladorDatos {
 
             boolean exito = false;
             try {
-                // Descomentar si PersonajeCSVManager está disponible y tiene el método
-                // exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+                exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
                 logger.warn("Simulando eliminación de: {}", personajeSlug);
-                exito = true; // Simulación
+                exito = true;
             } catch (Exception e) {
                 logger.error("Error real al eliminar el personaje.", e);
             }
-
 
             if (exito) {
                 mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", getStringSafe("eliminar.exito"));

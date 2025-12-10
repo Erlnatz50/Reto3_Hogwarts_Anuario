@@ -23,8 +23,8 @@ import java.util.ResourceBundle;
  * Controlador de la ficha individual de un personaje.
  * Gestiona la visualización de la tarjeta, i18n, carga de imágenes y navegación a detalles.
  *
- * @author Marco / Modificado por Gemini
- * @version 1.5 (Versión final consolidada y robusta)
+ * @author Marco
+ * @version 1.0
  */
 public class ControladorFichaPersonaje {
 
@@ -44,9 +44,7 @@ public class ControladorFichaPersonaje {
     @FXML
     private CheckBox checkBoxSeleccionar;
 
-    /** Recurso de internacionalización.
-     * La anotación @FXML es crucial para inyectar el ResourceBundle.
-     */
+    /** Recurso de internacionalización. */
     @FXML
     private ResourceBundle resources;
 
@@ -63,11 +61,10 @@ public class ControladorFichaPersonaje {
      * Inicializa el controlador.
      * Configura los tooltips traducidos.
      *
-     * @author Erlantz / Modificado por Gemini
+     * @author Erlantz
      */
     @FXML
     public void initialize() {
-        // Asegurarse de que el ResourceBundle esté cargado (si falla la inyección FXML)
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -76,7 +73,6 @@ public class ControladorFichaPersonaje {
             }
         }
 
-        // Aplicar Tooltips traducidos
         if (this.resources != null) {
             try {
                 Tooltip tooltipCard = new Tooltip(resources.getString("ficha.click.tooltip"));
@@ -117,24 +113,19 @@ public class ControladorFichaPersonaje {
             if (imagePath != null && !imagePath.isEmpty()) {
 
                 String rutaPrevia = imagePath;
-                // Definimos rutaFinal que será la variable efectivamente final
                 final String rutaFinal;
 
-                // Lógica de conversión de ruta local a URL de archivo (file:/)
                 if (!rutaPrevia.toLowerCase().startsWith("http") && !rutaPrevia.toLowerCase().startsWith("file:")) {
                     rutaFinal = "file:/" + rutaPrevia.replace("\\", "/");
                 } else {
                     rutaFinal = rutaPrevia;
                 }
 
-                // --- CREAMOS LA IMAGEN Y LA CARGAMOS ASÍNCRONAMENTE ---
                 Image imagen = new Image(rutaFinal, true);
 
-                // Manejo de errores de carga de imagen
                 imagen.errorProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue) {
                         logger.warn("Fallo al cargar la imagen de la ruta: {}. Verifique que el archivo exista.", rutaFinal);
-                        // Opcional: Establecer una imagen de placeholder si falla
                     }
                 });
 
@@ -155,7 +146,6 @@ public class ControladorFichaPersonaje {
      */
     @FXML
     private void handleCardClick() {
-        // 1. Lógica de Selección
         if (isSelectionMode) {
             boolean nuevoEstado = !checkBoxSeleccionar.isSelected();
             checkBoxSeleccionar.setSelected(nuevoEstado);
@@ -163,14 +153,11 @@ public class ControladorFichaPersonaje {
             return;
         }
 
-        // 2. Lógica de Apertura de Detalles
         logger.info("Abriendo ventana de detalles para '{}'.", labelNombre.getText());
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
 
-            // ¡IMPORTANTE!: Pasamos el 'resources' actual (que ya tiene el idioma correcto)
-            // al siguiente cargador.
             if (resources != null) {
                 loader.setResources(resources);
             }
@@ -185,7 +172,6 @@ public class ControladorFichaPersonaje {
 
             Scene scene = new Scene(root);
 
-            // Cargar estilos CSS
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
                 if (archivoCSS != null) {
@@ -197,7 +183,6 @@ public class ControladorFichaPersonaje {
             }
 
             Stage stage = new Stage();
-            // Asumiendo que el ControladorDatos establecerá su propio título traducido
             stage.setTitle("Datos del Personaje");
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);

@@ -1,38 +1,33 @@
 package es.potersitos.util;
 
-// Importaciones necesarias
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Clase estática modificada para leer datos y devolverlos como List<Map<String, String>>
- * para evitar el uso de la clase modelo Personaje.java.
+ * Utilidad estática para gestionar la lectura y eliminación de personajes desde/hacia archivos CSV.
  *
- * @author Marco / Modificado por Gemini
- * @version 1.4 (Ruta confirmada, lógica de eliminación refinada)
+ * @author Marco
+ * @version 1.0
  */
 public class PersonajeCSVManager {
 
-    /** Logger para esta clase */
+    /** Logger para registrar operaciones y errores. */
     private static final Logger logger = LoggerFactory.getLogger(PersonajeCSVManager.class);
 
-    // --- RUTA CLAVE ---
-    private static final String RUTA_ARCHIVO_DATOS = "C:\\Users\\dm2\\Reto3_Hogwarts_Anuario\\todosPersonajes.csv";
+    /** Nombre de la carpeta de datos en el directorio home del usuario. */
+    private static final String NOMBRE_CARPETA = "Reto3_Hogwarts_Anuario";
 
-    /** Índice donde se encuentra el SLUG del personaje en la línea (se asume que es el 3er campo, índice 2). */
-    private static final int INDICE_SLUG = 2;
+    /** Nombre del archivo CSV principal. */
+    private static final String NOMBRE_ARCHIVO = "todosPersonajes.csv";
 
-    // --- Array con las claves de los 28 atributos de tu modelo Python ---
+    /** Mapeo de las 28 columnas del CSV del universo Harry Potter a claves de búsqueda. */
     private static final String[] CLAVES_PERSONAJE = {
             "id", "type", "slug", "alias_names", "animagus", "blood_status", "boggart",
             "born", "died", "eye_color", "family_members", "gender", "hair_color",
@@ -41,60 +36,58 @@ public class PersonajeCSVManager {
             "weight", "wiki"
     };
 
-    // ------------------------------------------------------------------------
-    // MÉTODOS DE LECTURA
-    // ------------------------------------------------------------------------
-
     /**
      * Lee todos los personajes del archivo de datos (todosPersonajes.csv) y los devuelve como una lista de Mapas (clave -> valor).
      *
-     * @return Una lista de Map<String, String>, donde cada mapa es un personaje.
+     * @return Lista de mapas donde cada mapa representa un personaje con sus 28 atributos.
+     * @author Nizam
      */
     public static List<Map<String, String>> leerTodosLosPersonajes() {
-        List<Map<String, String>> listaPersonajesMapeados = new ArrayList<>();
+        List<Map<String, String>> personajes = new ArrayList<>();
+        String rutaCompleta = obtenerRutaCompletaCSV();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(RUTA_ARCHIVO_DATOS))) {
-            String lineaActual;
-
-            // Si el archivo tiene una línea de cabecera (títulos de columnas), descomenta la siguiente línea para saltarla.
-            // reader.readLine();
-
-            while ((lineaActual = reader.readLine()) != null) {
-                if (lineaActual.trim().isEmpty()) continue; // Ignorar líneas vacías
-
-                // --- Se asume que el delimitador es la coma (',') ---
-                String[] datos = lineaActual.split(",", -1);
-
-                // Debe haber al menos tantos datos como CLAVES_PERSONAJE
-                if (datos.length >= CLAVES_PERSONAJE.length) {
-                    Map<String, String> personajeMap = new HashMap<>();
-
-                    // Recorremos los datos y los asignamos al mapa usando las claves predefinidas
-                    for (int i = 0; i < CLAVES_PERSONAJE.length; i++) {
-                        // Usamos un valor seguro ("") si el dato es null o está fuera de límites
-                        String valor = (i < datos.length) ? datos[i].trim() : "";
-                        personajeMap.put(CLAVES_PERSONAJE[i], valor);
-                    }
-
-                    listaPersonajesMapeados.add(personajeMap);
-                } else {
-                    logger.warn("Línea omitida en el archivo {} por formato incorrecto (solo {} de {} campos).",
-                            RUTA_ARCHIVO_DATOS, datos.length, CLAVES_PERSONAJE.length);
-                }
-            }
-            logger.info("Lectura de datos finalizada. {} personajes cargados desde {}", listaPersonajesMapeados.size(), RUTA_ARCHIVO_DATOS);
-        } catch (IOException e) {
-            // Este error suele indicar que la RUTA_ARCHIVO_DATOS es incorrecta o no tiene permisos
-            logger.error("Error de E/S al intentar leer el archivo de datos: {}. Compruebe ruta y permisos.", RUTA_ARCHIVO_DATOS, e);
+        File archivo = new File(rutaCompleta);
+        if (!archivo.exists()){
+            logger.warn("Archivo CSV no encontrado: {}", rutaCompleta);
+            return Collections.emptyList();
         }
 
-        return listaPersonajesMapeados;
+        try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                procesarLineaCSV(linea, personajes);
+            }
+            logger.info("Lectura de datos finalizada. {} personajes cargados desde {}", personajes.size(), rutaCompleta);
+        } catch (IOException e) {
+            logger.error("Error de E/S al intentar leer el archivo de datos {}: {}.", rutaCompleta, e.getMessage());
+        }
+
+        return personajes;
     }
 
+    /**
+     * Procesa una línea individual del CSV y la convierte en un mapa de personaje.
+     *
+     * @param linea Línea completa del CSV
+     * @param personajes Lista destino para agregar el personaje procesado
+     * @author Nizam
+     */
+    private static void procesarLineaCSV(String linea, List<Map<String, String>> personajes) {
+        if (linea.trim().isEmpty()) return;
 
-    // ------------------------------------------------------------------------
-    // MÉTODOS DE ESCRITURA/ELIMINACIÓN
-    // ------------------------------------------------------------------------
+        String[] datos = linea.split(",", -1);
+        if (datos.length < CLAVES_PERSONAJE.length) {
+            logger.warn("Línea inválida: {} campos (requiere {})", datos.length, CLAVES_PERSONAJE.length);
+            return;
+        }
+
+        Map<String, String> personaje = new HashMap<>();
+        for (int i = 0; i < CLAVES_PERSONAJE.length; i++) {
+            String valor = i < datos.length ? datos[i].trim() : "";
+            personaje.put(CLAVES_PERSONAJE[i], valor);
+        }
+        personajes.add(personaje);
+    }
 
     /**
      * Elimina una línea del archivo de datos basándose en el SLUG del personaje.
@@ -104,62 +97,84 @@ public class PersonajeCSVManager {
      * @author Marco
      */
     public static boolean eliminarPersonajePorSlug(String slug) {
-        File inputFile = new File(RUTA_ARCHIVO_DATOS);
-        File tempFile = new File(inputFile.getParent(), "tempPersonajes.tmp");
+        if (slug == null || slug.trim().isEmpty()) {
+            logger.warn("SLUG inválido proporcionado para eliminación");
+            return false;
+        }
+
+        String rutaCSV = obtenerRutaCompletaCSV();
+        File archivoCSV = new File(rutaCSV);
+
+        if (!archivoCSV.exists()) {
+            logger.warn("No se puede eliminar: archivo CSV no existe ({})", rutaCSV);
+            return false;
+        }
+
+        List<Map<String, String>> personajes = leerTodosLosPersonajes();
+        if (personajes.isEmpty()) {
+            logger.warn("Archivo vacío, no hay personajes para eliminar");
+            return false;
+        }
 
         boolean eliminado = false;
+        List<Map<String, String>> personajesFiltrados = new ArrayList<>();
 
-        // 1. Escribir todas las líneas EXCEPTO la eliminada en un archivo temporal
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+        for (Map<String, String> personaje : personajes) {
+            String personajeSlug = personaje.getOrDefault("slug", "").trim();
+            if (personajeSlug.equalsIgnoreCase(slug)) {
+                eliminado = true;
+                logger.info("Eliminando personaje con SLUG: {}", slug);
+            } else {
+                personajesFiltrados.add(personaje);
+            }
+        }
 
-            String lineaActual;
-            while ((lineaActual = reader.readLine()) != null) {
-                if (lineaActual.trim().isEmpty()) continue;
+        if (eliminado) {
+            return reescribirCSV(personajesFiltrados, rutaCSV);
+        } else {
+            logger.warn("SLUG '{}' no encontrado en el CSV", slug);
+            return false;
+        }
+    }
 
-                String[] datos = lineaActual.split(",", -1);
-
-                if (datos.length > INDICE_SLUG) {
-                    if (datos[INDICE_SLUG].trim().equalsIgnoreCase(slug)) {
-                        eliminado = true;
-                        logger.info("Personaje con SLUG '{}' marcado para eliminación.", slug);
-                        continue; // No escribimos esta línea
+    /**
+     * Reescribe completamente el archivo CSV con la nueva lista de personajes.
+     *
+     * @param personajesFiltrados Lista de personajes sin el eliminado
+     * @param rutaCSV Ruta del archivo destino
+     * @return {@code true} si se escribió correctamente
+     */
+    private static boolean reescribirCSV(List<Map<String, String>> personajesFiltrados, String rutaCSV) {
+        try (FileWriter writer = new FileWriter(rutaCSV)) {
+            for (Map<String, String> personaje : personajesFiltrados) {
+                StringBuilder linea = new StringBuilder();
+                for (int i = 0; i < CLAVES_PERSONAJE.length; i++) {
+                    String valor = personaje.getOrDefault(CLAVES_PERSONAJE[i], "");
+                    if (valor.contains(",") || valor.contains("\"")) {
+                        valor = "\"" + valor.replace("\"", "\"\"") + "\"";
+                    }
+                    linea.append(valor);
+                    if (i < CLAVES_PERSONAJE.length - 1) {
+                        linea.append(",");
                     }
                 }
-                writer.write(lineaActual + System.lineSeparator());
+                writer.write(linea + System.lineSeparator());
             }
-
-            writer.flush();
-            logger.debug("Archivo temporal creado. Eliminado: {}", eliminado);
-
+            logger.info("CSV reescrito: {} personajes restantes", personajesFiltrados.size());
+            return true;
         } catch (IOException e) {
-            logger.error("Error de E/S durante el proceso de eliminación.", e);
-            // Asegurarse de borrar el temporal en caso de fallo intermedio
-            tempFile.delete();
+            logger.error("Error reescribiendo CSV: {}", e.getMessage());
             return false;
         }
+    }
 
-        // 2. Renombrar el archivo temporal al original
-        if (eliminado) {
-            if (inputFile.delete()) {
-                if (tempFile.renameTo(inputFile)) {
-                    logger.info("Eliminación exitosa. Archivo de datos reescrito.");
-                    return true;
-                } else {
-                    logger.error("Fallo al renombrar el archivo temporal. Debe mover/copiar manualmente: {}", tempFile.getAbsolutePath());
-                    // Dejar el archivo temporal para recuperación si no se puede renombrar
-                    return false;
-                }
-            } else {
-                logger.error("Fallo al eliminar el archivo original. Permisos denegados.");
-                tempFile.delete();
-                return false;
-            }
-        } else {
-            // Si no se encontró el slug, simplemente borramos el temporal
-            tempFile.delete();
-            logger.warn("El SLUG '{}' no fue encontrado en el archivo de datos.", slug);
-            return false;
-        }
+    /**
+     * Construye la ruta completa del archivo CSV usando el directorio home del usuario actual.
+     *
+     * @return Ruta absoluta: {@code $HOME/Reto3_Hogwarts_Anuario/todosPersonajes.csv}
+     */
+    private static String obtenerRutaCompletaCSV() {
+        String userHome = System.getProperty("user.home");
+        return userHome + File.separator + NOMBRE_CARPETA + File.separator + NOMBRE_ARCHIVO;
     }
 }

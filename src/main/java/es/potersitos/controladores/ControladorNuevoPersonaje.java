@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,7 +63,6 @@ public class ControladorNuevoPersonaje {
      */
     @FXML
     private void initialize() {
-        // Si el loader no inyectó los recursos (por ejemplo, al abrirse de forma aislada), cargamos el defecto.
         if (resources == null) {
             try {
                 resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -73,8 +71,7 @@ public class ControladorNuevoPersonaje {
             }
         }
 
-        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}",
-                resources != null ? resources.getLocale() : "Desconocido");
+        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}", resources != null ? resources.getLocale() : "Desconocido");
     }
 
     /**
@@ -89,14 +86,13 @@ public class ControladorNuevoPersonaje {
     }
 
     /**
-     * Valida y guarda nuevos personajes en CSV, XML y binario.
+     * Válida y guarda nuevos personajes en CSV, XML y binario.
      *
      * @author Erlantz
      */
     @FXML
     public void onAgregar() {
         try {
-            // Recogemos los datos (sin validación compleja por ahora, tal como estaba en el original)
             String[] datos = {
                     idField.getText().trim(),
                     typeField.getText().trim(),
@@ -128,32 +124,23 @@ public class ControladorNuevoPersonaje {
                     pesoField.getText().trim()
             };
 
-            // Definimos la ruta de guardado
             Path baseDir = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario");
             Files.createDirectories(baseDir);
             logger.debug("Directorio verificado/creado: {}", baseDir);
 
-            // Guardamos en los 3 formatos
             guardarCSV(baseDir, datos);
             guardarXML(baseDir, datos);
             guardarBinario(baseDir, datos);
 
-            logger.info("Personaje creado correctamente: {}", datos[20]); // datos[20] es el nombre
+            logger.info("Personaje creado correctamente: {}", datos[20]);
 
-            // Usamos las claves del ResourceBundle para los mensajes
-            mandarAlertas(Alert.AlertType.INFORMATION,
-                    resources.getString("exito"),
-                    resources.getString("personajeGuardado"),
-                    resources.getString("personajeGuardadoMensaje"));
+            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
 
             cancelarButton.getScene().getWindow().hide();
 
         } catch (Exception e) {
             logger.error("Error al guardar el personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR,
-                    resources.getString("error"),
-                    resources.getString("falloAlGuardarPersonaje"),
-                    e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("falloAlGuardarPersonaje"), e.getMessage());
         }
     }
 
@@ -172,7 +159,7 @@ public class ControladorNuevoPersonaje {
             logger.debug("CSV guardado: {}", csvPath);
         } catch (IOException e) {
             logger.error("Error al guardar en archivo CSV: {}", e.getMessage());
-            throw new RuntimeException("Error CSV: " + e.getMessage()); // Re-lanzamos para que salte la alerta
+            throw new RuntimeException("Error CSV: " + e.getMessage());
         }
     }
 
@@ -195,7 +182,6 @@ public class ControladorNuevoPersonaje {
                     doc = builder.parse(xmlPath.toFile());
                     doc.getDocumentElement().normalize();
                 } catch (Exception ex) {
-                    // Si el XML está corrupto o vacío, creamos uno nuevo
                     doc = builder.newDocument();
                     Element root = doc.createElement("characters");
                     doc.appendChild(root);
@@ -228,7 +214,7 @@ public class ControladorNuevoPersonaje {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(new DOMSource(doc), new StreamResult(xmlPath.toFile()));
 
             logger.debug("XML guardado: {}", xmlPath);
@@ -252,7 +238,6 @@ public class ControladorNuevoPersonaje {
 
             if (Files.exists(binPath)) {
                 try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(binPath))) {
-                    @SuppressWarnings("unchecked")
                     List<String[]> personajesLeidos = (List<String[]>) ois.readObject();
                     personajes = personajesLeidos != null ? personajesLeidos : new ArrayList<>();
                 } catch (Exception e) {
@@ -288,7 +273,7 @@ public class ControladorNuevoPersonaje {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 if (!linea.trim().isEmpty()) {
-                    lista.add(linea.split(",", -1)); // -1 para mantener columnas vacías
+                    lista.add(linea.split(",", -1));
                 }
             }
         } catch (Exception e) {
