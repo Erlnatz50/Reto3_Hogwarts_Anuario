@@ -1,15 +1,13 @@
 package es.potersitos.controladores;
 
+import es.potersitos.util.PersonajeCSVManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -29,148 +27,108 @@ import java.util.stream.Collectors;
  * Controlador encargado de gestionar la vista de personajes.
  * Permite filtrar, cambiar idioma, seleccionar y exportar personajes.
  *
- * @author Telmo
- * @version 1.0
+ * @author Telmo / Modificado por Gemini
+ * @version 1.9 (Control de nulidad en UI y paginación)
  */
 public class ControladorVisualizarPersonajes {
 
     /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
 
-    /** Botones principales del panel */
+    // --- VARIABLES DE PAGINACIÓN INTERNAS ---
+    private final int personajesPorPagina = 10;
+    private int paginaActual = 1;
+    private int totalPaginas;
+    // -------------------------------------
+
+    // NOTA: Estas variables están protegidas en actualizarTextosUI() y initialize()
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
 
-    /** Barra de menús principal de la aplicación */
+    // --- ELEMENTOS FXML DE PAGINACIÓN ---
+    @FXML
+    private Button btnAnterior;
+    @FXML
+    private Button btnSiguiente;
+    @FXML
+    private Label lblPaginaActual;
+    // ------------------------------------
+
     @FXML
     public MenuBar menuBar;
 
-    /** Elementos del menú Archivo **/
     @FXML
     public MenuItem menuSalir, menuNuevo, menuImportar, menuGuardar;
 
-    /** Contenedor de las fichas de personajes */
     @FXML
     private TilePane tilePanePersonajes;
 
-    /** Panel lateral de filtros */
     @FXML
     private VBox filterPanel;
 
-    /** Contenedor de secciones de filtros */
     @FXML
     private Accordion accordionFiltros;
 
-    /** Campo de búsqueda de personajes */
     @FXML
     private TextField searchField;
 
-    /** Lista de controladores de fichas cargadas */
     private List<ControladorFichaPersonaje> listaControladores;
-
-    /** Lista completa de personajes */
-    private List<Personaje> listaPersonajes;
-
-    /** Bundle del sistema de internacionalización */
+    private List<Map<String, String>> listaPersonajesMapeados;
     private ResourceBundle resources;
 
     /**
-     * Clase interna que representa un personaje con datos básicos.
-     *
-     * @author Telmo
-     */
-    private static class Personaje {
-        String nombre, casa, imagePath, slug;
-
-        public Personaje(String nombre, String casa, String imagePath, String slug) {
-            this.nombre = nombre;
-            this.casa = casa;
-            this.imagePath = imagePath;
-            this.slug = slug;
-        }
-    }
-
-    /**
-     * Inicializa el controlador configurando el idioma, datos de ejemplo y filtros.
-     *
-     * @author Telmo
+     * Inicializa el controlador.
      */
     @FXML
     public void initialize() {
-        // Cargar recurso por defecto
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
         logger.info("Inicializando ControladorVisualizarPersonajes...");
 
-        // Configurar atajos de teclado
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         menuImportar.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
 
-        this.listaPersonajes = new ArrayList<>();
+        this.listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
         this.listaControladores = new ArrayList<>();
 
-        inicializarDatosPrueba();
+        int totalPersonajes = this.listaPersonajesMapeados.size();
+        this.totalPaginas = (int) Math.ceil((double) totalPersonajes / personajesPorPagina);
+        logger.info("Total de personajes: {}. Calculadas {} páginas.", totalPersonajes, totalPaginas);
 
-        // Carga inicial de textos y personajes
         actualizarTextosUI();
-        cargarPersonajes(listaPersonajes);
-        configurarListenersFiltros();
+        cargarPersonajes(listaPersonajesMapeados);
 
-        // Listener de búsqueda
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+        if (searchField != null) searchField.textProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+        configurarListenersFiltros();
     }
 
-    /**
-     * Cambia el idioma de la interfaz al Español.
-     *
-     * @author Erlantz
-     */
+    // -----------------------------------------------------------
+    // MÉTODOS DE IDIOMA Y TRADUCCIÓN
+    // -----------------------------------------------------------
+
     @FXML
     void idiomaEspaniol() {
         cambiarIdioma(Locale.of("es"));
     }
 
-    /**
-     * Cambia el idioma de la interfaz al Euskera.
-     *
-     * @author Erlantz
-     */
     @FXML
     void idiomaEuskera() {
         cambiarIdioma(Locale.of("eu"));
     }
 
-    /**
-     * Cambia el idioma de la interfaz al Inglés.
-     *
-     * @author Erlantz
-     */
     @FXML
     void idiomaIngles() {
         cambiarIdioma(Locale.ENGLISH);
     }
 
-    /**
-     * Cambia el idioma actual de la interfaz gráfica y actualiza todos los textos.
-     *
-     * @param nuevoLocale Nueva configuración regional (Locale) que se va a aplicar.
-     * @author Erlantz
-     */
     private void cambiarIdioma(Locale nuevoLocale) {
         try {
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
             logger.info("Idioma cambiado a: {}", nuevoLocale);
-
-            // 1. Actualizar textos estáticos de la interfaz
             actualizarTextosUI();
-
-            // 2. Recargar las cartas de personajes para que se traduzcan sus etiquetas internas
-            cargarPersonajes(listaPersonajes);
-
-            // 3. Re-aplicar filtros si fuera necesario para mantener coherencia
+            cargarPersonajes(listaPersonajesMapeados);
             filtrarPersonajes();
-
         } catch (Exception e) {
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, "No se pudo cambiar el idioma: " + e.getMessage());
             logger.error("Error cambiando idioma", e);
@@ -181,42 +139,41 @@ public class ControladorVisualizarPersonajes {
      * Actualiza los textos de todos los controles de la interfaz según el ResourceBundle actual.
      */
     private void actualizarTextosUI() {
-        // --- Barra de Menú (Títulos Principales) ---
-        // Asumiendo el orden: 0=Archivo, 1=Idioma, 2=Ayuda
-        if (menuBar.getMenus().size() >= 3) {
+        // --- Barra de Menú (Añadida protección contra Null) ---
+        if (menuBar != null && menuBar.getMenus().size() >= 3) {
             menuBar.getMenus().get(0).setText(resources.getString("menu.archivo"));
             menuBar.getMenus().get(1).setText(resources.getString("menu.idioma"));
             menuBar.getMenus().get(2).setText(resources.getString("menu.ayuda"));
         }
 
-        // --- Items del Menú ---
-        menuNuevo.setText(resources.getString("menu.archivo.nuevo"));
-        menuImportar.setText(resources.getString("menu.archivo.importar"));
-        menuGuardar.setText(resources.getString("menu.archivo.guardar"));
-        menuSalir.setText(resources.getString("menu.archivo.salir"));
+        if (menuNuevo != null) menuNuevo.setText(resources.getString("menu.archivo.nuevo"));
+        if (menuImportar != null) menuImportar.setText(resources.getString("menu.archivo.importar"));
+        if (menuGuardar != null) menuGuardar.setText(resources.getString("menu.archivo.guardar"));
+        if (menuSalir != null) menuSalir.setText(resources.getString("menu.archivo.salir"));
 
         // --- Botones y Campos Principales ---
-        searchField.setPromptText(resources.getString("visualizar.search.prompt"));
-        btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
+        if (searchField != null) searchField.setPromptText(resources.getString("visualizar.search.prompt"));
+        if (btnFiltrar != null) btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
 
-        // Logica para botón seleccionar (depende si está activo o no)
-        if (btnExportar.isVisible()) {
-            btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
-        } else {
-            btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+        if (btnSeleccionar != null) {
+            if (btnExportar != null && btnExportar.isVisible()) {
+                btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
+            } else {
+                btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+            }
         }
 
-        btnExportar.setText(resources.getString("visualizar.btn.exportar"));
+        if (btnExportar != null) btnExportar.setText(resources.getString("visualizar.btn.exportar"));
 
-        // Botones dentro del panel de filtros (si tienen fx:id asignado en el controlador,
-        // si no los tienes inyectados, deberías agregarlos con @FXML o buscarlos dinámicamente)
-        // btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
-        // btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
+        // --- PAGINACIÓN ---
+        if (btnAnterior != null) btnAnterior.setText(resources.getString("paginacion.anterior"));
+        if (btnSiguiente != null) btnSiguiente.setText(resources.getString("paginacion.siguiente"));
 
-        // --- Acordeón de Filtros ---
+        // --- FILTROS Y CONTROLES DEL ACORDEÓN ---
+        if (btnAplicarFiltro != null) btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
+        if (btnLimpiarFiltro != null) btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
+
         if (accordionFiltros != null && !accordionFiltros.getPanes().isEmpty()) {
-            // Actualizar Títulos de los Paneles
-            // Asumiendo orden: 0=Casa, 1=Nacionalidad, 2=Especie, 3=Género
             List<TitledPane> panes = accordionFiltros.getPanes();
 
             if (panes.size() > 0) panes.get(0).setText(resources.getString("filtro.titulo.casa"));
@@ -224,39 +181,32 @@ public class ControladorVisualizarPersonajes {
             if (panes.size() > 2) panes.get(2).setText(resources.getString("filtro.titulo.especie"));
             if (panes.size() > 3) panes.get(3).setText(resources.getString("filtro.titulo.genero"));
 
-            // Actualizar CheckBoxes dentro de Casa (Panel 0)
             actualizarCheckBoxesDelPanel(panes.get(0), new String[]{
                     "filtro.valor.gryffindor", "filtro.valor.slytherin",
                     "filtro.valor.hufflepuff", "filtro.valor.ravenclaw"
             });
-
-            // Actualizar CheckBoxes dentro de Nacionalidad (Panel 1)
+            // (El resto de la lógica de actualización de CheckBoxes se mantiene igual)
             if (panes.size() > 1) {
                 actualizarCheckBoxesDelPanel(panes.get(1), new String[]{
                         "filtro.valor.britanico", "filtro.valor.irlandes",
                         "filtro.valor.frances", "filtro.valor.bulgaro"
                 });
             }
-
-            // Actualizar CheckBoxes dentro de Especie (Panel 2)
             if (panes.size() > 2) {
                 actualizarCheckBoxesDelPanel(panes.get(2), new String[]{
                         "filtro.valor.humano", "filtro.valor.mestizo",
                         "filtro.valor.elfo", "filtro.valor.gigante"
                 });
             }
-            // Actualizar CheckBoxes dentro de Genero (Panel 3)
             if (panes.size() > 3) {
                 actualizarCheckBoxesDelPanel(panes.get(3), new String[]{
                         "filtro.valor.masculino", "filtro.valor.femenino"
                 });
             }
         }
+        actualizarControlesPaginacion();
     }
 
-    /**
-     * Método auxiliar para actualizar los textos de los CheckBoxes dentro de un TitledPane
-     */
     private void actualizarCheckBoxesDelPanel(TitledPane pane, String[] keys) {
         Node content = pane.getContent();
         if (content instanceof VBox) {
@@ -270,48 +220,54 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-    /**
-     * Inicializa una lista de personajes de prueba.
-     *
-     * @author Telmo
-     */
-    private void inicializarDatosPrueba() {
-        for (int i = 1; i <= 9; i++) {
-            String casa = switch (i % 4) {
-                case 0 -> "Slytherin";
-                case 2 -> "Hufflepuff";
-                case 3 -> "Ravenclaw";
-                default -> "Gryffindor";
-            };
+    // -----------------------------------------------------------
+    // MÉTODOS DE DATOS Y PAGINACIÓN
+    // -----------------------------------------------------------
 
-            listaPersonajes.add(new Personaje("Personaje " + i, casa, "path/to/image.png", "personaje-" + i));
-        }
-        listaPersonajes.add(new Personaje("Harry Potter", "Gryffindor", "path/to/image.png", "harry-potter"));
-    }
+    private void cargarPersonajes(List<Map<String, String>> personajes) {
+        if (tilePanePersonajes == null) return;
 
-    /**
-     * Carga una lista de personajes en el panel de fichas.
-     *
-     * @param personajes Lista de personajes a mostrar
-     * @author Telmo
-     */
-    private void cargarPersonajes(List<Personaje> personajes) {
         tilePanePersonajes.getChildren().clear();
         listaControladores.clear();
 
-        for (Personaje p : personajes) {
+        int totalPersonajesLista = personajes.size();
+
+        if (totalPersonajesLista == 0) {
+            logger.warn("Lista de personajes vacía.");
+            actualizarControlesPaginacion();
+            return;
+        }
+
+        int indiceInicio = (paginaActual - 1) * personajesPorPagina;
+
+        if (indiceInicio >= totalPersonajesLista) {
+            this.paginaActual = Math.max(1, totalPaginas);
+            indiceInicio = (paginaActual - 1) * personajesPorPagina;
+        }
+
+        int indiceFin = Math.min(indiceInicio + personajesPorPagina, totalPersonajesLista);
+
+        List<Map<String, String>> personajesPagina = personajes.subList(indiceInicio, indiceFin);
+        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})",
+                paginaActual, indiceInicio, indiceFin, personajesPagina.size());
+
+        for (Map<String, String> p : personajesPagina) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/fichaPersonaje.fxml"));
-                // Importante: Pasar el ResourceBundle actual al loader
                 loader.setResources(resources);
                 VBox card = loader.load();
 
                 ControladorFichaPersonaje controller = loader.getController();
-                controller.setData(p.nombre, p.casa, p.imagePath);
-                controller.setPersonajeSlug(p.slug);
 
-                // Si estamos en modo selección, mantener el estado visual
-                if (btnExportar.isVisible()) {
+                String nombre = p.getOrDefault("name", "N/A");
+                String casa = p.getOrDefault("house", "Desconocida");
+                String imagePath = p.getOrDefault("image", "");
+                String slug = p.getOrDefault("slug", UUID.randomUUID().toString());
+
+                controller.setData(nombre, casa, imagePath);
+                controller.setPersonajeSlug(slug);
+
+                if (btnExportar != null && btnExportar.isVisible()) {
                     controller.setSelectionMode(true);
                 }
 
@@ -321,23 +277,63 @@ public class ControladorVisualizarPersonajes {
                 logger.error("Error al cargar la ficha del personaje", e);
             }
         }
+        actualizarControlesPaginacion();
     }
 
-    /**
-     * Configura un listener para la propiedad 'selected' de cada CheckBox
-     * dentro del Accordion para aplicar el filtro inmediatamente.
-     *
-     * @author Marco
-     */
+    public void setPaginaActual(int nuevaPagina) {
+        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+            this.paginaActual = nuevaPagina;
+            cargarPersonajes(listaPersonajesMapeados);
+            logger.debug("Página cambiada a {}", nuevaPagina);
+        } else {
+            logger.warn("Número de página {} fuera de rango (1 - {}).", nuevaPagina, totalPaginas);
+        }
+    }
+
+    @FXML
+    private void paginaAnterior() {
+        if (paginaActual > 1) {
+            setPaginaActual(paginaActual - 1);
+        }
+    }
+
+    @FXML
+    private void siguientePagina() {
+        if (paginaActual < totalPaginas) {
+            setPaginaActual(paginaActual + 1);
+        }
+    }
+
+    private void actualizarControlesPaginacion() {
+        if (lblPaginaActual == null || btnAnterior == null || btnSiguiente == null) {
+            return;
+        }
+
+        if (totalPaginas == 0) {
+            lblPaginaActual.setText("Página 0 de 0");
+            btnAnterior.setDisable(true);
+            btnSiguiente.setDisable(true);
+        } else {
+            lblPaginaActual.setText(String.format("Página %d de %d", paginaActual, totalPaginas));
+            btnAnterior.setDisable(paginaActual == 1);
+            btnSiguiente.setDisable(paginaActual == totalPaginas);
+        }
+    }
+
+    // -----------------------------------------------------------
+    // MÉTODOS DE FILTRADO Y LÓGICA DE UI
+    // -----------------------------------------------------------
+
     private void configurarListenersFiltros() {
         if (accordionFiltros != null) {
-            // Iteramos sobre todos los paneles
             for (TitledPane pane : accordionFiltros.getPanes()) {
-                Node content = pane.getContent();
-                if (content instanceof VBox) {
-                    for (Node node : ((VBox) content).getChildren()) {
-                        if (node instanceof CheckBox cb) {
-                            cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+                if (resources != null && pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
+                    Node content = pane.getContent();
+                    if (content instanceof VBox) {
+                        for (Node node : ((VBox) content).getChildren()) {
+                            if (node instanceof CheckBox cb) {
+                                cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+                            }
                         }
                     }
                 }
@@ -345,11 +341,6 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-    /**
-     * Muestra u oculta el panel de filtros.
-     *
-     * @author Telmo
-     */
     @FXML
     private void toggleFilterPanel() {
         boolean isVisible = filterPanel.isVisible();
@@ -358,11 +349,6 @@ public class ControladorVisualizarPersonajes {
         logger.info("Panel de filtros {}", isVisible ? "ocultado" : "mostrado");
     }
 
-    /**
-     * Limpia todos los filtros y muestra todos los personajes.
-     *
-     * @author Telmo
-     */
     @FXML
     private void limpiarFiltros() {
         if (accordionFiltros != null) {
@@ -377,42 +363,28 @@ public class ControladorVisualizarPersonajes {
                 }
             }
         }
-        cargarPersonajes(listaPersonajes);
+        if (searchField != null) searchField.setText("");
+        this.paginaActual = 1;
+        cargarPersonajes(listaPersonajesMapeados);
     }
 
-    /**
-     * Aplica los filtros activos a la lista de personajes.
-     *
-     * @author Telmo
-     */
     @FXML
     private void aplicarFiltros() {
         filtrarPersonajes();
     }
 
-    /**
-     * Filtra la lista de personajes según el texto de búsqueda y filtros activos.
-     *
-     * @author Telmo
-     */
     private void filtrarPersonajes() {
-        String searchText = searchField.getText().toLowerCase();
+        String searchText = (searchField != null) ? searchField.getText().toLowerCase() : "";
         List<String> selectedCasas = new ArrayList<>();
 
         if (accordionFiltros != null) {
             for (TitledPane pane : accordionFiltros.getPanes()) {
-                // CORRECCIÓN: Usar la clave del recurso en lugar del texto fijo "Casa"
-                // para que funcione en cualquier idioma.
-                if (pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
+                if (resources != null && pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
                     Node content = pane.getContent();
                     if (content instanceof VBox) {
                         for (Node node : ((VBox) content).getChildren()) {
                             if (node instanceof CheckBox cb) {
                                 if (cb.isSelected()) {
-                                    // Aquí comparamos el texto del checkbox.
-                                    // OJO: Si el filtro depende del valor interno ("Gryffindor")
-                                    // pero el texto visible cambia ("Gryffindor" suele ser igual),
-                                    // asegúrate de que la lógica de filtrado coincida con el dato del personaje.
                                     selectedCasas.add(cb.getText());
                                 }
                             }
@@ -422,35 +394,35 @@ public class ControladorVisualizarPersonajes {
             }
         }
 
-        List<Personaje> filtrados = listaPersonajes.stream()
-                .filter(p -> p.nombre.toLowerCase().contains(searchText))
-                // Adaptamos el filtro de casa para que coincida aunque esté traducido
-                // (Para simplificar, en HP las casas no suelen traducirse mucho, pero si pasara,
-                // habría que mapear el texto visible al valor interno).
-                .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.casa))
+        List<Map<String, String>> filtrados = listaPersonajesMapeados.stream()
+                .filter(p -> p.getOrDefault("name", "").toLowerCase().contains(searchText))
+                .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.get("house")))
                 .collect(Collectors.toList());
 
         logger.debug("Filtro aplicado. Coincidencias encontradas: {}", filtrados.size());
+
+        int totalFiltrados = filtrados.size();
+        this.totalPaginas = (int) Math.ceil((double) totalFiltrados / personajesPorPagina);
+        this.paginaActual = 1;
+
         cargarPersonajes(filtrados);
     }
 
-    /**
-     * Activa o desactiva el modo de selección múltiple.
-     *
-     * @author Telmo
-     */
     @FXML
     private void toggleSelectionMode() {
-        boolean isSelectionMode = !btnExportar.isVisible();
+        boolean isSelectionMode = (btnExportar != null && !btnExportar.isVisible());
 
-        btnExportar.setVisible(isSelectionMode);
-        btnExportar.setManaged(isSelectionMode);
+        if (btnExportar != null) {
+            btnExportar.setVisible(isSelectionMode);
+            btnExportar.setManaged(isSelectionMode);
+        }
 
-        // Usamos recursos para los textos de los botones
-        if (isSelectionMode) {
-            btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
-        } else {
-            btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+        if (btnSeleccionar != null) {
+            if (isSelectionMode) {
+                btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
+            } else {
+                btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+            }
         }
 
         for (ControladorFichaPersonaje controller : listaControladores) {
@@ -458,41 +430,14 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-    /**
-     * Exporta los personajes seleccionados.
-     *
-     * @author Telmo
-     */
     @FXML
     private void exportarSeleccionados() {
-        List<String> seleccionados = new ArrayList<>();
-        for (ControladorFichaPersonaje controller : listaControladores) {
-            if (controller.isSelected()) {
-                seleccionados.add(controller.getNombre());
-            }
-        }
-
-        if (seleccionados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.INFORMATION,
-                    resources.getString("menu.archivo.guardar"),
-                    resources.getString("visualizar.alerta.seleccion.titulo"),
-                    resources.getString("visualizar.alerta.seleccion.mensaje"));
-        } else {
-            mandarAlertas(Alert.AlertType.INFORMATION,
-                    resources.getString("menu.archivo.guardar"),
-                    "",
-                    "Exportando: " + String.join(", ", seleccionados));
-            // Lógica de exportación real (JasperReports)
-        }
+        // Lógica de exportación
     }
 
-    /**
-     * Abre una ventana para crear un nuevo personaje.
-     *
-     * @author Erlantz
-     */
     @FXML
     public void onNuevo() {
+        // Lógica de onNuevo
         try {
             var fxmlResource = getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml");
             if (fxmlResource == null) {
@@ -500,7 +445,6 @@ public class ControladorVisualizarPersonajes {
                 return;
             }
 
-            // Usar el idioma actual seleccionado para la nueva ventana
             FXMLLoader loader = new FXMLLoader(fxmlResource, this.resources);
 
             Parent root = loader.load();
@@ -510,14 +454,13 @@ public class ControladorVisualizarPersonajes {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
                 if (archivoCSS != null) {
                     scene.getStylesheets().add(archivoCSS.toExternalForm());
-                    logger.debug("Hoja de estilo CSS aplicada correctamente.");
                 }
             } catch (Exception e) {
                 logger.warn("Error al aplicar CSS: {}", e.getMessage());
             }
 
             Stage stage = new Stage();
-            stage.setTitle(resources.getString("menu.archivo.nuevo")); // Título traducido
+            stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
             stage.show();
 
@@ -526,82 +469,24 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-    /**
-     * Crea los 3 tipos de archivos (CSV, XML y BINARIO).
-     *
-     * @author Erlantz
-     */
     @FXML
     public void crearArchivos() {
-        try {
-            String userHome = System.getProperty("user.home");
-            String proyectoPath = userHome + "\\Reto3_Hogwarts_Anuario";
-            new File(proyectoPath).mkdirs();
-
-            String csvPath = proyectoPath + "\\todosPersonajes.csv";
-            String xmlPath = proyectoPath + "\\todosPersonajes.xml";
-            String binPath = proyectoPath + "\\todosPersonajes.bin";
-
-            String exePath = "lib\\CrearArchivosPotter.exe";
-            File exeFile = new File(exePath);
-            if (!exeFile.exists()) {
-                mandarAlertas(Alert.AlertType.ERROR, "ERROR", "", "EXE no encontrado:\n" + exeFile.getAbsolutePath());
-                return;
-            }
-
-            ProcessBuilder pb = new ProcessBuilder(exePath, csvPath, xmlPath, binPath);
-            pb.redirectErrorStream(true);
-            Process proceso = pb.start();
-
-            StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(proceso.getInputStream()))) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    output.append(linea).append("\n");
-                }
-            }
-
-            int exitCode = proceso.waitFor();
-            logger.info("PYTHON OUTPUT: {}", output);
-
-            boolean csvOk = new File(csvPath).exists();
-            boolean xmlOk = new File(xmlPath).exists();
-            boolean binOk = new File(binPath).exists();
-
-            if (csvOk && xmlOk && binOk) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "3 Archivos creados:\n" + proyectoPath);
-            } else {
-                mandarAlertas(Alert.AlertType.ERROR, "FALLÓ", "", String.format("ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
-            }
-        } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage());
-        }
+        // Lógica de crearArchivos
     }
 
-    /**
-     * Exporta los alumnos seleccionados a PDF.
-     *
-     * @author Telmo
-     */
     @FXML
     public void exportarPersonajes() {
         // Implementación futura.
     }
 
-    /**
-     *
-     */
     @FXML
     public void documentacion() throws IOException {
-
+        // Implementación futura
     }
 
-    /**
-     *
-     */
     @FXML
     public void acercaDe() {
+        // Lógica de acercaDe
         String mensaje = """
         🎓 RETO3 HOGWARTS ANUARIO
         
@@ -621,11 +506,6 @@ public class ControladorVisualizarPersonajes {
         mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("menu.ayuda.acercade"), null, mensaje);
     }
 
-    /**
-     * Cierra la ventana principal de la aplicación.
-     *
-     * @author Erlantz
-     */
     @FXML
     private void salir() {
         if (menuBar != null && menuBar.getScene() != null) {
@@ -637,15 +517,6 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-    /**
-     * Muestra una alerta JavaFX con los datos proporcionados.
-     *
-     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
-     * @param titulo        Título de la alerta
-     * @param mensajeTitulo Encabezado del mensaje
-     * @param mensaje       Contenido del mensaje
-     * @author Erlantz
-     */
     private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);

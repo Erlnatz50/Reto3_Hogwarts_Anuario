@@ -1,5 +1,6 @@
 package es.potersitos.controladores;
 
+import es.potersitos.util.PersonajeCSVManager; // Importar el gestor para buscar datos
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -10,7 +11,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -19,7 +19,6 @@ import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -27,15 +26,15 @@ import net.sf.jasperreports.view.JasperViewer;
  * Controlador para la ventana de datos de personajes.
  * Gestiona la interacción con los elementos del FXML y soporta multiidioma.
  *
- * @author Marco
- * @version 1.0
+ * @author Marco / Modificado por Gemini (Carga dinámica de datos y i18n)
+ * @version 1.1
  */
 public class ControladorDatos {
 
     /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
-    /** * Bundle del sistema de internacionalización.
+    /** Bundle del sistema de internacionalización.
      * LA ETIQUETA @FXML ES NECESARIA PARA RECIBIR EL IDIOMA DEL CONTROLADOR ANTERIOR.
      */
     @FXML
@@ -66,7 +65,6 @@ public class ControladorDatos {
     @FXML
     public void initialize() {
         // Si resources es null aquí, es que no se puso el @FXML o hubo un error en el loader.
-        // Intentamos cargar uno por defecto para que no crashee.
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -79,7 +77,7 @@ public class ControladorDatos {
                 resources != null ? resources.getLocale() : "Desconocido");
 
         configurarTextosBotones();
-        cargarDatosPrueba();
+        // cargarDatosPrueba(); // Ya no llamamos a datos de prueba
     }
 
     /**
@@ -108,53 +106,94 @@ public class ControladorDatos {
     }
 
     /**
-     * Asigna el identificador único (slug) del personaje actual.
+     * Asigna el identificador único (slug) del personaje actual y dispara la carga de datos.
      */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
+        cargarDatosPersonaje(slug); // Llamar a la carga real
     }
 
     /**
-     * Simula la carga de datos de un personaje de prueba.
-     * Usa 'establecerTexto' para traducir las etiquetas ("Nombre:", "Izena:", etc.)
+     * Carga el personaje completo usando el SLUG de la lista de datos.
      */
-    public void cargarDatosPrueba() {
-        try {
-            String rutaImagen = "/es/potersitos/img/persona_predeterminado.png";
-            InputStream imgStream = getClass().getResourceAsStream(rutaImagen);
-            if (imgStream != null) {
-                imageView.setImage(new Image(imgStream));
-            }
-        } catch (Exception e) {
-            logger.error("Error cargando imagen", e);
+    private void cargarDatosPersonaje(String slug) {
+        if (slug == null || slug.isEmpty()) {
+            logger.error("SLUG nulo o vacío. No se pueden cargar los datos.");
+            return;
         }
 
-        // Aquí usamos las claves para que se traduzca el prefijo (ej. "Nombre: " vs "Izena: ")
-        establecerTexto(nombreLabel, "nombre.label", "Harry James Potter");
-        personajeSlug = "harry-potter";
-        establecerTexto(aliasLabel, "alias.label", "El Niño que Vivió");
-        establecerTexto(animagusLabel, "animagus.label", "No");
-        establecerTexto(bloodStatusLabel, "bloodStatus.label", "Mestizo");
-        establecerTexto(boggartLabel, "boggart.label", "Dementor");
-        establecerTexto(nacidoLabel, "nacido.label", "31 de Julio de 1980");
-        establecerTexto(fallecidoLabel, "fallecido.label", "N/A");
-        establecerTexto(colorOjosLabel, "colorOjos.label", "Verde");
-        establecerTexto(familiaresLabel, "familiares.label", "Ginny Weasley (Esposa)");
-        establecerTexto(generoLabel, "genero.label", "Masculino");
-        establecerTexto(colorPeloLabel, "colorPelo.label", "Negro");
-        establecerTexto(alturaLabel, "altura.label", "1.75m");
-        establecerTexto(casaLabel, "casa.label", "Gryffindor");
-        establecerTexto(imagenLabel, "imagen.label", "N/A");
-        establecerTexto(trabajosLabel, "trabajos.label", "Jefe de Aurores");
-        establecerTexto(estadoCivilLabel, "estadoCivil.label", "Casado");
-        establecerTexto(nacionalidadLabel, "nacionalidad.label", "Británica");
-        establecerTexto(patronusLabel, "patronus.label", "Ciervo");
-        establecerTexto(romancesLabel, "romances.label", "Ginny Weasley");
-        establecerTexto(colorPielLabel, "colorPiel.label", "Clara");
-        establecerTexto(especieLabel, "especie.label", "Humano");
-        establecerTexto(titulosLabel, "titulos.label", "Maestro de la Muerte");
-        establecerTexto(varitasLabel, "varitas.label", "Acebo y pluma de fénix");
-        establecerTexto(pesoLabel, "peso.label", "70kg");
+        List<Map<String, String>> todosPersonajes = PersonajeCSVManager.leerTodosLosPersonajes();
+
+        Optional<Map<String, String>> personajeEncontrado = todosPersonajes.stream()
+                .filter(p -> slug.equalsIgnoreCase(p.getOrDefault("slug", "")))
+                .findFirst();
+
+        if (personajeEncontrado.isPresent()) {
+            rellenarInterfaz(personajeEncontrado.get());
+        } else {
+            logger.error("Personaje con SLUG '{}' no encontrado.", slug);
+            // Mostrar un mensaje de error o datos por defecto
+            establecerTexto(nombreLabel, "nombre.label", getStringSafe("error.nodatos"));
+        }
+    }
+
+    /**
+     * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la traducción de etiquetas.
+     */
+    private void rellenarInterfaz(Map<String, String> p) {
+        // --- Carga de Imagen (Lógica copiada de ControladorFichaPersonaje) ---
+        String imagePath = p.getOrDefault("image", "");
+        if (!imagePath.isEmpty()) {
+            try {
+                String rutaFinal = imagePath;
+                if (!rutaFinal.toLowerCase().startsWith("http") && !rutaFinal.toLowerCase().startsWith("file:")) {
+                    rutaFinal = "file:/" + rutaFinal.replace("\\", "/");
+                }
+                Image image = new Image(rutaFinal, true);
+                imageView.setImage(image);
+            } catch (Exception e) {
+                logger.error("Error al cargar la imagen desde la ruta: {}", imagePath, e);
+            }
+        } else {
+            try {
+                // Cargar imagen por defecto si no hay ruta
+                InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+                if (imgStream != null) {
+                    imageView.setImage(new Image(imgStream));
+                }
+            } catch (Exception ex) {
+                logger.error("No se pudo cargar la imagen por defecto.", ex);
+            }
+        }
+
+        // --- Carga de Etiquetas (usando las claves del modelo Python) ---
+        // El prefijo se traduce vía getStringSafe, el valor es el del CSV.
+        establecerTexto(nombreLabel, "nombre.label", p.getOrDefault("name", "N/A"));
+        establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
+        establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
+        establecerTexto(bloodStatusLabel, "bloodStatus.label", p.getOrDefault("blood_status", "N/A"));
+        establecerTexto(boggartLabel, "boggart.label", p.getOrDefault("boggart", "N/A"));
+        establecerTexto(nacidoLabel, "nacido.label", p.getOrDefault("born", "N/A"));
+        establecerTexto(fallecidoLabel, "fallecido.label", p.getOrDefault("died", "N/A"));
+        establecerTexto(colorOjosLabel, "colorOjos.label", p.getOrDefault("eye_color", "N/A"));
+        establecerTexto(familiaresLabel, "familiares.label", p.getOrDefault("family_members", "N/A"));
+        establecerTexto(generoLabel, "genero.label", p.getOrDefault("gender", "N/A"));
+        establecerTexto(colorPeloLabel, "colorPelo.label", p.getOrDefault("hair_color", "N/A"));
+        establecerTexto(alturaLabel, "altura.label", p.getOrDefault("height", "N/A"));
+        establecerTexto(casaLabel, "casa.label", p.getOrDefault("house", "N/A"));
+        establecerTexto(imagenLabel, "imagen.label", imagePath.isEmpty() ? "N/A" : imagePath);
+        establecerTexto(trabajosLabel, "trabajos.label", p.getOrDefault("jobs", "N/A"));
+        establecerTexto(estadoCivilLabel, "estadoCivil.label", p.getOrDefault("marital_status", "N/A"));
+        establecerTexto(nacionalidadLabel, "nacionalidad.label", p.getOrDefault("nationality", "N/A"));
+        establecerTexto(patronusLabel, "patronus.label", p.getOrDefault("patronus", "N/A"));
+        establecerTexto(romancesLabel, "romances.label", p.getOrDefault("romances", "N/A"));
+        establecerTexto(colorPielLabel, "colorPiel.label", p.getOrDefault("skin_color", "N/A"));
+        establecerTexto(especieLabel, "especie.label", p.getOrDefault("species", "N/A"));
+        establecerTexto(titulosLabel, "titulos.label", p.getOrDefault("titles", "N/A"));
+        establecerTexto(varitasLabel, "varitas.label", p.getOrDefault("wands", "N/A"));
+        establecerTexto(pesoLabel, "peso.label", p.getOrDefault("weight", "N/A"));
+
+        this.personajeSlug = p.get("slug");
     }
 
     /**
@@ -193,7 +232,7 @@ public class ControladorDatos {
      */
     @FXML
     public void handleActualizar() {
-        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "", "Datos actualizados (Simulación).");
+        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "", getStringSafe("actualizar.msg"));
     }
 
     /**
@@ -210,22 +249,25 @@ public class ControladorDatos {
                 return;
             }
 
-            // JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
-            // Map<String, Object> parameters = new HashMap<>();
-            // parameters.put("Casa", obtenerValor(casaLabel));
+            // Descomente y modifique si tiene las librerías de JasperReports configuradas
+            /*
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+            Map<String, Object> parameters = new HashMap<>();
 
-            // InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/foto.png");
-            // if(imagenStream != null) {
-            //      parameters.put("Imagen", imagenStream);
-            // }
+            // Ejemplo de cómo pasar datos traducidos al reporte
+            parameters.put("Nombre", obtenerValor(nombreLabel));
+            parameters.put("Casa", obtenerValor(casaLabel));
+            // ... otros
 
-            // JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
-            // JasperViewer.viewReport(jasperPrint, false);
+            // Asumiendo que la ruta del archivo Jasper es correcta
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
+            JasperViewer.viewReport(jasperPrint, false);
+            */
 
-            mandarAlertas(Alert.AlertType.INFORMATION, "Exportar", "", "Funcionalidad JasperReports comentada para evitar errores de compilación.");
+            mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exportar.button"), "", "Funcionalidad JasperReports comentada. Verifique la implementación en el código.");
 
         } catch (NoClassDefFoundError e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error Librería", "", "Falta la librería JasperReports.");
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Falta la librería JasperReports. Comente la funcionalidad si no la usa.");
         } catch (Exception e) {
             logger.error("Error Jasper", e);
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
@@ -238,6 +280,9 @@ public class ControladorDatos {
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
+        // Asumiendo que PersonajeCSVManager está disponible para eliminar
+        // Debe asegurarse de que PersonajeCSVManager.eliminarPersonajePorSlug exista
+
         if (personajeSlug == null || personajeSlug.isEmpty()) {
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Slug vacío.");
             return;
@@ -251,17 +296,24 @@ public class ControladorDatos {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // AQUÍ LLAMARÍAS A TU CLASE GESTORA DE CSV:
-            // boolean exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
 
-            boolean exito = true; // Simulación de éxito
+            boolean exito = false;
+            try {
+                // Descomentar si PersonajeCSVManager está disponible y tiene el método
+                // exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+                logger.warn("Simulando eliminación de: {}", personajeSlug);
+                exito = true; // Simulación
+            } catch (Exception e) {
+                logger.error("Error real al eliminar el personaje.", e);
+            }
+
 
             if (exito) {
-                mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", "Personaje eliminado.");
+                mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", getStringSafe("eliminar.exito"));
                 Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
                 stage.close();
             } else {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Error al eliminar.");
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("eliminar.error"));
             }
         }
     }
