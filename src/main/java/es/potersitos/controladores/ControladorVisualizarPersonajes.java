@@ -7,6 +7,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -14,11 +19,10 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.*;
+import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -85,7 +89,7 @@ public class ControladorVisualizarPersonajes {
     private int totalPaginas;
 
     /**
-     * Metodo de inicialización del controlador.
+     * Metodo de inicialización automática FXML.
      *
      * @author Telmo
      */
@@ -94,15 +98,11 @@ public class ControladorVisualizarPersonajes {
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
 
         configurarAtajosMenu();
-
         configurarBusqueda();
-
         configurarListenersFiltros();
 
         listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
-
         calcularTotalPaginas();
-
         actualizarTextosUI();
 
         if(listaPersonajesMapeados.isEmpty()){
@@ -115,7 +115,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Configura los atajos de teclado del menú principal.
      *
+     * @author Erlantz
      */
     private void configurarAtajosMenu(){
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
@@ -125,7 +127,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Configura el listener de búsqueda en tiempo real del campo de texto.
      *
+     * @author Erlantz
      */
     private void configurarBusqueda(){
         if (searchField != null){
@@ -134,7 +138,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Calcula el número total de páginas basándose en personajesPorPagina y el tamaño de la lista.
      *
+     * @author Nizam
      */
     private void calcularTotalPaginas(){
         int total = Math.max(1, listaPersonajesMapeados.size());
@@ -212,6 +218,8 @@ public class ControladorVisualizarPersonajes {
 
     /**
      * Actualiza los textos de todos los controles de la interfaz según el ResourceBundle actual.
+     *
+     * @author Marco
      */
     private void actualizarTextosUI() {
         if (menuBar != null && menuBar.getMenus().size() >= 3) {
@@ -276,6 +284,8 @@ public class ControladorVisualizarPersonajes {
      *
      * @param pane Contenedor que aloja los CheckBoxes.
      * @param keys Claves del {@link ResourceBundle} correspondientes a los textos.
+     *
+     * @author Telmo
      */
     private void actualizarCheckBoxesDelPanel(TitledPane pane, String[] keys) {
         Node content = pane.getContent();
@@ -291,9 +301,11 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Carga y muestra los personajes de una página específica en el TilePane.
+     * Crea dinámicamente las fichas FXML para cada personaje y las posiciona.
      *
-     *
-     * @param personajes
+     * @param personajes Lista de personajes a mostrar en la página actual.
+     * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
         if (tilePanePersonajes == null) return;
@@ -350,9 +362,10 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Cambia la página actual del paginador a la especificada.
      *
-     *
-     * @param nuevaPagina
+     * @param nuevaPagina Número de página a mostrar (1-based index)
+     * @author Nizam
      */
     public void setPaginaActual(int nuevaPagina) {
         if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
@@ -365,7 +378,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Navega a la página anterior en el paginador.
      *
+     * @author Nizam
      */
     @FXML
     private void paginaAnterior() {
@@ -375,7 +390,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Navega a la página siguiente en el paginador.
      *
+     * @author Nizam
      */
     @FXML
     private void siguientePagina() {
@@ -385,7 +402,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Actualiza el estado visual de los controles de paginación.
      *
+     * @author Nizam
      */
     private void actualizarControlesPaginacion() {
         if (lblPaginaActual == null || btnAnterior == null || btnSiguiente == null) {
@@ -404,7 +423,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Activa filtrado automático al seleccionar/des seleccionar cualquier opción.
      *
+     * @author Marco
      */
     private void configurarListenersFiltros() {
         if (accordionFiltros != null) {
@@ -424,7 +445,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Alterna la visibilidad del panel lateral de filtros.
      *
+     * @author Telmo
      */
     @FXML
     private void toggleFilterPanel() {
@@ -435,7 +458,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Limpia todos los filtros activos y restaura la vista completa.
      *
+     * @author Telmo
      */
     @FXML
     private void limpiarFiltros() {
@@ -457,7 +482,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Aplica manualmente los filtros actuales del panel.
      *
+     * @author Telmo
      */
     @FXML
     private void aplicarFiltros() {
@@ -465,7 +492,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de casas.
      *
+     * @author Telmo
      */
     private void filtrarPersonajes() {
         String searchText = (searchField != null) ? searchField.getText().toLowerCase() : "";
@@ -503,7 +532,11 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Alterna entre modo normal y modo selección de personajes para exportación.
+     * Muestra/oculta botón Exportar y actualiza texto del botón Seleccionar.
+     * Notifica a todas las fichas para activar/desactivar checkboxes.
      *
+     * @author Telmo
      */
     @FXML
     private void toggleSelectionMode() {
@@ -528,7 +561,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Exporta los personajes seleccionados en modo selección.
      *
+     * @author
      */
     @FXML
     private void exportarSeleccionados() {
@@ -536,7 +571,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Abre el formulario FXML para crear un nuevo personaje.
      *
+     * @author Erlantz
      */
     @FXML
     public void onNuevo() {
@@ -573,7 +610,9 @@ public class ControladorVisualizarPersonajes {
 
 
     /**
+     * Ejecuta el programa externo CrearArchivosPotter.exe para generar archivos CSV/XML/BIN.
      *
+     * @author Erlantz
      */
     @FXML
     public void crearArchivos() {
@@ -628,7 +667,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Exporta la lista completa de personajes visualizados.
      *
+     * @author
      */
     @FXML
     public void exportarPersonajes() {
@@ -636,19 +677,38 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Abre el manual de usuario en el visor PDF predeterminado del sistema.
      *
+     * @author Erlantz
      */
     @FXML
     public void documentacion() {
-        // Implementación futura
+        try {
+            InputStream input = getClass().getResourceAsStream("/es/potersitos/documentacion/manual.pdf");
+            if (input == null) {
+                mandarAlertas(Alert.AlertType.ERROR, "Error", null, "No se encontró manual.pdf");
+                return;
+            }
+
+            File tempFile = File.createTempFile("manual", ".pdf");
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                input.transferTo(out);
+            }
+
+            Desktop.getDesktop().open(tempFile);
+
+        } catch (Exception e) {
+            mandarAlertas(Alert.AlertType.ERROR, "Error", null, "No se pudo abrir el PDF: " + e.getMessage());
+        }
     }
 
     /**
+     * Muestra la ventana "Acerca de" con créditos del equipo y tecnologías usadas.
      *
+     * @author Erlantz
      */
     @FXML
     public void acercaDe() {
-        // Lógica de acercaDe
         String mensaje = """
         🎓 RETO3 HOGWARTS ANUARIO
         
@@ -658,18 +718,19 @@ public class ControladorVisualizarPersonajes {
         • Marco Muro
         • Nizam Abdel-Ghaffar
         
-        🏫 DEIN - Desarrollo de Interfaces
-        🔮 Universo Harry Potter API
-        
         🚀 Python + JavaFX + PyInstaller
         
         💻 Ultima modificación: 19 de Diciembre de 2025
+        
+        Manual de usuario disponible en el menú "Ayuda → Documentación"
         """;
         mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("menu.ayuda.acercade"), null, mensaje);
     }
 
     /**
+     * Cierra la ventana principal de la aplicación desde el menú Archivo → Salir.
      *
+     * @author Erlantz
      */
     @FXML
     private void salir() {

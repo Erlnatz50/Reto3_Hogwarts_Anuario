@@ -91,6 +91,7 @@ public class ControladorFichaPersonaje {
      * Define el identificador único (slug) del personaje mostrado.
      *
      * @param slug Identificador textual único del personaje.
+     * @author Marco
      */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
@@ -103,6 +104,7 @@ public class ControladorFichaPersonaje {
      * @param nombre Nombre completo del personaje
      * @param casa Casa a la que pertenece
      * @param imagePath Ruta de la imagen (URL o ruta de archivo)
+     * @author Nizam
      */
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
@@ -143,6 +145,8 @@ public class ControladorFichaPersonaje {
      * Detecta clics sobre la tarjeta.
      * Si está en modo selección, marca el checkbox.
      * Si no, abre la ventana de detalles pasando el idioma actual.
+     *
+     * @author Marco
      */
     @FXML
     private void handleCardClick() {

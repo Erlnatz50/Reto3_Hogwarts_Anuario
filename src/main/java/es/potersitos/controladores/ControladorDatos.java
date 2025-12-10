@@ -53,6 +53,8 @@ public class ControladorDatos {
     /**
      * Metodo de inicialización del controlador.
      * Configura los textos de la interfaz según el idioma recibido.
+     *
+     * @author Marco
      */
     @FXML
     public void initialize() {
@@ -72,6 +74,8 @@ public class ControladorDatos {
 
     /**
      * Configura los textos y tooltips de los botones usando el ResourceBundle.
+     *
+     * @author Marco
      */
     private void configurarTextosBotones() {
         if (resources == null) return;
@@ -96,6 +100,8 @@ public class ControladorDatos {
 
     /**
      * Asigna el identificador único (slug) del personaje actual y dispara la carga de datos.
+     *
+     * @author Marco
      */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
@@ -104,6 +110,8 @@ public class ControladorDatos {
 
     /**
      * Carga el personaje completo usando el SLUG de la lista de datos.
+     *
+     * @author Nizam
      */
     private void cargarDatosPersonaje(String slug) {
         if (slug == null || slug.isEmpty()) {
@@ -127,6 +135,8 @@ public class ControladorDatos {
 
     /**
      * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la traducción de etiquetas.
+     *
+     * @author Nizam
      */
     private void rellenarInterfaz(Map<String, String> p) {
         String imagePath = p.getOrDefault("image", "");
@@ -183,6 +193,8 @@ public class ControladorDatos {
     /**
      * Metodo auxiliar para establecer texto en Labels de forma segura y traducida.
      * Formato: "Traducción: Valor" (Ej.: "Izena: Harry Potter")
+     *
+     * @author Marco
      */
     private void establecerTexto(Label label, String key, String valor) {
         if (label != null) {
@@ -192,6 +204,8 @@ public class ControladorDatos {
 
     /**
      * Helper para obtener strings del resource bundle evitando excepciones.
+     *
+     * @author Marco
      */
     private String getStringSafe(String key) {
         if (resources == null) return key;
@@ -204,6 +218,8 @@ public class ControladorDatos {
 
     /**
      * Cierra la ventana actual de la aplicación.
+     *
+     * @author Marco
      */
     @FXML
     private void cerrarVentana(ActionEvent event) {
@@ -213,6 +229,8 @@ public class ControladorDatos {
 
     /**
      * Maneja la acción del botón de actualización.
+     *
+     * @author Nizam
      */
     @FXML
     public void handleActualizar() {
@@ -221,6 +239,8 @@ public class ControladorDatos {
 
     /**
      * Maneja la acción del botón de exportación.
+     *
+     * @author Nizam
      */
     @FXML
     public void handleExportar() {
@@ -253,6 +273,8 @@ public class ControladorDatos {
 
     /**
      * Maneja la acción del botón de eliminación de un personaje.
+     *
+     * @author Marco
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
@@ -290,7 +312,14 @@ public class ControladorDatos {
     }
 
     /**
-     * Muestra una alerta JavaFX.
+     * Muestra una alerta JavaFX con los datos proporcionados.
+     *
+     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo        Título de la alerta
+     * @param mensajeTitulo Encabezado del mensaje
+     * @param mensaje       Contenido del mensaje
+     *
+     * @author Erlantz
      */
     private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
         Alert alerta = new Alert(tipo);
@@ -302,6 +331,8 @@ public class ControladorDatos {
 
     /**
      * Obtiene el valor textual de una etiqueta.
+     *
+     * @author Marco
      */
     private String obtenerValor(Label label) {
         if (label == null) return "";
