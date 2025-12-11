@@ -1,102 +1,163 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61d56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ficha_personaje" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
-	<parameter name="Nombre" class="java.lang.String"/>
-	<parameter name="Alias" class="java.lang.String"/>
-	<parameter name="Casa" class="java.lang.String"/>
-	<parameter name="Genero" class="java.lang.String"/>
-	<parameter name="Especie" class="java.lang.String"/>
-	<parameter name="Ojos" class="java.lang.String"/>
-	<parameter name="Pelo" class="java.lang.String"/>
-	<parameter name="Piel" class="java.lang.String"/>
-	<parameter name="Patronus" class="java.lang.String"/>
-	<parameter name="Imagen" class="java.io.InputStream"/>
-	<queryString>
-		<![CDATA[]]>
-	</queryString>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
-	<title>
-		<band height="79" splitType="Stretch">
-			<staticText>
-				<reportElement x="0" y="0" width="555" height="79" uuid="1a33f6a9-0b0e-4017-952a-1b53a5b36dd4"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="26" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Ficha de Personaje - Hogwarts]]></text>
-			</staticText>
-		</band>
-	</title>
-	<detail>
-		<band height="400" splitType="Stretch">
-			<image>
-				<reportElement x="0" y="10" width="150" height="150" uuid="a1b2c3d4-e5f6-7890-1234-567890abcdef"/>
-				<imageExpression><![CDATA[$P{Imagen}]]></imageExpression>
-			</image>
-			<textField>
-				<reportElement x="170" y="10" width="380" height="30" uuid="b2c3d4e5-f678-9012-3456-7890abcdef12"/>
-				<textElement>
-					<font size="18" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Nombre: " + $P{Nombre}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="170" y="50" width="380" height="20" uuid="c3d4e5f6-7890-1234-5678-90abcdef1234"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Alias: " + $P{Alias}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="170" y="80" width="380" height="20" uuid="d4e5f678-9012-3456-7890-abcdef123456"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Casa: " + $P{Casa}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="170" y="110" width="380" height="20" uuid="e5f67890-1234-5678-90ab-cdef12345678"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Género: " + $P{Genero}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="170" y="140" width="380" height="20" uuid="f6789012-3456-7890-abcd-ef1234567890"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Especie: " + $P{Especie}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="180" width="270" height="20" uuid="01234567-890a-bcde-f012-34567890abcd"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Color de Ojos: " + $P{Ojos}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="280" y="180" width="270" height="20" uuid="12345678-90ab-cdef-0123-4567890abcde"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Color de Pelo: " + $P{Pelo}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="210" width="270" height="20" uuid="23456789-0abc-def0-1234-567890abcdef"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Color de Piel: " + $P{Piel}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="280" y="210" width="270" height="20" uuid="34567890-abcd-ef01-2345-67890abcdef0"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Patronus: " + $P{Patronus}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="ficha_personaje" language="java" columnCount="1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="Nombre" class="java.lang.String"/>
+    <parameter name="Alias" class="java.lang.String"/>
+    <parameter name="Casa" class="java.lang.String"/>
+    <parameter name="Genero" class="java.lang.String"/>
+    <parameter name="Especie" class="java.lang.String"/>
+    <parameter name="Ojos" class="java.lang.String"/>
+    <parameter name="Pelo" class="java.lang.String"/>
+    <parameter name="Piel" class="java.lang.String"/>
+    <parameter name="Patronus" class="java.lang.String"/>
+    <parameter name="Imagen" class="java.io.InputStream"/>
+
+    <detail>
+        <band height="770">
+
+            <!-- Rectángulo de fondo marrón -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="770" backcolor="#8d8469"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <!-- Imagen de fondo -->
+            <image>
+                <reportElement x="-20" y="-120" width="594" height="802"/>
+                <imageExpression class="java.io.InputStream"><![CDATA[
+                this.getClass().getResourceAsStream("/es/potersitos/imagenes/fondo.png")
+            ]]></imageExpression>
+            </image>
+
+
+
+            <!-- Imagen del personaje -->
+            <image onErrorType="Blank">
+                <reportElement x="50" y="150" width="130" height="180"/>
+                <imageExpression class="java.io.InputStream"><![CDATA[$P{Imagen}]]></imageExpression>
+            </image>
+
+            <!-- Nombre -->
+            <textField>
+                <reportElement x="215" y="150" width="340" height="30"/>
+                <textElement>
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Nombre: " + $P{Nombre}]]></textFieldExpression>
+            </textField>
+
+            <!-- Alias -->
+            <textField>
+                <reportElement x="215" y="190" width="340" height="20"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Alias: " + $P{Alias}]]></textFieldExpression>
+            </textField>
+
+            <!-- Casa -->
+            <textField>
+                <reportElement x="215" y="220" width="340" height="20"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Casa: " + $P{Casa}]]></textFieldExpression>
+            </textField>
+
+            <!-- Género -->
+            <textField>
+                <reportElement x="215" y="250" width="340" height="20"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Género: " + $P{Genero}]]></textFieldExpression>
+            </textField>
+
+            <!-- Especie -->
+            <textField>
+                <reportElement x="215" y="280" width="340" height="20"/>
+                <textElement>
+                    <font size="14"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Especie: " + $P{Especie}]]></textFieldExpression>
+            </textField>
+
+            <!-- Ojos -->
+            <textField>
+                <reportElement x="45" y="340" width="239" height="20"/>
+                <textElement>
+                    <font size="12"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Color de Ojos: " + $P{Ojos}]]></textFieldExpression>
+            </textField>
+
+            <!-- Pelo -->
+            <textField>
+                <reportElement x="285" y="340" width="239" height="20"/>
+                <textElement>
+                    <font size="12"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Color de Pelo: " + $P{Pelo}]]></textFieldExpression>
+            </textField>
+
+            <!-- Piel -->
+            <textField>
+                <reportElement x="45" y="370" width="239" height="20"/>
+                <textElement>
+                    <font size="12"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Color de Piel: " + $P{Piel}]]></textFieldExpression>
+            </textField>
+
+            <!-- Patronus -->
+            <textField>
+                <reportElement x="285" y="370" width="239" height="20"/>
+                <textElement>
+                    <font size="12"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Patronus: " + $P{Patronus}]]></textFieldExpression>
+            </textField>
+
+            <!-- Fecha
+            <textField pattern="MMMMM dd, yyyy">
+                <reportElement x="45" y="710" width="100" height="30"/>
+            <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>-->
+
+            <!-- Logo de Hogwarts -->
+            <image>
+                <reportElement x="213" y="420" width="190" height="190"/>
+                <imageExpression class="java.io.InputStream"><![CDATA[
+                this.getClass().getResourceAsStream("/es/potersitos/img/Hogwarts-Crest-modified.png")
+            ]]></imageExpression>
+            </image>
+
+            <!-- Logo de Potersitos (footer centrado)
+            <image>
+                <reportElement x="250" y="650" width="100" height="100"/>
+                <imageExpression class="java.io.InputStream"><![CDATA[
+                this.getClass().getResourceAsStream("/es/potersitos/img/potersitos-logo-modified.png")
+            ]]></imageExpression>
+            </image>-->
+
+            <!-- Nº de página (alineado a la derecha) -->
+            <textField>
+                <reportElement x="490" y="710" width="60" height="30"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+
+            <!-- Título -->
+            <staticText>
+                <reportElement x="0" y="60" width="555" height="79"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="26" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Ficha de Personaje - Hogwarts]]></text>
+            </staticText>
+
+        </band>
+    </detail>
+
 </jasperReport>

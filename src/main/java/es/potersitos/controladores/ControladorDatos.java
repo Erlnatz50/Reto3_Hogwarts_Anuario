@@ -78,18 +78,19 @@ public class ControladorDatos {
      * @author Marco
      */
     private void configurarTextosBotones() {
-        if (resources == null) return;
+        if (resources == null)
+            return;
 
         try {
-            if(actualizarButton != null) {
+            if (actualizarButton != null) {
                 actualizarButton.setText(getStringSafe("actualizar.button"));
                 actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
             }
-            if(exportarButton != null) {
+            if (exportarButton != null) {
                 exportarButton.setText(getStringSafe("exportar.button"));
                 exportarButton.setTooltip(new Tooltip(getStringSafe("exportar.tooltip")));
             }
-            if(eliminarButton != null) {
+            if (eliminarButton != null) {
                 eliminarButton.setText(getStringSafe("eliminar.button"));
                 eliminarButton.setTooltip(new Tooltip(getStringSafe("eliminar.tooltip")));
             }
@@ -99,7 +100,8 @@ public class ControladorDatos {
     }
 
     /**
-     * Asigna el identificador único (slug) del personaje actual y dispara la carga de datos.
+     * Asigna el identificador único (slug) del personaje actual y dispara la carga
+     * de datos.
      *
      * @author Marco
      */
@@ -134,7 +136,8 @@ public class ControladorDatos {
     }
 
     /**
-     * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la traducción de etiquetas.
+     * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la
+     * traducción de etiquetas.
      *
      * @author Nizam
      */
@@ -208,7 +211,8 @@ public class ControladorDatos {
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null) return key;
+        if (resources == null)
+            return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -234,7 +238,8 @@ public class ControladorDatos {
      */
     @FXML
     public void handleActualizar() {
-        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "", getStringSafe("actualizar.msg"));
+        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "",
+                getStringSafe("actualizar.msg"));
     }
 
     /**
@@ -256,15 +261,29 @@ public class ControladorDatos {
             Map<String, Object> parameters = new HashMap<>();
 
             parameters.put("Nombre", obtenerValor(nombreLabel));
+            parameters.put("Alias", obtenerValor(aliasLabel));
             parameters.put("Casa", obtenerValor(casaLabel));
+            parameters.put("Genero", obtenerValor(generoLabel));
+            parameters.put("Especie", obtenerValor(especieLabel));
+            parameters.put("Ojos", obtenerValor(colorOjosLabel));
+            parameters.put("Pelo", obtenerValor(colorPeloLabel));
+            parameters.put("Piel", obtenerValor(colorPielLabel));
+            parameters.put("Patronus", obtenerValor(patronusLabel));
+
+            // Cargar la imagen del personaje
+            InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+            if (imagenStream != null) {
+                parameters.put("Imagen", imagenStream);
+            }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
             JasperViewer.viewReport(jasperPrint, false);
 
-            mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exportar.button"), "", "Funcionalidad JasperReports comentada. Verifique la implementación en el código.");
+            logger.info("Reporte PDF generado exitosamente");
 
         } catch (NoClassDefFoundError e) {
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Falta la librería JasperReports. Comente la funcionalidad si no la usa.");
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "",
+                    "Falta la librería JasperReports. Comente la funcionalidad si no la usa.");
         } catch (Exception e) {
             logger.error("Error Jasper", e);
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
@@ -335,9 +354,11 @@ public class ControladorDatos {
      * @author Marco
      */
     private String obtenerValor(Label label) {
-        if (label == null) return "";
+        if (label == null)
+            return "";
         String text = label.getText();
-        if (text == null) return "";
+        if (text == null)
+            return "";
         int separatorIndex = text.indexOf(": ");
         return (separatorIndex != -1) ? text.substring(separatorIndex + 2).trim() : text.trim();
     }

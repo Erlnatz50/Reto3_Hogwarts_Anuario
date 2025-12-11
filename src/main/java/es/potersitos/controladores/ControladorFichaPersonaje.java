@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -21,7 +20,7 @@ import java.util.ResourceBundle;
 
 /**
  * Controlador de la ficha individual de un personaje.
- * Gestiona la visualización de la tarjeta, i18n, carga de imágenes y navegación a detalles.
+ * Gestiona la visualización de la tarjeta y la navegación a detalles.
  *
  * @author Marco
  * @version 1.0
@@ -44,7 +43,10 @@ public class ControladorFichaPersonaje {
     @FXML
     private CheckBox checkBoxSeleccionar;
 
-    /** Recurso de internacionalización. */
+    /** * Recurso de internacionalización.
+     * IMPORTANTE: La etiqueta @FXML permite que el FXMLLoader inyecte aquí
+     * el idioma que viene de la ventana principal (ControladorVisualizarPersonajes).
+     */
     @FXML
     private ResourceBundle resources;
 
@@ -65,6 +67,7 @@ public class ControladorFichaPersonaje {
      */
     @FXML
     public void initialize() {
+        // Si por alguna razón no se inyectó (ej. pruebas unitarias), cargamos el defecto
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -73,16 +76,19 @@ public class ControladorFichaPersonaje {
             }
         }
 
+        // Aplicar Tooltips usando las claves del archivo de propiedades
         if (this.resources != null) {
+            // Tooltip para la tarjeta completa
             try {
                 Tooltip tooltipCard = new Tooltip(resources.getString("ficha.click.tooltip"));
                 Tooltip.install(cardBox, tooltipCard);
 
+                // Tooltip para el checkbox de selección
                 if (checkBoxSeleccionar != null) {
                     checkBoxSeleccionar.setTooltip(new Tooltip(resources.getString("ficha.seleccion.tooltip")));
                 }
             } catch (Exception e) {
-                logger.warn("Faltan claves de Tooltip en el ResourceBundle. Ignorando tooltips.", e);
+                // Ignorar si falta alguna clave en el properties
             }
         }
     }
@@ -91,53 +97,26 @@ public class ControladorFichaPersonaje {
      * Define el identificador único (slug) del personaje mostrado.
      *
      * @param slug Identificador textual único del personaje.
-     * @author Marco
      */
     public void setPersonajeSlug(String slug) {
         this.personajeSlug = slug;
-        logger.debug("Slug asignado al personaje: {}", slug);
     }
 
     /**
-     * Asigna la información principal del personaje a la tarjeta, incluyendo la carga de la imagen.
+     * Asigna la información principal del personaje a la tarjeta.
      *
      * @param nombre Nombre completo del personaje
      * @param casa Casa a la que pertenece
-     * @param imagePath Ruta de la imagen (URL o ruta de archivo)
-     * @author Nizam
+     * @param imagePath Ruta de la imagen asociada
      */
     public void setData(String nombre, String casa, String imagePath) {
         labelNombre.setText(nombre);
         labelCasa.setText(casa);
-        logger.info("Datos cargados en la ficha: {} ({})", nombre, casa);
 
         try {
-            if (imagePath != null && !imagePath.isEmpty()) {
-
-                String rutaPrevia = imagePath;
-                final String rutaFinal;
-
-                if (!rutaPrevia.toLowerCase().startsWith("http") && !rutaPrevia.toLowerCase().startsWith("file:")) {
-                    rutaFinal = "file:/" + rutaPrevia.replace("\\", "/");
-                } else {
-                    rutaFinal = rutaPrevia;
-                }
-
-                Image imagen = new Image(rutaFinal, true);
-
-                imagen.errorProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        logger.warn("Fallo al cargar la imagen de la ruta: {}. Verifique que el archivo exista.", rutaFinal);
-                    }
-                });
-
-                imagePersonaje.setImage(imagen);
-
-            } else {
-                logger.warn("Ruta de imagen vacía para el personaje: {}", nombre);
-            }
+            // imagePersonaje.setImage(new Image(imagePath));
         } catch (Exception e) {
-            logger.error("Error FATAL al intentar procesar la ruta de imagen '{}': {}", imagePath, e.getMessage(), e);
+            logger.error("Error al cargar la imagen '{}': {}", imagePath, e.getMessage());
         }
     }
 
@@ -145,23 +124,24 @@ public class ControladorFichaPersonaje {
      * Detecta clics sobre la tarjeta.
      * Si está en modo selección, marca el checkbox.
      * Si no, abre la ventana de detalles pasando el idioma actual.
-     *
-     * @author Marco
      */
     @FXML
     private void handleCardClick() {
+        // 1. Lógica de Selección
         if (isSelectionMode) {
             boolean nuevoEstado = !checkBoxSeleccionar.isSelected();
             checkBoxSeleccionar.setSelected(nuevoEstado);
-            logger.debug("Personaje '{}' {} seleccionado.", labelNombre.getText(), nuevoEstado ? "" : "no");
             return;
         }
 
+        // 2. Lógica de Apertura de Detalles
         logger.info("Abriendo ventana de detalles para '{}'.", labelNombre.getText());
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
 
+            // ¡IMPORTANTE!: Pasamos el 'resources' actual (que ya tiene el idioma correcto)
+            // al siguiente cargador.
             if (resources != null) {
                 loader.setResources(resources);
             }
@@ -171,16 +151,15 @@ public class ControladorFichaPersonaje {
             ControladorDatos controladorDatos = loader.getController();
             if (personajeSlug != null) {
                 controladorDatos.setPersonajeSlug(personajeSlug);
-                logger.debug("Slug '{}' pasado al ControladorDatos.", personajeSlug);
             }
 
             Scene scene = new Scene(root);
 
+            // Cargar estilos CSS
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloDatos.css");
                 if (archivoCSS != null) {
                     scene.getStylesheets().add(archivoCSS.toExternalForm());
-                    logger.debug("Hoja de estilo CSS aplicada correctamente.");
                 }
             } catch (Exception e) {
                 logger.warn("Error al aplicar CSS: {}", e.getMessage());
@@ -192,18 +171,13 @@ public class ControladorFichaPersonaje {
             stage.initStyle(StageStyle.TRANSPARENT);
             stage.show();
 
-            logger.info("Ventana de datos abierta correctamente para '{}'.", labelNombre.getText());
-
         } catch (IOException e) {
-            logger.error("Error al cargar la ventana de datos del personaje '{}': {}", labelNombre.getText(), e.getMessage(), e);
+            logger.error("Error al cargar la ventana de datos: {}", e.getMessage(), e);
         }
     }
 
     /**
      * Alterna el modo de selección de la tarjeta.
-     *
-     * @param active {@code true} para activar modo selección, {@code false} para desactivarlo.
-     * @author Marco
      */
     public void setSelectionMode(boolean active) {
         this.isSelectionMode = active;
@@ -213,26 +187,17 @@ public class ControladorFichaPersonaje {
                 checkBoxSeleccionar.setSelected(false);
             }
         }
-        logger.debug("Modo selección {} para '{}'.", active ? "activado" : "desactivado", labelNombre.getText());
     }
 
     /**
      * Indica si la tarjeta está marcada en el modo de selección.
-     *
-     * @return {@code true} si la tarjeta está seleccionada, {@code false} si no lo está.
-     * @author Marco
      */
     public boolean isSelected() {
-        boolean seleccionado = checkBoxSeleccionar != null && checkBoxSeleccionar.isSelected();
-        logger.trace("Consulta de selección en '{}': {}", labelNombre.getText(), seleccionado);
-        return seleccionado;
+        return checkBoxSeleccionar != null && checkBoxSeleccionar.isSelected();
     }
 
     /**
      * Devuelve el nombre del personaje mostrado en la tarjeta.
-     *
-     * @return Nombre asignado al personaje.
-     * @author Marco
      */
     public String getNombre() {
         return labelNombre.getText();
