@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -601,6 +602,9 @@ public class ControladorVisualizarPersonajes {
             Stage stage = new Stage();
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
+            stage.getIcons().add(
+                    new Image(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))
+            );
             stage.show();
 
         } catch (Exception e) {
