@@ -4,9 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24"
             maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="600.0" prefWidth="900.0" styleClass="root"
@@ -53,6 +53,12 @@
 
     <center>
         <StackPane BorderPane.alignment="CENTER">
+            <ImageView fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" opacity="0.15" mouseTransparent="true">
+                <image>
+                    <Image url="@../img/logo_hogwarts.png" />
+                </image>
+            </ImageView>
+
             <VBox VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-container">
                     <Label styleClass="wand-icon" text="⚡">
