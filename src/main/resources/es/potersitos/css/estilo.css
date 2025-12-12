@@ -292,3 +292,22 @@ VBox[left] {
 .menu-item:focused .label {
     -fx-text-fill: white;
 }
+
+.page-number-button {
+    -fx-font-size: 10.5px;        /* Un poco más pequeño */
+    -fx-background-radius: 6px;
+    -fx-padding: 5 8 5 8;         /* Padding más compacto */
+    -fx-font-weight: bold;
+
+    /* Anchos específicos por número de dígitos */
+    -fx-min-width: 36px;          /* Para "1" */
+}
+
+.page-number-button:dos-digitos {
+    -fx-pref-width: 44px;         /* Para "10-99" */
+}
+
+.page-number-button:tres-digitos {
+    -fx-pref-width: 52px;         /* Para "100-525" */
+}
+

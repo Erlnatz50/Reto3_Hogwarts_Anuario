@@ -14,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -38,7 +39,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Botones generales de la interfaz. */
     @FXML
-    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro, btnSiguiente, btnAnterior;
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
 
     /** Etiqueta que muestra la página actual del paginador. */
     @FXML
@@ -67,6 +68,10 @@ public class ControladorVisualizarPersonajes {
     /** Campo de texto usado para realizar búsquedas por nombre. */
     @FXML
     private TextField searchField;
+
+    /**  */
+    @FXML
+    private HBox paginationContainer;
 
     /** Lista de controladores asociados a cada ficha de personaje cargado. */
     private List<ControladorFichaPersonaje> listaControladores;
@@ -237,8 +242,6 @@ public class ControladorVisualizarPersonajes {
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
         btnExportar.setText(resources.getString("visualizar.btn.exportar"));
-        btnAnterior.setText(resources.getString("paginacion.anterior"));
-        btnSiguiente.setText(resources.getString("paginacion.siguiente"));
         btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
         btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
 
@@ -379,48 +382,84 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Navega a la página anterior en el paginador.
-     *
-     * @author Nizam
-     */
-    @FXML
-    private void paginaAnterior() {
-        if (paginaActual > 1) {
-            setPaginaActual(paginaActual - 1);
-        }
-    }
-
-    /**
-     * Navega a la página siguiente en el paginador.
-     *
-     * @author Nizam
-     */
-    @FXML
-    private void siguientePagina() {
-        if (paginaActual < totalPaginas) {
-            setPaginaActual(paginaActual + 1);
-        }
-    }
-
-    /**
      * Actualiza el estado visual de los controles de paginación.
      *
-     * @author Nizam
+     * @author Erlantz
      */
     private void actualizarControlesPaginacion() {
-        if (lblPaginaActual == null || btnAnterior == null || btnSiguiente == null) {
+        if (paginationContainer == null) return;
+
+        paginationContainer.getChildren().clear();
+
+        if (totalPaginas <= 1) {
+            lblPaginaActual.setText("");
             return;
         }
 
-        if (totalPaginas == 0) {
-            lblPaginaActual.setText("Página 0 de 0");
-            btnAnterior.setDisable(true);
-            btnSiguiente.setDisable(true);
-        } else {
-            lblPaginaActual.setText(String.format("Página %d de %d", paginaActual, totalPaginas));
-            btnAnterior.setDisable(paginaActual == 1);
-            btnSiguiente.setDisable(paginaActual == totalPaginas);
+        lblPaginaActual.setText(String.format("Pág. %d de %d", paginaActual, totalPaginas));
+
+        if (totalPaginas <= 5) {
+            for (int i = 1; i <= totalPaginas; i++) {
+                agregarBotonPagina(i);
+            }
+            return;
         }
+
+        agregarBotonPagina(1);
+
+        int x, y, z;
+        if (paginaActual <= 3) {
+            x = 2; y = 3; z = 4;
+        } else if (paginaActual >= totalPaginas - 2) {
+            x = totalPaginas - 3; y = totalPaginas - 2; z = totalPaginas - 1;
+        } else {
+            x = paginaActual - 1; y = paginaActual; z = paginaActual + 1;
+        }
+
+        if (x > 2) {
+            Label puntos = new Label("...");
+            puntos.getStyleClass().add("pagination-dots");
+            paginationContainer.getChildren().add(puntos);
+        }
+
+        if (x > 1 && x < totalPaginas) agregarBotonPagina(x);
+        if (y > 1 && y < totalPaginas && y != x) agregarBotonPagina(y);
+        if (z > 1 && z < totalPaginas && z != x && z != y) agregarBotonPagina(z);
+
+        if (z < totalPaginas - 1) {
+            Label puntos = new Label("...");
+            puntos.getStyleClass().add("pagination-dots");
+            paginationContainer.getChildren().add(puntos);
+        }
+
+        // SIEMPRE última página
+        agregarBotonPagina(totalPaginas);
+    }
+
+    /**
+     *
+     * @param numeroPagina
+     * @author Erlantz
+     */
+    private void agregarBotonPagina(int numeroPagina) {
+        Button btn = new Button(String.valueOf(numeroPagina));
+        btn.getStyleClass().addAll("page-number-button", "small-button");
+
+        String texto = String.valueOf(numeroPagina);
+        if (texto.length() == 2) {
+            btn.getStyleClass().add("dos-digitos");
+        } else if (texto.length() == 3) {
+            btn.getStyleClass().add("tres-digitos");
+        }
+
+        if (numeroPagina == paginaActual) {
+            btn.setDisable(true);
+            btn.getStyleClass().add("active-page");
+        } else {
+            btn.setOnAction(e -> setPaginaActual(numeroPagina));
+        }
+
+        paginationContainer.getChildren().add(btn);
     }
 
     /**
