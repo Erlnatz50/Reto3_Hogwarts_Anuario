@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
  */
 public class ControladorVisualizarPersonajes {
 
+    private Button botonImportar;
+
     /** Botones generales de la interfaz. */
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
@@ -51,7 +53,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Elementos del menú superior. */
     @FXML
-    public MenuItem menuSalir, menuNuevo, menuImportar, menuGuardar;
+    public MenuItem menuSalir, menuNuevo, menuGuardar;
 
     /** Contenedor que aloja las fichas de los personajes. */
     @FXML
@@ -102,7 +104,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void initialize() {
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-
+        botonImportar = new Button ("importar");
         configurarAtajosMenu();
         configurarBusqueda();
         configurarListenersFiltros();
@@ -127,7 +129,6 @@ public class ControladorVisualizarPersonajes {
      */
     private void configurarAtajosMenu(){
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
-        menuImportar.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
     }
@@ -153,25 +154,7 @@ public class ControladorVisualizarPersonajes {
         totalPaginas = (int) Math.ceil((double) total / personajesPorPagina);
     }
 
-    /**
-     * Muestra un mensaje centrado indicando que no se han encontrado personajes
-     * y que el usuario debe importarlos.
-     *
-     * @author Erlantz
-     */
-    private void mostrarMensajeImportar() {
-        if (tilePanePersonajes != null) {
-            tilePanePersonajes.getChildren().clear();
 
-            Label mensaje = new Label("⚠️ No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
-            mensaje.setStyle("-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
-            mensaje.setWrapText(true);
-
-            VBox contenedor = new VBox(mensaje);
-            contenedor.setStyle("-fx-alignment: center;");
-            tilePanePersonajes.getChildren().add(contenedor);
-        }
-    }
 
     /**
      * Cambia el idioma a español.
@@ -215,6 +198,7 @@ public class ControladorVisualizarPersonajes {
             actualizarTextosUI();
             cargarPersonajes(listaPersonajesMapeados);
             filtrarPersonajes();
+            mostrarMensajeImportar();
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
@@ -235,10 +219,9 @@ public class ControladorVisualizarPersonajes {
         }
 
         menuNuevo.setText(resources.getString("menu.archivo.nuevo"));
-        menuImportar.setText(resources.getString("menu.archivo.importar"));
         menuGuardar.setText(resources.getString("menu.archivo.guardar"));
         menuSalir.setText(resources.getString("menu.archivo.salir"));
-
+        botonImportar.setText(resources.getString("importar"));
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
         btnExportar.setText(resources.getString("visualizar.btn.exportar"));
@@ -281,6 +264,30 @@ public class ControladorVisualizarPersonajes {
             }
         }
         actualizarControlesPaginacion();
+    }
+
+    /**
+     * Muestra un mensaje centrado indicando que no se han encontrado personajes
+     * y que el usuario debe importarlos.
+     *
+     * @author Erlantz
+     */
+    private void mostrarMensajeImportar() {
+        if (tilePanePersonajes != null) {
+            tilePanePersonajes.getChildren().clear();
+
+            Label mensaje = new Label("⚠️ No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
+            mensaje.setStyle("-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
+            mensaje.setWrapText(true);
+
+
+            VBox contenedor = new VBox(mensaje);
+            VBox contenedorbtn = new VBox(botonImportar);
+            botonImportar.setOnAction(e -> crearArchivos());
+            contenedor.setStyle("-fx-alignment: center;");
+            tilePanePersonajes.getChildren().add(contenedor);
+            tilePanePersonajes.getChildren().add(contenedorbtn);
+        }
     }
 
     /**
@@ -628,7 +635,8 @@ public class ControladorVisualizarPersonajes {
 
             Parent root = loader.load();
 
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(loader.load());
+
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
                 if (archivoCSS != null) {

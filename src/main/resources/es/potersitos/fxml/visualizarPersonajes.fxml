@@ -28,7 +28,6 @@
         <MenuBar fx:id="menuBar" prefHeight="28.0" prefWidth="900.0" styleClass="menu-bar">
             <Menu text="%menu.archivo">
                 <MenuItem fx:id="menuNuevo" onAction="#onNuevo" text="%menu.archivo.nuevo" />
-                <MenuItem fx:id="menuImportar" onAction="#crearArchivos" text="%menu.archivo.importar" />
                 <MenuItem fx:id="menuGuardar" onAction="#exportarPersonajes" text="%menu.archivo.guardar" />
                 <SeparatorMenuItem />
                 <MenuItem fx:id="menuSalir" onAction="#salir" text="%menu.archivo.salir" />
