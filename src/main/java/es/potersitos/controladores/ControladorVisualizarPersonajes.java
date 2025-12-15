@@ -40,8 +40,13 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
 
+    /**  */
     private Button botonImportar;
+
+    /**  */
     private boolean selectionModeActive = false;
+
+    /**  */
     private Set<String> selectedSlugs = new HashSet<>();
 
     /** Etiqueta que muestra la página actual del paginador. */
@@ -367,14 +372,12 @@ public class ControladorVisualizarPersonajes {
                 controller.setData(nombre, casa, imagePath);
                 controller.setPersonajeSlug(slug);
 
-                // Configurar listener de selección
                 controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
 
                 if (selectionModeActive) {
                     controller.setSelectionMode(true);
-                    // Restaurar estado de selección
                     if (selectedSlugs.contains(slug)) {
-                        controller.setSelected(true);
+                        //controller.setSelected(true);
                     }
                 }
 
@@ -385,7 +388,6 @@ public class ControladorVisualizarPersonajes {
             }
         }
 
-        // Actualizar el estado del botón al cargar (si estamos en modo selección)
         if (selectionModeActive) {
             actualizarEstadoBotonExportar();
         }
@@ -409,23 +411,20 @@ public class ControladorVisualizarPersonajes {
                 btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
             } else {
                 btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
-                selectedSlugs.clear(); // Limpiar seleccion al cancelar
+                selectedSlugs.clear();
             }
         }
 
         for (ControladorFichaPersonaje controller : listaControladores) {
             controller.setSelectionMode(selectionModeActive);
-            if (!selectionModeActive)
-                controller.setSelected(false);
+            if (!selectionModeActive){
+                 //controller.setSelected(false);
+            }
         }
 
         actualizarEstadoBotonExportar();
     }
 
-    /**
-     * Habilita o deshabilita el botón de exportar según si hay personajes
-     * seleccionados.
-     */
     /**
      * Habilita o deshabilita el botón de exportar según si hay personajes
      * seleccionados.
@@ -450,36 +449,31 @@ public class ControladorVisualizarPersonajes {
      * Exporta los personajes seleccionados en modo selección.
      * Genera un reporte PDF combinado para todos los personajes seleccionados.
      *
-     * @author
+     * @author Telmo
      */
     @FXML
     private void exportarSeleccionados() {
         if (selectedSlugs.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    "No hay personajes seleccionados.");
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No hay personajes seleccionados.");
             return;
         }
 
-        // Compilar reporte una vez
-        net.sf.jasperreports.engine.JasperReport jasperReport = null;
+        net.sf.jasperreports.engine.JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                        "No se encuentra el archivo .jrxml");
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "No se encuentra el archivo .jrxml");
                 return;
             }
             jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    "Error al cargar plantilla de reporte: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al cargar plantilla de reporte: " + e.getMessage());
             return;
         }
 
         List<net.sf.jasperreports.engine.JasperPrint> jasperPrints = new ArrayList<>();
         int exportados = 0;
 
-        // Generar un JasperPrint por cada personaje
         for (String slug : selectedSlugs) {
             Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
                     .filter(map -> slug.equals(map.get("slug")))
@@ -499,7 +493,6 @@ public class ControladorVisualizarPersonajes {
                     parameters.put("Piel", p.getOrDefault("skin_color", ""));
                     parameters.put("Patronus", p.getOrDefault("patronus", ""));
 
-                    // Imagen
                     InputStream imagenStream = getClass()
                             .getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
                     if (imagenStream != null) {
@@ -519,12 +512,10 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    "No se pudo generar ningún reporte.");
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No se pudo generar ningún reporte.");
             return;
         }
 
-        // Unificar todos los JasperPrint en uno solo
         try {
             net.sf.jasperreports.engine.JasperPrint mergedPrint = jasperPrints.get(0);
 
@@ -535,18 +526,15 @@ public class ControladorVisualizarPersonajes {
                 }
             }
 
-            // Mostrar el reporte unificado
             net.sf.jasperreports.view.JasperViewer.viewReport(mergedPrint, false);
 
             if (exportados > 0) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
-                        "Se han exportado " + exportados + " fichas en un único documento.");
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "Se han exportado " + exportados + " fichas en un único documento.");
             }
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    "Error al unificar/mostrar el reporte: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al unificar/mostrar el reporte: " + e.getMessage());
         }
     }
 
@@ -627,7 +615,6 @@ public class ControladorVisualizarPersonajes {
             paginationContainer.getChildren().add(puntos);
         }
 
-        // SIEMPRE última página
         agregarBotonPagina(totalPaginas);
     }
 
@@ -671,7 +658,7 @@ public class ControladorVisualizarPersonajes {
                         for (Node node : ((VBox) content).getChildren()) {
                             if (node instanceof CheckBox cb) {
                                 cb.selectedProperty()
-                                        .addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+                                        .addListener((o, ov, nv) -> filtrarPersonajes());
                             }
                         }
                     }
@@ -801,7 +788,7 @@ public class ControladorVisualizarPersonajes {
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
             stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")));
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
             stage.show();
 
         } catch (Exception e) {
