@@ -42,6 +42,7 @@ public class ControladorVisualizarPersonajes {
 
     private Button botonImportar;
     private boolean selectionModeActive = false;
+    private Set<String> selectedSlugs = new HashSet<>();
 
     /** Etiqueta que muestra la página actual del paginador. */
     @FXML
@@ -367,10 +368,14 @@ public class ControladorVisualizarPersonajes {
                 controller.setPersonajeSlug(slug);
 
                 // Configurar listener de selección
-                controller.setOnSelectionChanged(this::actualizarEstadoBotonExportar);
+                controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
 
                 if (selectionModeActive) {
                     controller.setSelectionMode(true);
+                    // Restaurar estado de selección
+                    if (selectedSlugs.contains(slug)) {
+                        controller.setSelected(true);
+                    }
                 }
 
                 listaControladores.add(controller);
@@ -404,11 +409,14 @@ public class ControladorVisualizarPersonajes {
                 btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
             } else {
                 btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+                selectedSlugs.clear(); // Limpiar seleccion al cancelar
             }
         }
 
         for (ControladorFichaPersonaje controller : listaControladores) {
             controller.setSelectionMode(selectionModeActive);
+            if (!selectionModeActive)
+                controller.setSelected(false);
         }
 
         actualizarEstadoBotonExportar();
@@ -418,14 +426,24 @@ public class ControladorVisualizarPersonajes {
      * Habilita o deshabilita el botón de exportar según si hay personajes
      * seleccionados.
      */
+    /**
+     * Habilita o deshabilita el botón de exportar según si hay personajes
+     * seleccionados.
+     */
     private void actualizarEstadoBotonExportar() {
         if (btnExportar == null)
             return;
 
-        boolean haySeleccionados = listaControladores.stream()
-                .anyMatch(ControladorFichaPersonaje::isSelected);
+        btnExportar.setDisable(selectedSlugs.isEmpty());
+    }
 
-        btnExportar.setDisable(!haySeleccionados);
+    private void handleSelectionChange(ControladorFichaPersonaje controller) {
+        if (controller.isSelected()) {
+            selectedSlugs.add(controller.getPersonajeSlug());
+        } else {
+            selectedSlugs.remove(controller.getPersonajeSlug());
+        }
+        actualizarEstadoBotonExportar();
     }
 
     /**
@@ -436,12 +454,7 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     private void exportarSeleccionados() {
-        List<String> slugsSeleccionados = listaControladores.stream()
-                .filter(ControladorFichaPersonaje::isSelected)
-                .map(ControladorFichaPersonaje::getPersonajeSlug)
-                .collect(Collectors.toList());
-
-        if (slugsSeleccionados.isEmpty()) {
+        if (selectedSlugs.isEmpty()) {
             mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
                     "No hay personajes seleccionados.");
             return;
@@ -467,7 +480,7 @@ public class ControladorVisualizarPersonajes {
         int exportados = 0;
 
         // Generar un JasperPrint por cada personaje
-        for (String slug : slugsSeleccionados) {
+        for (String slug : selectedSlugs) {
             Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
                     .filter(map -> slug.equals(map.get("slug")))
                     .findFirst();
