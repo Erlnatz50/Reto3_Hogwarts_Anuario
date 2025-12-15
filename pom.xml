@@ -65,6 +65,13 @@
 
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>jaspersoft-third-party</id>
+            <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <!-- Plugin para generar el Javadoc -->

@@ -222,16 +222,22 @@ VBox[left] {
 
 /* Estilo para el campo de búsqueda estilo Hogwarts (Transparente) */
 .hogwarts-search-field {
-    -fx-background-color: transparent; /* Hace el fondo invisible */
+    -fx-background-color: transparent;
+    /* Hace el fondo invisible */
     -fx-background-insets: 0;
-    -fx-border-color: transparent;     /* Quita los bordes */
+    -fx-border-color: transparent;
+    /* Quita los bordes */
     -fx-border-width: 0;
 
     /* Tipografía */
-    -fx-text-fill: #1a1a1a;            /* Color del texto al escribir */
-    -fx-prompt-text-fill: #555555;     /* Color de la palabra 'BUSCAR' */
-    -fx-font-family: "Times New Roman", "Georgia", serif; /* Fuente con serifa */
-    -fx-font-style: italic;            /* Cursiva */
+    -fx-text-fill: #1a1a1a;
+    /* Color del texto al escribir */
+    -fx-prompt-text-fill: #555555;
+    /* Color de la palabra 'BUSCAR' */
+    -fx-font-family: "Times New Roman", "Georgia", serif;
+    /* Fuente con serifa */
+    -fx-font-style: italic;
+    /* Cursiva */
     -fx-font-size: 20px;
     -fx-padding: 0;
 }
@@ -294,20 +300,26 @@ VBox[left] {
 }
 
 .page-number-button {
-    -fx-font-size: 10.5px;        /* Un poco más pequeño */
+    -fx-font-size: 10.5px;
+    /* Un poco más pequeño */
     -fx-background-radius: 6px;
-    -fx-padding: 5 8 5 8;         /* Padding más compacto */
+    -fx-padding: 5 8 5 8;
+    /* Padding más compacto */
     -fx-font-weight: bold;
+    -fx-alignment: center;
+    /* Centrar el texto */
 
     /* Anchos específicos por número de dígitos */
-    -fx-min-width: 36px;          /* Para "1" */
+    -fx-min-width: 36px;
+    /* Para "1" */
 }
 
 .page-number-button:dos-digitos {
-    -fx-pref-width: 44px;         /* Para "10-99" */
+    -fx-pref-width: 44px;
+    /* Para "10-99" */
 }
 
 .page-number-button:tres-digitos {
-    -fx-pref-width: 52px;         /* Para "100-525" */
+    -fx-pref-width: 52px;
+    /* Para "100-525" */
 }
-

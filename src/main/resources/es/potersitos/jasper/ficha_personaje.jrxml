@@ -23,10 +23,10 @@
             </rectangle>
 
             <!-- Imagen de fondo -->
-            <image>
+            <image onErrorType="Blank">
                 <reportElement x="-20" y="-120" width="594" height="802"/>
                 <imageExpression class="java.io.InputStream"><![CDATA[
-                this.getClass().getResourceAsStream("/es/potersitos/imagenes/fondo.png")
+                this.getClass().getResourceAsStream("/es/potersitos/img/fondo.png")
             ]]></imageExpression>
             </image>
 

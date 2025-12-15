@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
  * Controlador encargado de gestionar la vista de personajes.
  * Permite filtrar, cambiar idioma, seleccionar y exportar personajes.
@@ -37,11 +36,12 @@ import java.util.stream.Collectors;
  */
 public class ControladorVisualizarPersonajes {
 
-    private Button botonImportar;
-
     /** Botones generales de la interfaz. */
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
+
+    private Button botonImportar;
+    private boolean selectionModeActive = false;
 
     /** Etiqueta que muestra la página actual del paginador. */
     @FXML
@@ -104,7 +104,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void initialize() {
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-        botonImportar = new Button ("importar");
+        botonImportar = new Button("importar");
         configurarAtajosMenu();
         configurarBusqueda();
         configurarListenersFiltros();
@@ -113,7 +113,7 @@ public class ControladorVisualizarPersonajes {
         calcularTotalPaginas();
         actualizarTextosUI();
 
-        if(listaPersonajesMapeados.isEmpty()){
+        if (listaPersonajesMapeados.isEmpty()) {
             mostrarMensajeImportar();
         } else {
             cargarPersonajes(listaPersonajesMapeados);
@@ -127,7 +127,7 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Erlantz
      */
-    private void configurarAtajosMenu(){
+    private void configurarAtajosMenu() {
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
@@ -138,23 +138,22 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Erlantz
      */
-    private void configurarBusqueda(){
-        if (searchField != null){
+    private void configurarBusqueda() {
+        if (searchField != null) {
             searchField.textProperty().addListener((o, ov, nv) -> filtrarPersonajes());
         }
     }
 
     /**
-     * Calcula el número total de páginas basándose en personajesPorPagina y el tamaño de la lista.
+     * Calcula el número total de páginas basándose en personajesPorPagina y el
+     * tamaño de la lista.
      *
      * @author Nizam
      */
-    private void calcularTotalPaginas(){
+    private void calcularTotalPaginas() {
         int total = Math.max(1, listaPersonajesMapeados.size());
         totalPaginas = (int) Math.ceil((double) total / personajesPorPagina);
     }
-
-
 
     /**
      * Cambia el idioma a español.
@@ -187,7 +186,8 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Cambia el idioma (locale) activo y actualiza todos los textos visibles en la interfaz.
+     * Cambia el idioma (locale) activo y actualiza todos los textos visibles en la
+     * interfaz.
      *
      * @param nuevoLocale Nuevo idioma a aplicar.
      * @author Erlantz
@@ -202,12 +202,14 @@ public class ControladorVisualizarPersonajes {
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, "No se pudo cambiar el idioma: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                    "No se pudo cambiar el idioma: " + e.getMessage());
         }
     }
 
     /**
-     * Actualiza los textos de todos los controles de la interfaz según el ResourceBundle actual.
+     * Actualiza los textos de todos los controles de la interfaz según el
+     * ResourceBundle actual.
      *
      * @author Marco
      */
@@ -228,7 +230,7 @@ public class ControladorVisualizarPersonajes {
         btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
         btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
 
-        if (btnExportar.isVisible()) {
+        if (selectionModeActive) {
             btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
         } else {
             btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
@@ -237,28 +239,31 @@ public class ControladorVisualizarPersonajes {
         if (accordionFiltros != null && !accordionFiltros.getPanes().isEmpty()) {
             List<TitledPane> panes = accordionFiltros.getPanes();
             panes.get(0).setText(resources.getString("filtro.titulo.casa"));
-            if (panes.size() > 1) panes.get(1).setText(resources.getString("filtro.titulo.nacionalidad"));
-            if (panes.size() > 2) panes.get(2).setText(resources.getString("filtro.titulo.especie"));
-            if (panes.size() > 3) panes.get(3).setText(resources.getString("filtro.titulo.genero"));
+            if (panes.size() > 1)
+                panes.get(1).setText(resources.getString("filtro.titulo.nacionalidad"));
+            if (panes.size() > 2)
+                panes.get(2).setText(resources.getString("filtro.titulo.especie"));
+            if (panes.size() > 3)
+                panes.get(3).setText(resources.getString("filtro.titulo.genero"));
 
-            actualizarCheckBoxesDelPanel(panes.get(0), new String[]{
+            actualizarCheckBoxesDelPanel(panes.get(0), new String[] {
                     "filtro.valor.gryffindor", "filtro.valor.slytherin",
                     "filtro.valor.hufflepuff", "filtro.valor.ravenclaw"
             });
             if (panes.size() > 1) {
-                actualizarCheckBoxesDelPanel(panes.get(1), new String[]{
+                actualizarCheckBoxesDelPanel(panes.get(1), new String[] {
                         "filtro.valor.britanico", "filtro.valor.irlandes",
                         "filtro.valor.frances", "filtro.valor.bulgaro"
                 });
             }
             if (panes.size() > 2) {
-                actualizarCheckBoxesDelPanel(panes.get(2), new String[]{
+                actualizarCheckBoxesDelPanel(panes.get(2), new String[] {
                         "filtro.valor.humano", "filtro.valor.mestizo",
                         "filtro.valor.elfo", "filtro.valor.gigante"
                 });
             }
             if (panes.size() > 3) {
-                actualizarCheckBoxesDelPanel(panes.get(3), new String[]{
+                actualizarCheckBoxesDelPanel(panes.get(3), new String[] {
                         "filtro.valor.masculino", "filtro.valor.femenino"
                 });
             }
@@ -276,10 +281,11 @@ public class ControladorVisualizarPersonajes {
         if (tilePanePersonajes != null) {
             tilePanePersonajes.getChildren().clear();
 
-            Label mensaje = new Label("⚠️ No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
-            mensaje.setStyle("-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
+            Label mensaje = new Label(
+                    "⚠️ No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
+            mensaje.setStyle(
+                    "-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
             mensaje.setWrapText(true);
-
 
             VBox contenedor = new VBox(mensaje);
             VBox contenedorbtn = new VBox(botonImportar);
@@ -319,7 +325,8 @@ public class ControladorVisualizarPersonajes {
      * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
-        if (tilePanePersonajes == null) return;
+        if (tilePanePersonajes == null)
+            return;
 
         tilePanePersonajes.getChildren().clear();
         listaControladores = new ArrayList<>();
@@ -359,7 +366,10 @@ public class ControladorVisualizarPersonajes {
                 controller.setData(nombre, casa, imagePath);
                 controller.setPersonajeSlug(slug);
 
-                if (btnExportar != null && btnExportar.isVisible()) {
+                // Configurar listener de selección
+                controller.setOnSelectionChanged(this::actualizarEstadoBotonExportar);
+
+                if (selectionModeActive) {
                     controller.setSelectionMode(true);
                 }
 
@@ -369,7 +379,140 @@ public class ControladorVisualizarPersonajes {
                 logger.error("Error al cargar la ficha del personaje", e);
             }
         }
+
+        // Actualizar el estado del botón al cargar (si estamos en modo selección)
+        if (selectionModeActive) {
+            actualizarEstadoBotonExportar();
+        }
+
         actualizarControlesPaginacion();
+    }
+
+    /**
+     * Alterna entre modo normal y modo selección de personajes para exportación.
+     * Muestra/oculta botón Exportar y actualiza texto del botón Seleccionar.
+     * Notifica a todas las fichas para activar/desactivar checkboxes.
+     *
+     * @author Telmo
+     */
+    @FXML
+    private void toggleSelectionMode() {
+        selectionModeActive = !selectionModeActive;
+
+        if (btnSeleccionar != null) {
+            if (selectionModeActive) {
+                btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
+            } else {
+                btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
+            }
+        }
+
+        for (ControladorFichaPersonaje controller : listaControladores) {
+            controller.setSelectionMode(selectionModeActive);
+        }
+
+        actualizarEstadoBotonExportar();
+    }
+
+    /**
+     * Habilita o deshabilita el botón de exportar según si hay personajes
+     * seleccionados.
+     */
+    private void actualizarEstadoBotonExportar() {
+        if (btnExportar == null)
+            return;
+
+        boolean haySeleccionados = listaControladores.stream()
+                .anyMatch(ControladorFichaPersonaje::isSelected);
+
+        btnExportar.setDisable(!haySeleccionados);
+    }
+
+    /**
+     * Exporta los personajes seleccionados en modo selección.
+     * Genera un reporte PDF para cada personaje seleccionado.
+     *
+     * @author
+     */
+    @FXML
+    private void exportarSeleccionados() {
+        List<String> slugsSeleccionados = listaControladores.stream()
+                .filter(ControladorFichaPersonaje::isSelected)
+                .map(ControladorFichaPersonaje::getPersonajeSlug)
+                .collect(Collectors.toList());
+
+        if (slugsSeleccionados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No hay personajes seleccionados.");
+            return;
+        }
+
+        int exportados = 0;
+
+        // Compilar reporte una vez
+        net.sf.jasperreports.engine.JasperReport jasperReport = null;
+        try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
+            if (reportStream == null) {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        "No se encuentra el archivo .jrxml");
+                return;
+            }
+            jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(reportStream);
+        } catch (Exception e) {
+            logger.error("Error compilando reporte Jasper", e);
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al cargar plantilla de reporte: " + e.getMessage());
+            return;
+        }
+
+        // Buscar datos completos y generar reportes
+        for (String slug : slugsSeleccionados) {
+            Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
+                    .filter(map -> slug.equals(map.get("slug")))
+                    .findFirst();
+
+            if (datosOpt.isPresent()) {
+                Map<String, String> p = datosOpt.get();
+                try {
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("Nombre", p.getOrDefault("name", ""));
+                    parameters.put("Alias", p.getOrDefault("alias_names", ""));
+                    parameters.put("Casa", p.getOrDefault("house", ""));
+                    parameters.put("Genero", p.getOrDefault("gender", ""));
+                    parameters.put("Especie", p.getOrDefault("species", ""));
+                    parameters.put("Ojos", p.getOrDefault("eye_color", ""));
+                    parameters.put("Pelo", p.getOrDefault("hair_color", ""));
+                    parameters.put("Piel", p.getOrDefault("skin_color", ""));
+                    parameters.put("Patronus", p.getOrDefault("patronus", ""));
+
+                    // Imagen
+                    InputStream imagenStream = getClass()
+                            .getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+                    if (imagenStream != null) {
+                        parameters.put("Imagen", imagenStream);
+                    }
+                    // TODO: Si quisieramos la imagen real, habría que cargarla como en
+                    // ControladorDatos
+
+                    net.sf.jasperreports.engine.JasperPrint jasperPrint = net.sf.jasperreports.engine.JasperFillManager
+                            .fillReport(jasperReport, parameters, new net.sf.jasperreports.engine.JREmptyDataSource(1));
+
+                    // Mostrar reporte (Nota: esto abrirá N ventanas si son muchos.
+                    // Idealmente se exportaría a PDF directamente o se unirían, pero por ahora
+                    // mostramos el visor)
+                    net.sf.jasperreports.view.JasperViewer.viewReport(jasperPrint, false);
+                    exportados++;
+
+                } catch (Exception e) {
+                    logger.error("Error generando reporte para {}", slug, e);
+                }
+            }
+        }
+
+        if (exportados > 0) {
+            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                    "Se han generado " + exportados + " fichas.");
+        }
     }
 
     /**
@@ -394,7 +537,8 @@ public class ControladorVisualizarPersonajes {
      * @author Erlantz
      */
     private void actualizarControlesPaginacion() {
-        if (paginationContainer == null) return;
+        if (paginationContainer == null)
+            return;
 
         paginationContainer.getChildren().clear();
 
@@ -416,11 +560,17 @@ public class ControladorVisualizarPersonajes {
 
         int x, y, z;
         if (paginaActual <= 3) {
-            x = 2; y = 3; z = 4;
+            x = 2;
+            y = 3;
+            z = 4;
         } else if (paginaActual >= totalPaginas - 2) {
-            x = totalPaginas - 3; y = totalPaginas - 2; z = totalPaginas - 1;
+            x = totalPaginas - 3;
+            y = totalPaginas - 2;
+            z = totalPaginas - 1;
         } else {
-            x = paginaActual - 1; y = paginaActual; z = paginaActual + 1;
+            x = paginaActual - 1;
+            y = paginaActual;
+            z = paginaActual + 1;
         }
 
         if (x > 2) {
@@ -429,9 +579,12 @@ public class ControladorVisualizarPersonajes {
             paginationContainer.getChildren().add(puntos);
         }
 
-        if (x > 1 && x < totalPaginas) agregarBotonPagina(x);
-        if (y > 1 && y < totalPaginas && y != x) agregarBotonPagina(y);
-        if (z > 1 && z < totalPaginas && z != x && z != y) agregarBotonPagina(z);
+        if (x > 1 && x < totalPaginas)
+            agregarBotonPagina(x);
+        if (y > 1 && y < totalPaginas && y != x)
+            agregarBotonPagina(y);
+        if (z > 1 && z < totalPaginas && z != x && z != y)
+            agregarBotonPagina(z);
 
         if (z < totalPaginas - 1) {
             Label puntos = new Label("...");
@@ -482,7 +635,8 @@ public class ControladorVisualizarPersonajes {
                     if (content instanceof VBox) {
                         for (Node node : ((VBox) content).getChildren()) {
                             if (node instanceof CheckBox cb) {
-                                cb.selectedProperty().addListener((observable, oldValue, newValue) -> filtrarPersonajes());
+                                cb.selectedProperty()
+                                        .addListener((observable, oldValue, newValue) -> filtrarPersonajes());
                             }
                         }
                     }
@@ -523,7 +677,8 @@ public class ControladorVisualizarPersonajes {
                 }
             }
         }
-        if (searchField != null) searchField.setText("");
+        if (searchField != null)
+            searchField.setText("");
         this.paginaActual = 1;
         cargarPersonajes(listaPersonajesMapeados);
     }
@@ -579,45 +734,6 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Alterna entre modo normal y modo selección de personajes para exportación.
-     * Muestra/oculta botón Exportar y actualiza texto del botón Seleccionar.
-     * Notifica a todas las fichas para activar/desactivar checkboxes.
-     *
-     * @author Telmo
-     */
-    @FXML
-    private void toggleSelectionMode() {
-        boolean isSelectionMode = (btnExportar != null && !btnExportar.isVisible());
-
-        if (btnExportar != null) {
-            btnExportar.setVisible(isSelectionMode);
-            btnExportar.setManaged(isSelectionMode);
-        }
-
-        if (btnSeleccionar != null) {
-            if (isSelectionMode) {
-                btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
-            } else {
-                btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
-            }
-        }
-
-        for (ControladorFichaPersonaje controller : listaControladores) {
-            controller.setSelectionMode(isSelectionMode);
-        }
-    }
-
-    /**
-     * Exporta los personajes seleccionados en modo selección.
-     *
-     * @author
-     */
-    @FXML
-    private void exportarSeleccionados() {
-        // Lógica de exportación
-    }
-
-    /**
      * Abre el formulario FXML para crear un nuevo personaje.
      *
      * @author Erlantz
@@ -650,8 +766,7 @@ public class ControladorVisualizarPersonajes {
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
             stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))
-            );
+                    new Image(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")));
             stage.show();
 
         } catch (Exception e) {
@@ -659,9 +774,9 @@ public class ControladorVisualizarPersonajes {
         }
     }
 
-
     /**
-     * Ejecuta el programa externo CrearArchivosPotter.exe para generar archivos CSV/XML/BIN.
+     * Ejecuta el programa externo CrearArchivosPotter.exe para generar archivos
+     * CSV/XML/BIN.
      *
      * @author Erlantz
      */
@@ -704,13 +819,15 @@ public class ControladorVisualizarPersonajes {
             boolean binOk = new File(binPath).exists();
 
             if (csvOk && xmlOk && binOk) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "3 Archivos creados:\n" + proyectoPath);
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                        "3 Archivos creados:\n" + proyectoPath);
 
                 listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
                 calcularTotalPaginas();
                 cargarPersonajes(listaPersonajesMapeados);
             } else {
-                mandarAlertas(Alert.AlertType.ERROR, "FALLÓ", "", String.format("ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
+                mandarAlertas(Alert.AlertType.ERROR, "FALLÓ", "", String.format(
+                        "ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
             }
         } catch (Exception e) {
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage());
@@ -761,20 +878,20 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void acercaDe() {
         String mensaje = """
-        🎓 RETO3 HOGWARTS ANUARIO
-        
-        📚 Creado por:
-        • Erlantz García
-        • Telmo Castillo
-        • Marco Muro
-        • Nizam Abdel-Ghaffar
-        
-        🚀 Python + JavaFX + PyInstaller
-        
-        💻 Ultima modificación: 19 de Diciembre de 2025
-        
-        Manual de usuario disponible en el menú "Ayuda → Documentación"
-        """;
+                🎓 RETO3 HOGWARTS ANUARIO
+
+                📚 Creado por:
+                • Erlantz García
+                • Telmo Castillo
+                • Marco Muro
+                • Nizam Abdel-Ghaffar
+
+                🚀 Python + JavaFX + PyInstaller
+
+                💻 Ultima modificación: 19 de Diciembre de 2025
+
+                Manual de usuario disponible en el menú "Ayuda → Documentación"
+                """;
         mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("menu.ayuda.acercade"), null, mensaje);
     }
 

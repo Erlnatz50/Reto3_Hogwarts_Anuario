@@ -43,9 +43,11 @@ public class ControladorFichaPersonaje {
     @FXML
     private CheckBox checkBoxSeleccionar;
 
-    /** * Recurso de internacionalización.
+    /**
+     * * Recurso de internacionalización.
      * IMPORTANTE: La etiqueta @FXML permite que el FXMLLoader inyecte aquí
-     * el idioma que viene de la ventana principal (ControladorVisualizarPersonajes).
+     * el idioma que viene de la ventana principal
+     * (ControladorVisualizarPersonajes).
      */
     @FXML
     private ResourceBundle resources;
@@ -67,7 +69,8 @@ public class ControladorFichaPersonaje {
      */
     @FXML
     public void initialize() {
-        // Si por alguna razón no se inyectó (ej. pruebas unitarias), cargamos el defecto
+        // Si por alguna razón no se inyectó (ej. pruebas unitarias), cargamos el
+        // defecto
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
@@ -105,8 +108,8 @@ public class ControladorFichaPersonaje {
     /**
      * Asigna la información principal del personaje a la tarjeta.
      *
-     * @param nombre Nombre completo del personaje
-     * @param casa Casa a la que pertenece
+     * @param nombre    Nombre completo del personaje
+     * @param casa      Casa a la que pertenece
      * @param imagePath Ruta de la imagen asociada
      */
     public void setData(String nombre, String casa, String imagePath) {
@@ -176,6 +179,9 @@ public class ControladorFichaPersonaje {
         }
     }
 
+    /** Callback para notificar cambios de selección */
+    private Runnable onSelectionChanged;
+
     /**
      * Alterna el modo de selección de la tarjeta.
      */
@@ -186,6 +192,20 @@ public class ControladorFichaPersonaje {
             if (!active) {
                 checkBoxSeleccionar.setSelected(false);
             }
+        }
+    }
+
+    /**
+     * Establece el callback que se ejecutará cuando cambie la selección.
+     */
+    public void setOnSelectionChanged(Runnable listener) {
+        this.onSelectionChanged = listener;
+        if (checkBoxSeleccionar != null) {
+            checkBoxSeleccionar.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (onSelectionChanged != null) {
+                    onSelectionChanged.run();
+                }
+            });
         }
     }
 
@@ -201,5 +221,9 @@ public class ControladorFichaPersonaje {
      */
     public String getNombre() {
         return labelNombre.getText();
+    }
+
+    public String getPersonajeSlug() {
+        return personajeSlug;
     }
 }
