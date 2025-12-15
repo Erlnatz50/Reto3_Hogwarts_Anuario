@@ -430,7 +430,7 @@ public class ControladorVisualizarPersonajes {
 
     /**
      * Exporta los personajes seleccionados en modo selección.
-     * Genera un reporte PDF para cada personaje seleccionado.
+     * Genera un reporte PDF combinado para todos los personajes seleccionados.
      *
      * @author
      */
@@ -446,8 +446,6 @@ public class ControladorVisualizarPersonajes {
                     "No hay personajes seleccionados.");
             return;
         }
-
-        int exportados = 0;
 
         // Compilar reporte una vez
         net.sf.jasperreports.engine.JasperReport jasperReport = null;
@@ -465,7 +463,10 @@ public class ControladorVisualizarPersonajes {
             return;
         }
 
-        // Buscar datos completos y generar reportes
+        List<net.sf.jasperreports.engine.JasperPrint> jasperPrints = new ArrayList<>();
+        int exportados = 0;
+
+        // Generar un JasperPrint por cada personaje
         for (String slug : slugsSeleccionados) {
             Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
                     .filter(map -> slug.equals(map.get("slug")))
@@ -491,16 +492,11 @@ public class ControladorVisualizarPersonajes {
                     if (imagenStream != null) {
                         parameters.put("Imagen", imagenStream);
                     }
-                    // TODO: Si quisieramos la imagen real, habría que cargarla como en
-                    // ControladorDatos
 
                     net.sf.jasperreports.engine.JasperPrint jasperPrint = net.sf.jasperreports.engine.JasperFillManager
                             .fillReport(jasperReport, parameters, new net.sf.jasperreports.engine.JREmptyDataSource(1));
 
-                    // Mostrar reporte (Nota: esto abrirá N ventanas si son muchos.
-                    // Idealmente se exportaría a PDF directamente o se unirían, pero por ahora
-                    // mostramos el visor)
-                    net.sf.jasperreports.view.JasperViewer.viewReport(jasperPrint, false);
+                    jasperPrints.add(jasperPrint);
                     exportados++;
 
                 } catch (Exception e) {
@@ -509,9 +505,35 @@ public class ControladorVisualizarPersonajes {
             }
         }
 
-        if (exportados > 0) {
-            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
-                    "Se han generado " + exportados + " fichas.");
+        if (jasperPrints.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No se pudo generar ningún reporte.");
+            return;
+        }
+
+        // Unificar todos los JasperPrint en uno solo
+        try {
+            net.sf.jasperreports.engine.JasperPrint mergedPrint = jasperPrints.get(0);
+
+            for (int i = 1; i < jasperPrints.size(); i++) {
+                net.sf.jasperreports.engine.JasperPrint nextPrint = jasperPrints.get(i);
+                for (net.sf.jasperreports.engine.JRPrintPage page : nextPrint.getPages()) {
+                    mergedPrint.addPage(page);
+                }
+            }
+
+            // Mostrar el reporte unificado
+            net.sf.jasperreports.view.JasperViewer.viewReport(mergedPrint, false);
+
+            if (exportados > 0) {
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                        "Se han exportado " + exportados + " fichas en un único documento.");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error al unificar reportes", e);
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al unificar/mostrar el reporte: " + e.getMessage());
         }
     }
 
