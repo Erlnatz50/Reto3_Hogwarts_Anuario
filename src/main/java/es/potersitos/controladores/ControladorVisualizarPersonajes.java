@@ -18,6 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.view.JasperViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,9 +205,12 @@ public class ControladorVisualizarPersonajes {
         try {
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
             actualizarTextosUI();
-            cargarPersonajes(listaPersonajesMapeados);
+            if (listaPersonajesMapeados.isEmpty()){
+                mostrarMensajeImportar();
+            } else{
+                cargarPersonajes(listaPersonajesMapeados);
+            }
             filtrarPersonajes();
-            mostrarMensajeImportar();
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
@@ -288,7 +294,7 @@ public class ControladorVisualizarPersonajes {
             tilePanePersonajes.getChildren().clear();
 
             Label mensaje = new Label(
-                    "⚠️ No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
+                    "No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
             mensaje.setStyle(
                     "-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
             mensaje.setWrapText(true);
@@ -458,20 +464,20 @@ public class ControladorVisualizarPersonajes {
             return;
         }
 
-        net.sf.jasperreports.engine.JasperReport jasperReport;
+        JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
                 mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "No se encuentra el archivo .jrxml");
                 return;
             }
-            jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(reportStream);
+            jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al cargar plantilla de reporte: " + e.getMessage());
             return;
         }
 
-        List<net.sf.jasperreports.engine.JasperPrint> jasperPrints = new ArrayList<>();
+        List<JasperPrint> jasperPrints = new ArrayList<>();
         int exportados = 0;
 
         for (String slug : selectedSlugs) {
@@ -499,8 +505,8 @@ public class ControladorVisualizarPersonajes {
                         parameters.put("Imagen", imagenStream);
                     }
 
-                    net.sf.jasperreports.engine.JasperPrint jasperPrint = net.sf.jasperreports.engine.JasperFillManager
-                            .fillReport(jasperReport, parameters, new net.sf.jasperreports.engine.JREmptyDataSource(1));
+                    JasperPrint jasperPrint = JasperFillManager
+                            .fillReport(jasperReport, parameters, new JREmptyDataSource(1));
 
                     jasperPrints.add(jasperPrint);
                     exportados++;
@@ -517,16 +523,16 @@ public class ControladorVisualizarPersonajes {
         }
 
         try {
-            net.sf.jasperreports.engine.JasperPrint mergedPrint = jasperPrints.get(0);
+            JasperPrint mergedPrint = jasperPrints.get(0);
 
             for (int i = 1; i < jasperPrints.size(); i++) {
-                net.sf.jasperreports.engine.JasperPrint nextPrint = jasperPrints.get(i);
-                for (net.sf.jasperreports.engine.JRPrintPage page : nextPrint.getPages()) {
+                JasperPrint nextPrint = jasperPrints.get(i);
+                for (JRPrintPage page : nextPrint.getPages()) {
                     mergedPrint.addPage(page);
                 }
             }
 
-            net.sf.jasperreports.view.JasperViewer.viewReport(mergedPrint, false);
+            JasperViewer.viewReport(mergedPrint, false);
 
             if (exportados > 0) {
                 mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "Se han exportado " + exportados + " fichas en un único documento.");
@@ -773,7 +779,7 @@ public class ControladorVisualizarPersonajes {
 
             Parent root = loader.load();
 
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(root);
 
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
@@ -788,7 +794,10 @@ public class ControladorVisualizarPersonajes {
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
             stage.getIcons().add(
-                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+            );
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setResizable(false);
             stage.show();
 
         } catch (Exception e) {
@@ -859,11 +868,89 @@ public class ControladorVisualizarPersonajes {
     /**
      * Exporta la lista completa de personajes visualizados.
      *
-     * @author
+     * @author Telmo
      */
     @FXML
     public void exportarPersonajes() {
-        // Implementación futura.
+        if (listaPersonajesMapeados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No hay personajes para exportar. Importa primero.");
+            return;
+        }
+
+        JasperReport jasperReport;
+        try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
+            if (reportStream == null) {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        "No se encuentra el archivo .jrxml");
+                return;
+            }
+            jasperReport = JasperCompileManager.compileReport(reportStream);
+        } catch (Exception e) {
+            logger.error("Error compilando reporte Jasper", e);
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al cargar plantilla: " + e.getMessage());
+            return;
+        }
+
+        List<JasperPrint> jasperPrints = new ArrayList<>();
+        int exportados = 0;
+
+        for (Map<String, String> p : listaPersonajesMapeados) {
+            try {
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("Nombre", p.getOrDefault("name", ""));
+                parameters.put("Alias", p.getOrDefault("alias_names", ""));
+                parameters.put("Casa", p.getOrDefault("house", ""));
+                parameters.put("Genero", p.getOrDefault("gender", ""));
+                parameters.put("Especie", p.getOrDefault("species", ""));
+                parameters.put("Ojos", p.getOrDefault("eye_color", ""));
+                parameters.put("Pelo", p.getOrDefault("hair_color", ""));
+                parameters.put("Piel", p.getOrDefault("skin_color", ""));
+                parameters.put("Patronus", p.getOrDefault("patronus", ""));
+
+                InputStream imagenStream = getClass()
+                        .getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+                if (imagenStream != null) {
+                    parameters.put("Imagen", imagenStream);
+                }
+
+                JasperPrint jasperPrint = JasperFillManager
+                        .fillReport(jasperReport, parameters, new JREmptyDataSource(1));
+
+                jasperPrints.add(jasperPrint);
+                exportados++;
+
+            } catch (Exception e) {
+                logger.error("Error generando reporte para {}", p.getOrDefault("name", "desconocido"), e);
+            }
+        }
+
+        if (jasperPrints.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No se pudo generar ningún reporte.");
+            return;
+        }
+
+        try {
+            // Unifica todos los reportes en uno solo
+            JasperPrint mergedPrint = jasperPrints.get(0);
+            for (int i = 1; i < jasperPrints.size(); i++) {
+                JasperPrint nextPrint = jasperPrints.get(i);
+                for (JRPrintPage page : nextPrint.getPages()) {
+                    mergedPrint.addPage(page);
+                }
+            }
+
+            JasperViewer.viewReport(mergedPrint, false);
+            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                    String.format("Exportados %d personajes en un único PDF.", exportados));
+
+            logger.info("Exportados {} personajes completos", exportados);
+
+        } catch (Exception e) {
+            logger.error("Error al unificar reportes", e);
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al mostrar PDF: " + e.getMessage());
+        }
     }
 
     /**
@@ -900,17 +987,17 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void acercaDe() {
         String mensaje = """
-                🎓 RETO3 HOGWARTS ANUARIO
+                RETO3 HOGWARTS ANUARIO
 
-                📚 Creado por:
+                Creado por:
                 • Erlantz García
                 • Telmo Castillo
                 • Marco Muro
                 • Nizam Abdel-Ghaffar
 
-                🚀 Python + JavaFX + PyInstaller
+                Python + JavaFX + PyInstaller
 
-                💻 Ultima modificación: 19 de Diciembre de 2025
+                Ultima modificación: 19 de Diciembre de 2025
 
                 Manual de usuario disponible en el menú "Ayuda → Documentación"
                 """;
@@ -924,12 +1011,22 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     private void salir() {
-        if (menuBar != null && menuBar.getScene() != null) {
-            Stage stage = (Stage) menuBar.getScene().getWindow();
-            logger.info("Cerrando aplicación desde menú Archivo → Salir...");
-            stage.close();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Salir");
+        alert.setHeaderText("Cerrar aplicación");
+        alert.setContentText("¿Deseas salir de la aplicación?");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+
+        if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+            if (menuBar != null && menuBar.getScene() != null) {
+                Stage stage = (Stage) menuBar.getScene().getWindow();
+                logger.info("Cerrando aplicación desde menú Archivo → Salir...");
+                stage.close();
+            } else {
+                logger.error("No se pudo obtener el Stage para cerrar la ventana.");
+            }
         } else {
-            logger.error("No se pudo obtener el Stage para cerrar la ventana.");
+            logger.info("Usuario canceló la salida de la aplicación.");
         }
     }
 
