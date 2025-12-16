@@ -3,6 +3,7 @@ package es.potersitos.controladores;
 import es.potersitos.util.PersonajeCSVManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -41,16 +42,13 @@ public class ControladorVisualizarPersonajes {
 
     /** Botones generales de la interfaz. */
     @FXML
-    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro;
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro, botonImportar;
 
-    /**  */
-    private Button botonImportar;
-
-    /**  */
+    /** Indica si el modo selección está activo. */
     private boolean selectionModeActive = false;
 
-    /**  */
-    private Set<String> selectedSlugs = new HashSet<>();
+    /** Conjunto de identificadores “slug” de los personajes seleccionados. */
+    private final Set<String> selectedSlugs = new HashSet<>();
 
     /** Etiqueta que muestra la página actual del paginador. */
     @FXML
@@ -80,7 +78,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private TextField searchField;
 
-    /**  */
+    /** Contenedor de botones de paginación. */
     @FXML
     private HBox paginationContainer;
 
@@ -97,13 +95,16 @@ public class ControladorVisualizarPersonajes {
     private static final Logger logger = LoggerFactory.getLogger(ControladorVisualizarPersonajes.class);
 
     /** Número de personajes que se muestran por página. */
-    private static final int personajesPorPagina = 10;
+    private static final int personajesPorPagina = 12;
 
     /** Página activa actual. */
     private int paginaActual = 1;
 
     /** Total de páginas calculadas con los personajes disponibles. */
     private int totalPaginas;
+
+    /** Mensaje de error si no hay personajes importados. */
+    private Label mensaje;
 
     /**
      * Metodo de inicialización automática FXML.
@@ -113,7 +114,8 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void initialize() {
         this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-        botonImportar = new Button("importar");
+        botonImportar = new Button("");
+        mensaje = new Label("");
         configurarAtajosMenu();
         configurarBusqueda();
         configurarListenersFiltros();
@@ -214,8 +216,7 @@ public class ControladorVisualizarPersonajes {
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
-                    "No se pudo cambiar el idioma: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
         }
     }
 
@@ -293,18 +294,22 @@ public class ControladorVisualizarPersonajes {
         if (tilePanePersonajes != null) {
             tilePanePersonajes.getChildren().clear();
 
-            Label mensaje = new Label(
-                    "No se encontraron personajes.\n\nPor favor, importa los archivos desde el menú 'Archivo → Importar'.");
-            mensaje.setStyle(
-                    "-fx-text-alignment: center; -fx-font-size: 18px; -fx-text-fill: #555; -fx-padding: 40px;");
+            mensaje.setText(resources.getString("no.se.encontraron.personajes"));
+            mensaje.setStyle("-fx-text-fill: black; -fx-text-alignment: center; -fx-font-size: 18px; -fx-padding: 40px;");
             mensaje.setWrapText(true);
 
             VBox contenedor = new VBox(mensaje);
             VBox contenedorbtn = new VBox(botonImportar);
             botonImportar.setOnAction(e -> crearArchivos());
+
+            HBox contenedorCentral = new HBox(contenedorbtn);
+            contenedorCentral.setAlignment(Pos.CENTER);
+            contenedorCentral.setSpacing(10);
+
             contenedor.setStyle("-fx-alignment: center;");
-            tilePanePersonajes.getChildren().add(contenedor);
-            tilePanePersonajes.getChildren().add(contenedorbtn);
+            contenedorCentral.setStyle("-fx-alignment: center;");
+
+            tilePanePersonajes.getChildren().addAll(contenedor, contenedorCentral);
         }
     }
 
@@ -383,7 +388,7 @@ public class ControladorVisualizarPersonajes {
                 if (selectionModeActive) {
                     controller.setSelectionMode(true);
                     if (selectedSlugs.contains(slug)) {
-                        //controller.setSelected(true);
+                        controller.setSelected(true);
                     }
                 }
 
@@ -417,14 +422,13 @@ public class ControladorVisualizarPersonajes {
                 btnSeleccionar.setText(resources.getString("cancelar.button").toUpperCase());
             } else {
                 btnSeleccionar.setText(resources.getString("visualizar.btn.seleccionar"));
-                selectedSlugs.clear();
             }
         }
 
         for (ControladorFichaPersonaje controller : listaControladores) {
             controller.setSelectionMode(selectionModeActive);
             if (!selectionModeActive){
-                 //controller.setSelected(false);
+                 controller.setSelected(false);
             }
         }
 
@@ -434,6 +438,8 @@ public class ControladorVisualizarPersonajes {
     /**
      * Habilita o deshabilita el botón de exportar según si hay personajes
      * seleccionados.
+     *
+     * @author Telmo
      */
     private void actualizarEstadoBotonExportar() {
         if (btnExportar == null)
@@ -442,6 +448,12 @@ public class ControladorVisualizarPersonajes {
         btnExportar.setDisable(selectedSlugs.isEmpty());
     }
 
+    /**
+     * Gestiona los cambios en la selección de personajes.
+     *
+     * @param controller Instancia del controlador {@link ControladorFichaPersonaje} cuyo estado de selección ha cambiado.
+     * @author Telmo
+     */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
         if (controller.isSelected()) {
             selectedSlugs.add(controller.getPersonajeSlug());
@@ -523,7 +535,7 @@ public class ControladorVisualizarPersonajes {
         }
 
         try {
-            JasperPrint mergedPrint = jasperPrints.get(0);
+            JasperPrint mergedPrint = jasperPrints.getFirst();
 
             for (int i = 1; i < jasperPrints.size(); i++) {
                 JasperPrint nextPrint = jasperPrints.get(i);
@@ -625,8 +637,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Crea y agrega dinámicamente un botón de paginación para una página específica.
      *
-     * @param numeroPagina
+     * @param numeroPagina Número de página que representa este botón. Debe estar dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
@@ -931,8 +944,7 @@ public class ControladorVisualizarPersonajes {
         }
 
         try {
-            // Unifica todos los reportes en uno solo
-            JasperPrint mergedPrint = jasperPrints.get(0);
+            JasperPrint mergedPrint = jasperPrints.getFirst();
             for (int i = 1; i < jasperPrints.size(); i++) {
                 JasperPrint nextPrint = jasperPrints.get(i);
                 for (JRPrintPage page : nextPrint.getPages()) {
