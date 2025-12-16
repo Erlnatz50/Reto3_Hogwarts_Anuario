@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -71,13 +72,13 @@ public class App extends Application {
             stage.setResizable(true);
             // Icono de la aplicación:
             stage.getIcons().add(
-                    new Image(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
             );
 
-            // stage.setMinWidth(400);
-            // stage.setMinHeight(350);
-            // stage.setMaxWidth(500);
-            // stage.setMaxHeight(500);
+            stage.setMinWidth(1000);
+            stage.setMinHeight(700);
+            stage.setMaxWidth(1300);
+            stage.setMaxHeight(700);
             stage.show();
 
         } catch (Exception e) {
