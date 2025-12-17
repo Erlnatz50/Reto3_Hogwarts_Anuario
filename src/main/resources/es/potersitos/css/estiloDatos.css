@@ -81,9 +81,11 @@
 }
 
 /* Estilo al pasar el ratón por encima de los botones */
+/* APLICAMOS UN FONDO MÁS SÓLIDO Y UN COLOR DE TEXTO MÁS CLARO PARA ASEGURAR VISIBILIDAD */
 .button:hover {
-    /* Tinte semi-transparente para feedback */
-    -fx-background-color: rgba(140, 127, 112, 0.3);
+    -fx-background-color: #3d3429; /* Marrón oscuro sólido */
+    -fx-text-fill: #ffffff; /* Texto blanco */
+    -fx-border-color: #ffffff; /* Borde blanco */
 }
 
 /* =======================================================
@@ -101,7 +103,7 @@
 }
 
 #closeButton:hover {
-    -fx-background-color: 211f1a;
+    -fx-background-color: #211f1a;
     -fx-text-fill: white;
 }
 

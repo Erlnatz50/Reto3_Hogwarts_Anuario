@@ -5,17 +5,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorDatos">
-
-    <stylesheets>
-        <String fx:value="@/es/potersitos/css/estiloDatos.css" />
-    </stylesheets>
+<StackPane xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="es.potersitos.controladores.ControladorDatos">
 
     <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
 
@@ -31,7 +29,6 @@
         <center>
             <VBox BorderPane.alignment="CENTER">
                 <ScrollPane fitToWidth="true">
-                    <content>
                         <VBox fx:id="datosVBox" spacing="8">
                             <padding>
                                 <Insets bottom="10" left="10" right="10" top="10" />
@@ -61,7 +58,6 @@
                             <Label fx:id="varitasLabel" text="%varitas.label" />
                             <Label fx:id="pesoLabel" text="%peso.label" />
                         </VBox>
-                    </content>
                 </ScrollPane>
             </VBox>
         </center>
@@ -75,19 +71,30 @@
                     <HBox.margin>
                         <Insets left="220.0" />
                     </HBox.margin>
+                   <tooltip>
+                      <Tooltip text="%actualizar.tooltip" />
+                   </tooltip>
                 </Button>
-                <Button fx:id="exportarButton" onAction="#handleExportar" text="%exportar.button" />
-                <Button fx:id="eliminarButton" onAction="#handleEliminar" text="%eliminar.button" />
+                <Button fx:id="exportarButton" onAction="#handleExportar" text="%exportar.button">
+                   <tooltip>
+                      <Tooltip text="%exportar.tooltip" />
+                   </tooltip>
+                </Button>
+                <Button fx:id="eliminarButton" onAction="#handleEliminar" text="%eliminar.button">
+                   <tooltip>
+                      <Tooltip text="%eliminar.tooltip" />
+                   </tooltip>
+                </Button>
             </HBox>
         </bottom>
-        <top>
-
-            <Button fx:id="closeButton" onAction="#cerrarVentana" text="X" BorderPane.alignment="CENTER_RIGHT">
-                <BorderPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                </BorderPane.margin>
-            </Button>
-        </top>
+      <top>
+      
+          <Button fx:id="closeButton" onAction="#cerrarVentana" text="X" BorderPane.alignment="CENTER_RIGHT">
+            <BorderPane.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </BorderPane.margin>
+          </Button>
+      </top>
     </BorderPane>
 
 </StackPane>

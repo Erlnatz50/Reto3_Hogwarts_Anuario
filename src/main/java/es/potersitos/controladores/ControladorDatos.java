@@ -1,201 +1,365 @@
 package es.potersitos.controladores;
 
+import es.potersitos.util.PersonajeCSVManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage; // NECESARIO para obtener la ventana
+import javafx.stage.Stage;
+import net.sf.jasperreports.engine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.io.InputStream;
+import java.util.*;
+
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * Controlador para la ventana de datos de personajes.
- * Gestiona la interacción con los elementos del FXML.
+ * Gestiona la interacción con los elementos del FXML y soporta multiidioma.
+ *
+ * @author Marco
+ * @version 1.1
  */
-public class ControladorDatos implements Initializable {
+public class ControladorDatos {
 
     /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
-    /** Bundle del sistema de internacionalización */
-    private ResourceBundle bundle;
+    /** Bundle del sistema de internacionalización. */
+    @FXML
+    private ResourceBundle resources;
 
-    // =======================================================
-    // Elementos FXML (Deben coincidir con fx:id del FXML)
-    // =======================================================
+    /** SLUG del personaje actual (necesario para la eliminación) */
+    private String personajeSlug;
 
+    /** Imagen del personaje */
     @FXML
     private ImageView imageView;
 
+    /** Etiquetas FXML que muestran los datos del personaje */
     @FXML
-    private VBox datosVBox;
+    private Label nombreLabel, aliasLabel, animagusLabel, bloodStatusLabel, boggartLabel, nacidoLabel,
+            fallecidoLabel, colorOjosLabel, familiaresLabel, generoLabel, colorPeloLabel, alturaLabel,
+            casaLabel, imagenLabel, trabajosLabel, estadoCivilLabel, nacionalidadLabel, patronusLabel,
+            romancesLabel, colorPielLabel, especieLabel, titulosLabel, varitasLabel, pesoLabel;
 
-    // Elementos inyectados para mostrar datos (Labels)
-    @FXML private Label nombreLabel;
-    @FXML private Label aliasLabel;
-    @FXML private Label animagusLabel;
-    @FXML private Label bloodStatusLabel;
-    @FXML private Label boggartLabel;
-    @FXML private Label nacidoLabel;
-    @FXML private Label fallecidoLabel;
-    @FXML private Label colorOjosLabel;
-    @FXML private Label familiaresLabel;
-    @FXML private Label generoLabel;
-    @FXML private Label colorPeloLabel;
-    @FXML private Label alturaLabel;
-    @FXML private Label casaLabel;
-    @FXML private Label imagenLabel;
-    @FXML private Label trabajosLabel;
-    @FXML private Label estadoCivilLabel;
-    @FXML private Label nacionalidadLabel;
-    @FXML private Label patronusLabel;
-    @FXML private Label romancesLabel;
-    @FXML private Label colorPielLabel;
-    @FXML private Label especieLabel;
-    @FXML private Label titulosLabel;
-    @FXML private Label varitasLabel;
-    @FXML private Label pesoLabel;
-
-    // Botones de acción inferior
-    @FXML private Button actualizarButton;
-    @FXML private Button exportarButton;
-    @FXML private Button eliminarButton;
-
-    // [NUEVO] Inyección del botón de cierre (fx:id="closeButton")
-    @FXML private Button closeButton;
+    /** Botones principales de acción */
+    @FXML
+    private Button actualizarButton, exportarButton, eliminarButton, closeButton;
 
     /**
-     * Método de inicialización.
+     * Metodo de inicialización del controlador.
+     * Configura los textos de la interfaz según el idioma recibido.
+     *
+     * @author Marco
      */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        this.bundle = resources;
-        logger.info("ControladorVentana inicializado correctamente.");
-
-        // Simulación: Cargar datos de prueba al iniciar la ventana
-        cargarDatosPrueba();
-    }
-
-    // =======================================================
-    // Métodos de Lógica
-    // =======================================================
-
-    /**
-     * Simula la carga de datos de un personaje de prueba en la interfaz.
-     */
-    public void cargarDatosPrueba() {
-        logger.debug("Cargando datos de prueba...");
-
-        // 1. Cargar imagen del personaje
-        try {
-            // La ruta es relativa al classpath. Nota que la ruta empieza con '/'
-            // y luego sigue la estructura de paquetes/carpetas que creaste.
-            String rutaImagen = "/es/potersitos/img/foto.png"; // Usando foto.png
-
-            Image image = new Image(getClass().getResourceAsStream(rutaImagen));
-            imageView.setImage(image);
-
-            logger.info("Imagen cargada con éxito desde: " + rutaImagen);
-
-        } catch (Exception e) {
-            // Si la imagen no se encuentra, esto registrará un error útil.
-            logger.error("Error al cargar la imagen. Verifica la ruta y el nombre del archivo: /es/potersitos/img/foto.png", e);
+    @FXML
+    public void initialize() {
+        if (this.resources == null) {
+            try {
+                this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
+            } catch (Exception e) {
+                logger.error("No se pudo cargar ResourceBundle por defecto.", e);
+            }
         }
 
-        // 2. Actualizar los Labels con datos de ejemplo
-        // Se concatena la etiqueta traducida (%nombre.label) con el valor real.
-        // Se asume que el bundle existe y contiene las claves.
+        logger.info("ControladorDatos inicializado. Idioma: {}",
+                resources != null ? resources.getLocale() : "Desconocido");
 
-        nombreLabel.setText(bundle.getString("nombre.label") + ": Harry James Potter");
-        aliasLabel.setText(bundle.getString("alias.label") + ": El Niño que Vivió");
-        animagusLabel.setText(bundle.getString("animagus.label") + ": No");
-        bloodStatusLabel.setText(bundle.getString("bloodStatus.label") + ": Mestizo");
-        boggartLabel.setText(bundle.getString("boggart.label") + ": Dementor");
-        nacidoLabel.setText(bundle.getString("nacido.label") + ": 31 de Julio de 1980");
-        fallecidoLabel.setText(bundle.getString("fallecido.label") + ": N/A");
-        colorOjosLabel.setText(bundle.getString("colorOjos.label") + ": Verde");
-        familiaresLabel.setText(bundle.getString("familiares.label") + ": Ginny Weasley (Esposa)");
-        generoLabel.setText(bundle.getString("genero.label") + ": Masculino");
-        colorPeloLabel.setText(bundle.getString("colorPelo.label") + ": Negro");
-        alturaLabel.setText(bundle.getString("altura.label") + ": 1.75m");
-        casaLabel.setText(bundle.getString("casa.label") + ": Gryffindor");
-        imagenLabel.setText(bundle.getString("imagen.label") + ": (Ruta a la imagen de Harry)");
-        trabajosLabel.setText(bundle.getString("trabajos.label") + ": Jefe de Aurores");
-        estadoCivilLabel.setText(bundle.getString("estadoCivil.label") + ": Casado");
-        nacionalidadLabel.setText(bundle.getString("nacionalidad.label") + ": Británica");
-        patronusLabel.setText(bundle.getString("patronus.label") + ": Ciervo");
-        romancesLabel.setText(bundle.getString("romances.label") + ": Ginny Weasley, Cho Chang");
-        colorPielLabel.setText(bundle.getString("colorPiel.label") + ": Clara");
-        especieLabel.setText(bundle.getString("especie.label") + ": Humano");
-        titulosLabel.setText(bundle.getString("titulos.label") + ": Maestro de la Muerte");
-        varitasLabel.setText(bundle.getString("varitas.label") + ": Acebo y pluma de fénix");
-        pesoLabel.setText(bundle.getString("peso.label") + ": Aproximado");
+        configurarTextosBotones();
     }
 
-    // =======================================================
-    // Métodos de Acción
-    // =======================================================
+    /**
+     * Configura los textos y tooltips de los botones usando el ResourceBundle.
+     *
+     * @author Marco
+     */
+    private void configurarTextosBotones() {
+        if (resources == null)
+            return;
+
+        try {
+            if (actualizarButton != null) {
+                actualizarButton.setText(getStringSafe("actualizar.button"));
+                actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
+            }
+            if (exportarButton != null) {
+                exportarButton.setText(getStringSafe("exportar.button"));
+                exportarButton.setTooltip(new Tooltip(getStringSafe("exportar.tooltip")));
+            }
+            if (eliminarButton != null) {
+                eliminarButton.setText(getStringSafe("eliminar.button"));
+                eliminarButton.setTooltip(new Tooltip(getStringSafe("eliminar.tooltip")));
+            }
+        } catch (Exception e) {
+            logger.warn("Error configurando botones: {}", e.getMessage());
+        }
+    }
 
     /**
-     * [NUEVO] Maneja el clic en el botón de cierre ('X').
-     * Cierra la ventana (Stage) actual.
+     * Asigna el identificador único (slug) del personaje actual y dispara la carga
+     * de datos.
+     *
+     * @author Marco
+     */
+    public void setPersonajeSlug(String slug) {
+        this.personajeSlug = slug;
+        cargarDatosPersonaje(slug);
+    }
+
+    /**
+     * Carga el personaje completo usando el SLUG de la lista de datos.
+     *
+     * @author Nizam
+     */
+    private void cargarDatosPersonaje(String slug) {
+        if (slug == null || slug.isEmpty()) {
+            logger.error("SLUG nulo o vacío. No se pueden cargar los datos.");
+            return;
+        }
+
+        List<Map<String, String>> todosPersonajes = PersonajeCSVManager.leerTodosLosPersonajes();
+
+        Optional<Map<String, String>> personajeEncontrado = todosPersonajes.stream()
+                .filter(p -> slug.equalsIgnoreCase(p.getOrDefault("slug", "")))
+                .findFirst();
+
+        if (personajeEncontrado.isPresent()) {
+            rellenarInterfaz(personajeEncontrado.get());
+        } else {
+            logger.error("Personaje con SLUG '{}' no encontrado.", slug);
+            establecerTexto(nombreLabel, "nombre.label", getStringSafe("error.nodatos"));
+        }
+    }
+
+    /**
+     * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la
+     * traducción de etiquetas.
+     *
+     * @author Nizam
+     */
+    private void rellenarInterfaz(Map<String, String> p) {
+        String imagePath = p.getOrDefault("image", "");
+        if (!imagePath.isEmpty()) {
+            try {
+                String rutaFinal = imagePath;
+                if (!rutaFinal.toLowerCase().startsWith("http") && !rutaFinal.toLowerCase().startsWith("file:")) {
+                    rutaFinal = "file:/" + rutaFinal.replace("\\", "/");
+                }
+                Image image = new Image(rutaFinal, true);
+                imageView.setImage(image);
+            } catch (Exception e) {
+                logger.error("Error al cargar la imagen desde la ruta: {}", imagePath, e);
+            }
+        } else {
+            try {
+                InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+                if (imgStream != null) {
+                    imageView.setImage(new Image(imgStream));
+                }
+            } catch (Exception ex) {
+                logger.error("No se pudo cargar la imagen por defecto.", ex);
+            }
+        }
+
+        establecerTexto(nombreLabel, "nombre.label", p.getOrDefault("name", "N/A"));
+        establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
+        establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
+        establecerTexto(bloodStatusLabel, "bloodStatus.label", p.getOrDefault("blood_status", "N/A"));
+        establecerTexto(boggartLabel, "boggart.label", p.getOrDefault("boggart", "N/A"));
+        establecerTexto(nacidoLabel, "nacido.label", p.getOrDefault("born", "N/A"));
+        establecerTexto(fallecidoLabel, "fallecido.label", p.getOrDefault("died", "N/A"));
+        establecerTexto(colorOjosLabel, "colorOjos.label", p.getOrDefault("eye_color", "N/A"));
+        establecerTexto(familiaresLabel, "familiares.label", p.getOrDefault("family_members", "N/A"));
+        establecerTexto(generoLabel, "genero.label", p.getOrDefault("gender", "N/A"));
+        establecerTexto(colorPeloLabel, "colorPelo.label", p.getOrDefault("hair_color", "N/A"));
+        establecerTexto(alturaLabel, "altura.label", p.getOrDefault("height", "N/A"));
+        establecerTexto(casaLabel, "casa.label", p.getOrDefault("house", "N/A"));
+        establecerTexto(imagenLabel, "imagen.label", imagePath.isEmpty() ? "N/A" : imagePath);
+        establecerTexto(trabajosLabel, "trabajos.label", p.getOrDefault("jobs", "N/A"));
+        establecerTexto(estadoCivilLabel, "estadoCivil.label", p.getOrDefault("marital_status", "N/A"));
+        establecerTexto(nacionalidadLabel, "nacionalidad.label", p.getOrDefault("nationality", "N/A"));
+        establecerTexto(patronusLabel, "patronus.label", p.getOrDefault("patronus", "N/A"));
+        establecerTexto(romancesLabel, "romances.label", p.getOrDefault("romances", "N/A"));
+        establecerTexto(colorPielLabel, "colorPiel.label", p.getOrDefault("skin_color", "N/A"));
+        establecerTexto(especieLabel, "especie.label", p.getOrDefault("species", "N/A"));
+        establecerTexto(titulosLabel, "titulos.label", p.getOrDefault("titles", "N/A"));
+        establecerTexto(varitasLabel, "varitas.label", p.getOrDefault("wands", "N/A"));
+        establecerTexto(pesoLabel, "peso.label", p.getOrDefault("weight", "N/A"));
+
+        this.personajeSlug = p.get("slug");
+    }
+
+    /**
+     * Metodo auxiliar para establecer texto en Labels de forma segura y traducida.
+     * Formato: "Traducción: Valor" (Ej.: "Izena: Harry Potter")
+     *
+     * @author Marco
+     */
+    private void establecerTexto(Label label, String key, String valor) {
+        if (label != null) {
+            label.setText(getStringSafe(key) + ": " + valor);
+        }
+    }
+
+    /**
+     * Helper para obtener strings del resource bundle evitando excepciones.
+     *
+     * @author Marco
+     */
+    private String getStringSafe(String key) {
+        if (resources == null)
+            return key;
+        try {
+            return resources.getString(key);
+        } catch (Exception e) {
+            return key;
+        }
+    }
+
+    /**
+     * Cierra la ventana actual de la aplicación.
+     *
+     * @author Marco
      */
     @FXML
     private void cerrarVentana(ActionEvent event) {
-        logger.info("Botón de cierre ('X') presionado. Cerrando ventana.");
-
-        // Obtener la Stage (ventana) a partir del elemento que disparó el evento
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.close();
     }
 
     /**
-     * Maneja el clic en el botón Actualizar.
+     * Maneja la acción del botón de actualización.
+     *
+     * @author Nizam
      */
     @FXML
-    public void handleActualizar(ActionEvent event) {
-        logger.info("Botón Actualizar presionado");
-        String mensaje = (bundle != null && bundle.containsKey("actualizar.msg"))
-                ? bundle.getString("actualizar.msg")
-                : "Funcionalidad de actualizar ejecutada.";
-
-        mostrarAlerta("Actualizar", mensaje);
+    public void handleActualizar() {
+        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "",
+                getStringSafe("actualizar.msg"));
     }
 
     /**
-     * Maneja el clic en el botón Exportar.
+     * Maneja la acción del botón de exportación.
+     *
+     * @author Nizam
      */
     @FXML
-    public void handleExportar(ActionEvent event) {
-        logger.info("Botón Exportar presionado");
-        mostrarAlerta("Exportar", "Funcionalidad de exportar ejecutada.");
+    public void handleExportar() {
+        logger.info("Botón 'Exportar' presionado");
+
+        try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
+            if (reportStream == null) {
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "No se encuentra el archivo .jrxml");
+                return;
+            }
+
+            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("Nombre", obtenerValor(nombreLabel));
+            parameters.put("Alias", obtenerValor(aliasLabel));
+            parameters.put("Casa", obtenerValor(casaLabel));
+            parameters.put("Genero", obtenerValor(generoLabel));
+            parameters.put("Especie", obtenerValor(especieLabel));
+            parameters.put("Ojos", obtenerValor(colorOjosLabel));
+            parameters.put("Pelo", obtenerValor(colorPeloLabel));
+            parameters.put("Piel", obtenerValor(colorPielLabel));
+            parameters.put("Patronus", obtenerValor(patronusLabel));
+
+            // Cargar la imagen del personaje
+            InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+            if (imagenStream != null) {
+                parameters.put("Imagen", imagenStream);
+            }
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
+            JasperViewer.viewReport(jasperPrint, false);
+
+            logger.info("Reporte PDF generado exitosamente");
+
+        } catch (NoClassDefFoundError e) {
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "",
+                    "Falta la librería JasperReports. Comente la funcionalidad si no la usa.");
+        } catch (Exception e) {
+            logger.error("Error Jasper", e);
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
+        }
     }
 
     /**
-     * Maneja el clic en el botón Eliminar.
+     * Maneja la acción del botón de eliminación de un personaje.
+     *
+     * @author Marco
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        logger.info("Botón Eliminar presionado");
-        mostrarAlerta("Eliminar", "Funcionalidad de eliminar ejecutada.");
+        if (personajeSlug == null || personajeSlug.isEmpty()) {
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Slug vacío.");
+            return;
+        }
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle(getStringSafe("eliminar.confirm.titulo"));
+        confirmAlert.setHeaderText(getStringSafe("eliminar.confirm.header"));
+        confirmAlert.setContentText(getStringSafe("eliminar.confirm.contenido"));
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+
+            boolean exito = false;
+            try {
+                exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+                logger.warn("Simulando eliminación de: {}", personajeSlug);
+                exito = true;
+            } catch (Exception e) {
+                logger.error("Error real al eliminar el personaje.", e);
+            }
+
+            if (exito) {
+                mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", getStringSafe("eliminar.exito"));
+                Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                stage.close();
+            } else {
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("eliminar.error"));
+            }
+        }
     }
 
     /**
-     * Método auxiliar para mostrar alertas simples.
+     * Muestra una alerta JavaFX con los datos proporcionados.
+     *
+     * @param tipo          Tipo de alerta (INFO, WARNING, ERROR...)
+     * @param titulo        Título de la alerta
+     * @param mensajeTitulo Encabezado del mensaje
+     * @param mensaje       Contenido del mensaje
+     *
+     * @author Erlantz
      */
-    private void mostrarAlerta(String titulo, String contenido) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
+    private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(mensajeTitulo);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+    }
+
+    /**
+     * Obtiene el valor textual de una etiqueta.
+     *
+     * @author Marco
+     */
+    private String obtenerValor(Label label) {
+        if (label == null)
+            return "";
+        String text = label.getText();
+        if (text == null)
+            return "";
+        int separatorIndex = text.indexOf(": ");
+        return (separatorIndex != -1) ? text.substring(separatorIndex + 2).trim() : text.trim();
     }
 }

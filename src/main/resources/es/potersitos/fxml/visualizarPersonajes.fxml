@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
+
+    <top>
+        <MenuBar fx:id="menuBar" prefHeight="28.0" prefWidth="900.0" styleClass="menu-bar">
+            <Menu text="%menu.archivo">
+                <MenuItem fx:id="menuNuevo" onAction="#onNuevo" text="%menu.archivo.nuevo" />
+                <MenuItem fx:id="menuGuardar" onAction="#exportarPersonajes" text="%menu.archivo.guardar" />
+                <SeparatorMenuItem />
+                <MenuItem fx:id="menuSalir" onAction="#salir" text="%menu.archivo.salir" />
+            </Menu>
+            <Menu text="%menu.idioma">
+                <MenuItem onAction="#idiomaEspaniol" text="%menu.idioma.espanol">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../img/logo_españa.png" />
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+                <MenuItem onAction="#idiomaIngles" text="%menu.idioma.ingles">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../img/logo_ingles.png" />
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+                <MenuItem onAction="#idiomaEuskera" text="%menu.idioma.euskera">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../img/logo_euskera.png" />
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+            </Menu>
+            <Menu text="%menu.ayuda">
+                <MenuItem onAction="#documentacion" text="%menu.ayuda.documentacion" />
+                <MenuItem onAction="#acercaDe" text="%menu.ayuda.acercade" />
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <center>
+        <StackPane BorderPane.alignment="CENTER">
+            <ImageView fitHeight="400.0" fitWidth="400.0" mouseTransparent="true" opacity="0.15" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../img/logo_hogwarts.png" />
+                </image>
+            </ImageView>
+
+            <VBox VBox.vgrow="ALWAYS">
+                <HBox prefHeight="94.0" prefWidth="900.0" spacing="10.0" styleClass="search-container">
+
+                       <ImageView fitHeight="37.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@../img/gafas.png" />
+                        </image>
+                        <HBox.margin>
+                            <Insets bottom="2.0" right="5.0" top="10.0" /> </HBox.margin>
+                    </ImageView>
+
+                    <VBox fx:id="searchContainerVBox" alignment="CENTER_LEFT" spacing="-8.0" HBox.hgrow="ALWAYS">
+                        <TextField fx:id="searchField" prefHeight="24.0" prefWidth="700.0" promptText="%visualizar.search.prompt" styleClass="hogwarts-search-field">
+                            <tooltip><Tooltip text="%buscar.tooltip" /></tooltip>
+                            <font><Font name="System Italic" size="20.0" /></font>
+                        </TextField>
+
+                        <ImageView fitHeight="25.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="false">
+                            <image>
+                                <Image url="@../img/varita.png" />
+                            </image>
+                            <VBox.margin>
+                                <Insets top="6.0" />
+                            </VBox.margin>
+                        </ImageView>
+                  <HBox.margin>
+                     <Insets top="10.0" />
+                  </HBox.margin>
+                    </VBox>
+
+                    <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#toggleFilterPanel" styleClass="filter-button" text="%visualizar.filtro.titulo">
+                        <tooltip><Tooltip text="%filtro.button.tooltip" /></tooltip>
+                        <font><Font size="14.0" /></font>
+                        <HBox.margin>
+                            <Insets bottom="5.0" top="15.0" />
+                        </HBox.margin>
+                    </Button>
+
+                    <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
+                </HBox>
+
+                <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                    <TilePane fx:id="tilePanePersonajes" alignment="CENTER" hgap="20.0" prefColumns="4" styleClass="character-grid" vgap="20.0">
+                        <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+                    </TilePane>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </ScrollPane>
+
+                <HBox alignment="CENTER" spacing="15.0" styleClass="bottom-container">
+                    <Button fx:id="btnSeleccionar" mnemonicParsing="false" onAction="#toggleSelectionMode" prefWidth="135.0" styleClass="action-button" text="%visualizar.btn.seleccionar">
+                        <tooltip><Tooltip text="%seleccionar.tooltip" /></tooltip>
+                        <font><Font size="12.0" /></font>
+                    </Button>
+
+                    <HBox fx:id="paginationContainer" alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblPaginaActual" styleClass="page-dots" text="">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                        </Label>
+                    </HBox>
+
+                    <Button fx:id="btnExportar" disable="true" mnemonicParsing="false" onAction="#exportarSeleccionados" styleClass="action-button" text="%visualizar.btn.exportar">
+                        <tooltip><Tooltip text="%exportar.todos.tooltip" /></tooltip>
+                        <font><Font size="12.0" /></font>
+                    </Button>
+                    <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
+                </HBox>
+            </VBox>
+
+            <VBox fx:id="filterPanel" managed="false" maxWidth="300.0" prefWidth="300.0" styleClass="filter-panel" visible="false" StackPane.alignment="CENTER_RIGHT">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Label styleClass="filter-title" text="Filtrar" HBox.hgrow="ALWAYS">
+                        <tooltip><Tooltip text="%abrirFiltro.tooltip" /></tooltip>
+                        <font><Font name="System Bold" size="18.0" /></font>
+                    </Label>
+                    <Button fx:id="btnCerrarFiltro" alignment="CENTER" mnemonicParsing="false" onAction="#toggleFilterPanel" styleClass="close-filter-button" text="✕">
+                        <tooltip><Tooltip text="%cerrarFiltro.tooltip" /></tooltip>
+                        <font><Font size="16.0" /></font>
+                        <opaqueInsets><Insets /></opaqueInsets>
+                        <HBox.margin><Insets left="180.0" /></HBox.margin>
+                    </Button>
+                    <VBox.margin><Insets bottom="10.0" /></VBox.margin>
+                </HBox>
+
+                <Accordion fx:id="accordionFiltros" styleClass="filter-accordion" VBox.vgrow="ALWAYS">
+                    <tooltip><Tooltip text="%acordeonFiltros.tooltip" /></tooltip>
+                    <panes>
+                        <TitledPane styleClass="filter-titled-pane" text="%filtro.titulo.casa">
+                            <tooltip><Tooltip text="%filtrarPorCasa.tooltip" /></tooltip>
+                            <VBox spacing="5.0" styleClass="filter-checkboxes">
+                                <CheckBox text="%filtro.valor.gryffindor">
+                                    <tooltip><Tooltip text="%gryffindor.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.slytherin">
+                                    <tooltip><Tooltip text="%slytherin.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.hufflepuff">
+                                    <tooltip><Tooltip text="%hufflepuff.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.ravenclaw">
+                                    <tooltip><Tooltip text="%ravenclaw.tooltip" /></tooltip>
+                                </CheckBox>
+                                <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0" /></padding>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane styleClass="filter-titled-pane" text="%filtro.titulo.nacionalidad">
+                            <tooltip><Tooltip text="%nacionalidad.tooltip" /></tooltip>
+                            <VBox spacing="5.0" styleClass="filter-checkboxes">
+                                <CheckBox text="%filtro.valor.britanico">
+                                    <tooltip><Tooltip text="%britanico.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.irlandes">
+                                    <tooltip><Tooltip text="%irlandes.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.frances">
+                                    <tooltip><Tooltip text="%frances.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.bulgaro">
+                                    <tooltip><Tooltip text="%bulgaro.tooltip" /></tooltip>
+                                </CheckBox>
+                                <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0" /></padding>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane styleClass="filter-titled-pane" text="%filtro.titulo.especie">
+                            <tooltip><Tooltip text="Filtrar personajes según su especie" /></tooltip>
+                            <VBox spacing="5.0" styleClass="filter-checkboxes">
+                                <CheckBox text="%filtro.valor.humano">
+                                    <tooltip><Tooltip text="%humanos.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.mestizo">
+                                    <tooltip><Tooltip text="%mestizo.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.elfo">
+                                    <tooltip><Tooltip text="%elfos.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.gigante">
+                                    <tooltip><Tooltip text="%gigante.tooltip" /></tooltip>
+                                </CheckBox>
+                                <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0" /></padding>
+                            </VBox>
+                        </TitledPane>
+                        <TitledPane styleClass="filter-titled-pane" text="%filtro.titulo.genero">
+                            <tooltip><Tooltip text="%genero.tooltip" /></tooltip>
+                            <VBox spacing="5.0" styleClass="filter-checkboxes">
+                                <CheckBox text="%filtro.valor.masculino">
+                                    <tooltip><Tooltip text="%masculino.tooltip" /></tooltip>
+                                </CheckBox>
+                                <CheckBox text="%filtro.valor.femenino">
+                                    <tooltip><Tooltip text="%femenino.tooltip" /></tooltip>
+                                </CheckBox>
+                                <padding><Insets bottom="5.0" left="10.0" right="10.0" top="5.0" /></padding>
+                            </VBox>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <Button fx:id="btnAplicarFiltro" onAction="#aplicarFiltros" styleClass="apply-filter-button" text="%visualizar.filtro.aplicar">
+                        <tooltip><Tooltip text="%aplicarFiltro.tooltip" /></tooltip>
+                        <font><Font size="12.0" /></font>
+                    </Button>
+                    <Button fx:id="btnLimpiarFiltro" onAction="#limpiarFiltros" styleClass="clear-filter-button" text="%visualizar.filtro.limpiar">
+                        <tooltip><Tooltip text="%quitarFiltro.tooltip" /></tooltip>
+                        <font><Font size="12.0" /></font>
+                    </Button>
+                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                </HBox>
+                <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>
