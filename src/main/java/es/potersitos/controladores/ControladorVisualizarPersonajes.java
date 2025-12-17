@@ -18,6 +18,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
@@ -794,6 +795,10 @@ public class ControladorVisualizarPersonajes {
 
             Scene scene = new Scene(root);
 
+            // --- CAMBIO CLAVE: Hacer la escena transparente ---
+            // Esto evita que se pinten las esquinas blancas del sistema operativo
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
                 if (archivoCSS != null) {
@@ -806,10 +811,14 @@ public class ControladorVisualizarPersonajes {
             Stage stage = new Stage();
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
+
+            // --- CAMBIO CLAVE: Quitar la decoración de ventana estándar ---
+            stage.initStyle(StageStyle.TRANSPARENT);
+
             stage.getIcons().add(
                     new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
             );
-            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
             stage.show();
 
