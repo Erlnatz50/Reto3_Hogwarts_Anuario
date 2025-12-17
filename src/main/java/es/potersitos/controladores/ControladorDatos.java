@@ -11,6 +11,8 @@ import net.sf.jasperreports.engine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -21,7 +23,7 @@ import net.sf.jasperreports.view.JasperViewer;
  * Gestiona la interacción con los elementos del FXML y soporta multiidioma.
  *
  * @author Marco
- * @version 1.1
+ * @version 1.2
  */
 public class ControladorDatos {
 
@@ -49,6 +51,9 @@ public class ControladorDatos {
     /** Botones principales de acción */
     @FXML
     private Button actualizarButton, exportarButton, eliminarButton, closeButton;
+
+    // ✅ NUEVO: La ruta donde están tus imágenes arregladas
+    private static final String RUTA_LOCAL_IMAGENES = "C:\\Users\\dm2\\Reto3_Hogwarts_Anuario\\imagenes\\";
 
     /**
      * Metodo de inicialización del controlador.
@@ -136,35 +141,52 @@ public class ControladorDatos {
     }
 
     /**
-     * Rellena las etiquetas FXML con los valores del mapa del personaje y maneja la
-     * traducción de etiquetas.
+     * Rellena las etiquetas FXML con los valores del mapa del personaje.
      *
      * @author Nizam
      */
     private void rellenarInterfaz(Map<String, String> p) {
-        String imagePath = p.getOrDefault("image", "");
-        if (!imagePath.isEmpty()) {
-            try {
-                String rutaFinal = imagePath;
-                if (!rutaFinal.toLowerCase().startsWith("http") && !rutaFinal.toLowerCase().startsWith("file:")) {
-                    rutaFinal = "file:/" + rutaFinal.replace("\\", "/");
-                }
-                Image image = new Image(rutaFinal, true);
-                imageView.setImage(image);
-            } catch (Exception e) {
-                logger.error("Error al cargar la imagen desde la ruta: {}", imagePath, e);
-            }
-        } else {
-            try {
-                InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-                if (imgStream != null) {
-                    imageView.setImage(new Image(imgStream));
-                }
-            } catch (Exception ex) {
-                logger.error("No se pudo cargar la imagen por defecto.", ex);
+        String nombre = p.getOrDefault("name", "");
+        String imagePathCSV = p.getOrDefault("image", "");
+
+        boolean imagenCargada = false;
+
+        // 1. INTENTO LOCAL (PRIORIDAD): Buscar en tu carpeta C:\...\imagenes
+        // Formateamos el nombre (Ej: "Harry Potter") para buscar el archivo
+        String nombreBonito = formatearTexto(nombre);
+        if (!nombreBonito.isEmpty()) {
+            // Prueba 1: Nombre bonito (Ej: Harry Potter.png)
+            if (intentarCargarVariasExtensiones(nombreBonito)) imagenCargada = true;
+
+            // Prueba 2: Nombre con guiones (Ej: harry-potter.png)
+            if (!imagenCargada) {
+                String nombreGuiones = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
+                if (intentarCargarVariasExtensiones(nombreGuiones)) imagenCargada = true;
             }
         }
 
+        // 2. INTENTO CSV (FALLBACK): Si no está en local, probamos la ruta del CSV
+        if (!imagenCargada && !imagePathCSV.isEmpty()) {
+            // Intento limpiar nombre del archivo del CSV
+            String nombreArchivoCSV = limpiaNombreArchivo(imagePathCSV);
+            if (intentarCargarVariasExtensiones(nombreArchivoCSV)) {
+                imagenCargada = true;
+            }
+            // Si es una URL web real (http...), intentamos cargarla (opcional)
+            else if (imagePathCSV.startsWith("http")) {
+                try {
+                    imageView.setImage(new Image(imagePathCSV, true));
+                    imagenCargada = true;
+                } catch (Exception e) {}
+            }
+        }
+
+        // 3. IMAGEN POR DEFECTO: Si todo falla
+        if (!imagenCargada) {
+            cargarImagenPorDefecto();
+        }
+
+        // Relleno de textos
         establecerTexto(nombreLabel, "nombre.label", p.getOrDefault("name", "N/A"));
         establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
         establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
@@ -178,7 +200,7 @@ public class ControladorDatos {
         establecerTexto(colorPeloLabel, "colorPelo.label", p.getOrDefault("hair_color", "N/A"));
         establecerTexto(alturaLabel, "altura.label", p.getOrDefault("height", "N/A"));
         establecerTexto(casaLabel, "casa.label", p.getOrDefault("house", "N/A"));
-        establecerTexto(imagenLabel, "imagen.label", imagePath.isEmpty() ? "N/A" : imagePath);
+        establecerTexto(imagenLabel, "imagen.label", imagePathCSV.isEmpty() ? "N/A" : imagePathCSV);
         establecerTexto(trabajosLabel, "trabajos.label", p.getOrDefault("jobs", "N/A"));
         establecerTexto(estadoCivilLabel, "estadoCivil.label", p.getOrDefault("marital_status", "N/A"));
         establecerTexto(nacionalidadLabel, "nacionalidad.label", p.getOrDefault("nationality", "N/A"));
@@ -193,9 +215,62 @@ public class ControladorDatos {
         this.personajeSlug = p.get("slug");
     }
 
+    // ✅ METODOS AUXILIARES DE CARGA DE IMAGEN (Traídos del otro controlador)
+
+    private boolean intentarCargarVariasExtensiones(String nombreBase) {
+        if (cargarImagenFuerzaBruta(nombreBase + ".png")) return true;
+        if (cargarImagenFuerzaBruta(nombreBase + ".jpg")) return true;
+        return cargarImagenFuerzaBruta(nombreBase + ".jpeg");
+    }
+
+    private boolean cargarImagenFuerzaBruta(String nombreArchivo) {
+        File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
+        if (archivo.exists()) {
+            try (FileInputStream fis = new FileInputStream(archivo)) {
+                imageView.setImage(new Image(fis));
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private void cargarImagenPorDefecto() {
+        try {
+            InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+            if (imgStream != null) {
+                imageView.setImage(new Image(imgStream));
+            }
+        } catch (Exception ex) {
+            logger.error("No se pudo cargar la imagen por defecto.", ex);
+        }
+    }
+
+    private String formatearTexto(String texto) {
+        if (texto == null || texto.isEmpty()) return "";
+        String[] palabras = texto.trim().split("\\s+");
+        StringBuilder res = new StringBuilder();
+        for (String p : palabras) if (!p.isEmpty()) {
+            res.append(Character.toUpperCase(p.charAt(0)))
+                    .append(p.substring(1).toLowerCase())
+                    .append(" ");
+        }
+        return res.toString().trim();
+    }
+
+    private String limpiaNombreArchivo(String ruta) {
+        String nombre = ruta;
+        if (nombre.contains("/")) nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
+        if (nombre.contains("?")) nombre = nombre.substring(0, nombre.indexOf("?"));
+        if (nombre.contains(".")) nombre = nombre.substring(0, nombre.lastIndexOf("."));
+        return nombre.replace("%20", " ");
+    }
+
+    // -------------------------------------------------------------
+
     /**
      * Metodo auxiliar para establecer texto en Labels de forma segura y traducida.
-     * Formato: "Traducción: Valor" (Ej.: "Izena: Harry Potter")
      *
      * @author Marco
      */
@@ -270,10 +345,14 @@ public class ControladorDatos {
             parameters.put("Piel", obtenerValor(colorPielLabel));
             parameters.put("Patronus", obtenerValor(patronusLabel));
 
-            // Cargar la imagen del personaje
-            InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-            if (imagenStream != null) {
-                parameters.put("Imagen", imagenStream);
+            // Para el reporte también pasamos la imagen si la tenemos cargada en el ImageView
+            if (imageView.getImage() != null) {
+                parameters.put("Imagen", imageView.getImage());
+            } else {
+                InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+                if (imagenStream != null) {
+                    parameters.put("Imagen", imagenStream);
+                }
             }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
