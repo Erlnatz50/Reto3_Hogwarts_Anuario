@@ -43,7 +43,7 @@ public class ControladorVisualizarPersonajes {
     /** Botones generales de la interfaz. */
     @FXML
     public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro,
-            botonImportar;
+            botonImportar, btnEliminarSeleccionados, btnNuevoRapido;
 
     /** Indica si el modo selección está activo. */
     private boolean selectionModeActive = false;
@@ -446,10 +446,10 @@ public class ControladorVisualizarPersonajes {
      * @author Telmo
      */
     private void actualizarEstadoBotonExportar() {
-        if (btnExportar == null)
-            return;
-
-        btnExportar.setDisable(selectedSlugs.isEmpty());
+        if (btnExportar != null)
+            btnExportar.setDisable(selectedSlugs.isEmpty());
+        if (btnEliminarSeleccionados != null)
+            btnEliminarSeleccionados.setDisable(selectedSlugs.isEmpty());
     }
 
     /**
@@ -564,6 +564,58 @@ public class ControladorVisualizarPersonajes {
             logger.error("Error al unificar reportes", e);
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
                     "Error al unificar/mostrar el reporte: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Elimina los personajes seleccionados de la lista y del CSV.
+     * Muestra alerta de confirmación antes de proceder.
+     *
+     * @author Erlantz
+     */
+    @FXML
+    private void eliminarSeleccionados() {
+        if (selectedSlugs.isEmpty())
+            return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resources.getString("eliminar.confirm.titulo"));
+        alert.setHeaderText(null);
+        alert.setContentText(
+                "¿Estás seguro de que deseas eliminar " + selectedSlugs.size() + " personajes seleccionados?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean algunError = false;
+            int eliminados = 0;
+
+            // Evitar ConcurrentModificationException copiando el set
+            Set<String> slugsParaBorrar = new HashSet<>(selectedSlugs);
+
+            for (String slug : slugsParaBorrar) {
+                if (PersonajeCSVManager.eliminarPersonajePorSlug(slug)) {
+                    eliminados++;
+                } else {
+                    algunError = true;
+                }
+            }
+
+            if (eliminados > 0) {
+                // Limpiar selección y recargar
+                selectedSlugs.clear();
+                if (selectionModeActive) {
+                    actualizarEstadoBotonExportar();
+                }
+                recargarListaCompleta();
+
+                String msg = "Se han eliminado " + eliminados + " personajes correctamente.";
+                if (algunError)
+                    msg += "\nAlgunos personajes no pudieron comprobarse.";
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", msg);
+            } else {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        "No se pudo eliminar ningún personaje.");
+            }
         }
     }
 
@@ -835,7 +887,13 @@ public class ControladorVisualizarPersonajes {
                             .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setResizable(false);
-            stage.show();
+            stage.showAndWait();
+
+            // Recargar datos y limpiar filtros para mostrar el nuevo personaje
+            listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
+            limpiarFiltros();
+            calcularTotalPaginas();
+            setPaginaActual(totalPaginas);
 
         } catch (Exception e) {
             logger.error("Error al abrir el formulario de nuevo personaje", e);
