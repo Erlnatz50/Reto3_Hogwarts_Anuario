@@ -4,11 +4,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -29,7 +31,7 @@ public class App extends Application {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     /** Bundle del sistema de internacionalización */
-    private ResourceBundle bundle;
+    private ResourceBundle resources;
 
     /**
      * Metodo principal que se ejecuta al iniciar la aplicación JavaFX.
@@ -45,14 +47,12 @@ public class App extends Application {
         try {
             // Detectar el idioma del sistema
             // Locale locale = Locale.getDefault();
-            Locale locale = new Locale("es");
+            Locale locale = Locale.of("es");
 
-            // Bundle del sistema de internacionalización
-            bundle = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
+            resources = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
             logger.debug("Cargando el archivo FXML: visualizarPersonajes.fxml");
-            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"),
-                    bundle);
+            FXMLLoader loaded = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/visualizarPersonajes.fxml"), resources);
 
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
@@ -60,27 +60,30 @@ public class App extends Application {
             // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
             if (archivoCSS != null) {
-                logger.info("CSS cargado correctamente: " + archivoCSS.toExternalForm());
+                logger.info("CSS cargado correctamente: {}", archivoCSS.toExternalForm());
                 scene.getStylesheets().add(archivoCSS.toExternalForm());
             } else {
                 logger.error("No se ha podido cargar el CSS");
-                mandarAlertas(Alert.AlertType.INFORMATION, bundle.getString("cssNoEncontrado"), null,
-                        bundle.getString("cssNoEncontradoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("cssNoEncontrado"), null, resources.getString("cssNoEncontradoMensaje"));
             }
 
             stage.setTitle("Anuario de Hogwarts");
             stage.setScene(scene);
             stage.setResizable(true);
-            // stage.setMinWidth(400);
-            // stage.setMinHeight(350);
-            // stage.setMaxWidth(500);
-            // stage.setMaxHeight(500);
+            // Icono de la aplicación:
+            stage.getIcons().add(
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+            );
+
+            stage.setMinWidth(1000);
+            stage.setMinHeight(700);
+            stage.setMaxWidth(1300);
+            stage.setMaxHeight(700);
             stage.show();
 
         } catch (Exception e) {
             logger.error("Error al intentar cargar la aplicación {}", e.getMessage());
-            mandarAlertas(Alert.AlertType.ERROR, bundle.getString("error"), bundle.getString("errorIniciarAplicacion"),
-                    bundle.getString("errorIniciarAplicacionMensaje"));
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("errorIniciarAplicacion"), resources.getString("errorIniciarAplicacionMensaje"));
         }
     }
 

@@ -5,7 +5,8 @@ module es.potersitos {
     requires jdk.compiler;
     requires java.desktop;
     requires java.net.http;
-    requires com.google.gson;
+    requires java.sql;
+    requires jasperreports;
 
     opens es.potersitos.controladores to javafx.fxml;
 

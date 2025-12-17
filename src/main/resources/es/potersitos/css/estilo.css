@@ -1,7 +1,7 @@
 /* ===== Fondo general ===== */
 .root {
     -fx-font-family: "Times New Roman", "Georgia", serif;
-    -fx-background-color: #c3ced0;
+    -fx-background-color: #9ca796;
     /* gris verdoso suave */
 }
 
@@ -207,4 +207,119 @@ VBox[left] {
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
     -fx-border-color: #3498db;
+}
+
+/* ======================================================= */
+/* NUEVOS ESTILOS PARA LA BÚSQUEDA MÁGICA                  */
+/* ======================================================= */
+
+/* Estilo para los iconos de rayo y gafas */
+.magic-icon {
+    -fx-text-fill: #2c3e50;
+    -fx-font-family: "Segoe UI Symbol", "Apple Color Emoji", serif;
+    -fx-padding: 0 5 5 0;
+}
+
+/* Estilo para el campo de búsqueda estilo Hogwarts (Transparente) */
+.hogwarts-search-field {
+    -fx-background-color: transparent;
+    /* Hace el fondo invisible */
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    /* Quita los bordes */
+    -fx-border-width: 0;
+
+    /* Tipografía */
+    -fx-text-fill: #1a1a1a;
+    /* Color del texto al escribir */
+    -fx-prompt-text-fill: #555555;
+    /* Color de la palabra 'BUSCAR' */
+    -fx-font-family: "Times New Roman", "Georgia", serif;
+    /* Fuente con serifa */
+    -fx-font-style: italic;
+    /* Cursiva */
+    -fx-font-size: 20px;
+    -fx-padding: 0;
+}
+
+/* Eliminar el resaltado azul por defecto cuando haces clic */
+.hogwarts-search-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+
+/* ===== MENÚ SUPERIOR OSCURO ===== */
+.menu-bar {
+    -fx-background-color: linear-gradient(to right, #2c3e50, #34495e);
+    -fx-text-fill: white;
+    -fx-border-color: #1a252f;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* ===== Hover MENÚ PRINCIPAL ===== */
+.menu:hover,
+.menu-button:hover {
+    -fx-background-color: rgba(52, 152, 219, 0.15);
+    -fx-background-radius: 6;
+}
+
+.menu:hover .label,
+.menu-button:hover .label {
+    -fx-text-fill: #3498db;
+    -fx-font-weight: bold;
+}
+
+.menu-bar .label {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+/* ===== Hover MENÚ DESPLEGABLE ===== */
+.menu-item:hover {
+    -fx-background-color: rgba(52, 152, 219, 0.3);
+}
+
+/* ===== Menú desplegable ===== */
+.context-menu {
+    -fx-background-color: #272727;
+    -fx-border-color: #3b3b3b;
+}
+
+.menu-item .label {
+    -fx-text-fill: white;
+}
+
+.menu-item:focused {
+    -fx-background-color: #403f3e;
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: white;
+}
+
+.page-number-button {
+    -fx-font-size: 10.5px;
+    /* Un poco más pequeño */
+    -fx-background-radius: 6px;
+    -fx-padding: 5 8 5 8;
+    /* Padding más compacto */
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    /* Centrar el texto */
+
+    /* Anchos específicos por número de dígitos */
+    -fx-min-width: 36px;
+    /* Para "1" */
+}
+
+.page-number-button:dos-digitos {
+    -fx-pref-width: 44px;
+    /* Para "10-99" */
+}
+
+.page-number-button:tres-digitos {
+    -fx-pref-width: 52px;
+    /* Para "100-525" */
 }
