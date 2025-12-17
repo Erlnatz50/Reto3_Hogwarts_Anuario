@@ -78,7 +78,8 @@ public class ControladorFichaPersonaje {
         if (this.resources == null) {
             try {
                 this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-            } catch (Exception _) {}
+            } catch (Exception _) {
+            }
         }
     }
 
@@ -95,8 +96,8 @@ public class ControladorFichaPersonaje {
     /**
      * Carga los datos visuales del personaje en la tarjeta: nombre, casa e imagen.
      *
-     * @param nombre Nombre del personaje.
-     * @param casa Casa de Hogwarts a la que pertenece.
+     * @param nombre    Nombre del personaje.
+     * @param casa      Casa de Hogwarts a la que pertenece.
      * @param imagePath Ruta o nombre del archivo de imagen.
      * @author Nizam
      */
@@ -111,7 +112,7 @@ public class ControladorFichaPersonaje {
 
             if (nombre != null && !nombre.isBlank()) {
                 String base1 = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
-                 encontrado = intentarCargarVariasExtensiones(base1);
+                encontrado = intentarCargarVariasExtensiones(base1);
             }
 
             if (!encontrado && !nombreBonito.isEmpty()) {
@@ -138,12 +139,15 @@ public class ControladorFichaPersonaje {
      * Ruta o nombre del archivo de imagen.
      *
      * @param nombreBase Nombre base del archivo de imagen.
-     * @return {@code true} si se encontró y cargó una imagen válida, {@code false} en caso contrario.
+     * @return {@code true} si se encontró y cargó una imagen válida, {@code false}
+     *         en caso contrario.
      * @author Nizam
      */
     private boolean intentarCargarVariasExtensiones(String nombreBase) {
-        if (cargarImagenFuerzaBruta(nombreBase + ".png")) return true;
-        if (cargarImagenFuerzaBruta(nombreBase + ".jpg")) return true;
+        if (cargarImagenFuerzaBruta(nombreBase + ".png"))
+            return true;
+        if (cargarImagenFuerzaBruta(nombreBase + ".jpg"))
+            return true;
         return cargarImagenFuerzaBruta(nombreBase + ".jpeg");
     }
 
@@ -176,14 +180,16 @@ public class ControladorFichaPersonaje {
      * @author Nizam
      */
     private String formatearTexto(String texto) {
-        if (texto == null || texto.isEmpty()) return "";
+        if (texto == null || texto.isEmpty())
+            return "";
         String[] palabras = texto.trim().split("\\s+");
         StringBuilder res = new StringBuilder();
-        for (String p : palabras) if (!p.isEmpty()) {
-            res.append(Character.toUpperCase(p.charAt(0)))
-                    .append(p.substring(1).toLowerCase())
-                    .append(" ");
-        }
+        for (String p : palabras)
+            if (!p.isEmpty()) {
+                res.append(Character.toUpperCase(p.charAt(0)))
+                        .append(p.substring(1).toLowerCase())
+                        .append(" ");
+            }
         return res.toString().trim();
     }
 
@@ -197,20 +203,25 @@ public class ControladorFichaPersonaje {
      */
     private String limpiaNombreArchivo(String ruta) {
         String nombre = ruta;
-        if (nombre.contains("/")) nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        if (nombre.contains("?")) nombre = nombre.substring(0, nombre.indexOf("?"));
-        if (nombre.contains(".")) nombre = nombre.substring(0, nombre.lastIndexOf("."));
+        if (nombre.contains("/"))
+            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
+        if (nombre.contains("?"))
+            nombre = nombre.substring(0, nombre.indexOf("?"));
+        if (nombre.contains("."))
+            nombre = nombre.substring(0, nombre.lastIndexOf("."));
         return nombre.replace("%20", " ");
     }
 
     /**
      * Aplica un color distintivo a la etiqueta de casa según la casa del personaje.
      *
-     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y Hufflepuff).
+     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y
+     *             Hufflepuff).
      * @author Nizam
      */
     private void aplicarEstiloCasa(String casa) {
-        if (casa == null) return;
+        if (casa == null)
+            return;
         String estilo = "-fx-font-weight: bold; -fx-text-fill: ";
         switch (casa.toLowerCase().trim()) {
             case "gryffindor" -> labelCasa.setStyle(estilo + "#740001;");
@@ -222,14 +233,16 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Carga una imagen por defecto si no se encuentra imagen específica del personaje.
+     * Carga una imagen por defecto si no se encuentra imagen específica del
+     * personaje.
      *
      * @author Nizam
      */
     private void cargarImagenPorDefecto() {
         try {
             InputStream stream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-            if (stream != null) imagePersonaje.setImage(new Image(stream));
+            if (stream != null)
+                imagePersonaje.setImage(new Image(stream));
         } catch (Exception e) {
             logger.warn("No se ha podido cargar la imagen por defecto");
         }
@@ -242,7 +255,8 @@ public class ControladorFichaPersonaje {
      *
      * @author Marco
      */
-    @FXML private void handleCardClick() {
+    @FXML
+    private void handleCardClick() {
         if (isSelectionMode) {
             checkBoxSeleccionar.setSelected(!checkBoxSeleccionar.isSelected());
         } else {
@@ -264,19 +278,23 @@ public class ControladorFichaPersonaje {
 
             Parent root = loader.load();
             ControladorDatos cd = loader.getController();
-            if (personajeSlug != null){
+            if (personajeSlug != null) {
                 cd.setPersonajeSlug(personajeSlug);
             }
 
             Scene scene = new Scene(root);
             var css = getClass().getResource("/es/potersitos/css/estiloDatos.css");
-            if (css != null){
+            if (css != null) {
                 scene.getStylesheets().add(css.toExternalForm());
             }
 
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);
+
+            // Recargar datos cuando se cierre la ventana
+            stage.setOnHidden(e -> recargarDatos());
+
             stage.show();
 
         } catch (IOException e) {
@@ -285,30 +303,72 @@ public class ControladorFichaPersonaje {
     }
 
     /**
+     * Callback para solicitar refresco a la vista padre (por ejemplo, si se borró).
+     */
+    private Runnable onRefreshListener;
+
+    public void setOnRefreshListener(Runnable listener) {
+        this.onRefreshListener = listener;
+    }
+
+    /**
+     * Recarga los datos del personaje desde el CSV usando el slug actual.
+     */
+    private void recargarDatos() {
+        if (personajeSlug == null || personajeSlug.isEmpty())
+            return;
+
+        java.util.List<java.util.Map<String, String>> todos = es.potersitos.util.PersonajeCSVManager
+                .leerTodosLosPersonajes();
+        java.util.Optional<java.util.Map<String, String>> opt = todos.stream()
+                .filter(p -> personajeSlug.equalsIgnoreCase(p.getOrDefault("slug", "")))
+                .findFirst();
+
+        if (opt.isPresent()) {
+            java.util.Map<String, String> p = opt.get();
+            String nombre = p.getOrDefault("name", "N/A");
+            String casa = p.getOrDefault("house", "Desconocida");
+            String imagePath = p.getOrDefault("image", "");
+            setData(nombre, casa, imagePath);
+            logger.info("Ficha recargada para slug: {}", personajeSlug);
+        } else {
+            // El personaje ya no existe (fue borrado), avisamos al padre para que refresque
+            // la lista completa
+            if (onRefreshListener != null) {
+                onRefreshListener.run();
+                logger.info("Solicitando refresco por eliminación de: {}", personajeSlug);
+            }
+        }
+    }
+
+    /**
      * Activa o desactiva el modo selección de la tarjeta.
      *
-     * @param active {@code true} para mostrar el checkbox, {@code false} para ocultarlo.
+     * @param active {@code true} para mostrar el checkbox, {@code false} para
+     *               ocultarlo.
      * @author Telmo
      */
     public void setSelectionMode(boolean active) {
         isSelectionMode = active;
         if (checkBoxSeleccionar != null) {
             checkBoxSeleccionar.setVisible(active);
-            if (!active) checkBoxSeleccionar.setSelected(false);
+            if (!active)
+                checkBoxSeleccionar.setSelected(false);
         }
     }
 
     /**
-     * Establece una acción (callback) a ejecutar cuando cambia la selección del checkbox.
+     * Establece una acción (callback) a ejecutar cuando cambia la selección del
+     * checkbox.
      *
      * @param listener Acción a ejecutar al cambiar el estado del checkbox.
      * @author Telmo
      */
     public void setOnSelectionChanged(Runnable listener) {
         this.onSelectionChanged = listener;
-        if (checkBoxSeleccionar != null){
+        if (checkBoxSeleccionar != null) {
             checkBoxSeleccionar.selectedProperty().addListener((o, ov, nv) -> {
-                if (onSelectionChanged != null){
+                if (onSelectionChanged != null) {
                     onSelectionChanged.run();
                 }
             });
