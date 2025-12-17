@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="es.potersitos.controladores.ControladorNuevoPersonaje">
+
+    <center>
+        <ScrollPane fitToWidth="true">
+            <GridPane hgap="15" prefHeight="380.0" prefWidth="740.0" vgap="10">
+                <padding>
+                    <Insets bottom="20" left="20" right="20" top="20" />
+                </padding>
+
+                <columnConstraints>
+                    <ColumnConstraints minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                    <ColumnConstraints minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                   <ColumnConstraints minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                   <ColumnConstraints minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                </columnConstraints>
+
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                    <RowConstraints />
+                </rowConstraints>
+
+                <!-- COLUMNA IZQUIERDA (14 campos) -->
+                <Label text="%id.label" GridPane.rowIndex="0" />
+                <TextField fx:id="idField" promptText="f5a1e23b-2519-406b-8ca3-593262654410" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                   <tooltip>
+                      <Tooltip text="%id.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%tipo.label" GridPane.rowIndex="1" />
+                <TextField fx:id="typeField" promptText="personaje" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                   <tooltip>
+                      <Tooltip text="%tipo.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%slug.label" GridPane.rowIndex="2" />
+                <TextField fx:id="slugField" promptText="Aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                   <tooltip>
+                      <Tooltip text="%slug.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%alias.label" GridPane.rowIndex="3" />
+                <TextField fx:id="aliasNamesField" promptText="Aamir" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                   <tooltip>
+                      <Tooltip text="%alias.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%animagus.label" GridPane.rowIndex="4" />
+                <TextField fx:id="animagusField" promptText="Gato" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                   <tooltip>
+                      <Tooltip text="%animagus.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%bloodStatus.label" GridPane.rowIndex="5" />
+                <TextField fx:id="bloodStatusField" promptText="Sangre Mestiza" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                   <tooltip>
+                      <Tooltip text="%bloodStatus.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%boggart.label" GridPane.rowIndex="6" />
+                <TextField fx:id="boggartField" promptText="Dementor" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                   <tooltip>
+                      <Tooltip text="%boggart.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%nacido.label" GridPane.rowIndex="7" />
+                <TextField fx:id="bornField" promptText="31 August 1982 or earlier" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                   <tooltip>
+                      <Tooltip text="%nacido.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%fallecido.label" GridPane.rowIndex="8" />
+                <TextField fx:id="diedField" promptText="24 July 2024" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                   <tooltip>
+                      <Tooltip text="%fallecido.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%colorOjos.label" GridPane.rowIndex="9" />
+                <TextField fx:id="eyeColorField" promptText="Azul" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                   <tooltip>
+                      <Tooltip text="%colorOjos.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%trabajos.label" GridPane.rowIndex="10" />
+                <TextField fx:id="trabajoField" promptText="Estudiante" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                    <tooltip>
+                        <Tooltip text="%trabajos.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="%familiares.label" GridPane.rowIndex="11" />
+                <TextField fx:id="miembrosFamiliaField" promptText="Noemi" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                    <tooltip>
+                        <Tooltip text="%familiares.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="%colorPiel.label" GridPane.rowIndex="12" />
+                <TextField fx:id="colorPielField" promptText="Clara" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                    <tooltip>
+                        <Tooltip text="%colorPiel.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="%varitas.label" GridPane.rowIndex="13" />
+                <TextField fx:id="varitaField" promptText="Endrino" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                    <tooltip>
+                        <Tooltip text="%varitas.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <!-- COLUMNA DERECHA (14 campos) -->
+                <Label text="%genero.label" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="genderField" promptText="Hombre" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                   <tooltip>
+                      <Tooltip text="%genero.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%colorPelo.label" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="hairColorField" promptText="Negro" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                   <tooltip>
+                      <Tooltip text="%colorPelo.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%altura.label" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="heightField" promptText="1,80m" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                   <tooltip>
+                      <Tooltip text="%altura.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%casa.label" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="houseField" promptText="Gryffindor" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                   <tooltip>
+                      <Tooltip text="%casa.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%imagen.label" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="imageField" promptText="https://static.wikia.nocookie.net/harrypotter/images/c/cd/Aamir_Loonat.png" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                   <tooltip>
+                      <Tooltip text="%imagen.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%estadoCivil.label" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="maritalStatusField" promptText="Casado" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                   <tooltip>
+                      <Tooltip text="%estadoCivil.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%nombre.label" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="nameField" promptText="Aamir Loonat" GridPane.columnIndex="3" GridPane.rowIndex="6">
+                   <tooltip>
+                      <Tooltip text="%nombre.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%nacionalidad.label" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="nationalityField" promptText="British or Irish" GridPane.columnIndex="3" GridPane.rowIndex="7">
+                   <tooltip>
+                      <Tooltip text="%nacionalidad.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%patronus.label" GridPane.columnIndex="2" GridPane.rowIndex="8">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="patronusField" promptText="Ciervo" GridPane.columnIndex="3" GridPane.rowIndex="8">
+                   <tooltip>
+                      <Tooltip text="%patronus.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%especie.label" GridPane.columnIndex="2" GridPane.rowIndex="9">
+                   <GridPane.margin>
+                      <Insets left="10.0" />
+                   </GridPane.margin>
+                </Label>
+                <TextField fx:id="speciesField" promptText="Humano" GridPane.columnIndex="3" GridPane.rowIndex="9">
+                   <tooltip>
+                      <Tooltip text="%especie.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%wikipedia.label" GridPane.columnIndex="2" GridPane.rowIndex="10" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="wikipediaField" promptText="https://es.wikipedia.org/wiki/Harry_Potter" GridPane.columnIndex="3" GridPane.rowIndex="10">
+                   <tooltip>
+                      <Tooltip text="%wikipedia.textfield.tooltip" />
+                   </tooltip>
+                </TextField>
+
+                <Label text="%romances.label" GridPane.columnIndex="2" GridPane.rowIndex="11" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="romancesField" promptText="Ginny" GridPane.columnIndex="3" GridPane.rowIndex="11">
+                    <tooltip>
+                        <Tooltip text="%romances.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="%titulos.label" GridPane.columnIndex="2" GridPane.rowIndex="12" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="titulosField" promptText="Campeón del Torneo de los Tres Magos" GridPane.columnIndex="3" GridPane.rowIndex="12">
+                    <tooltip>
+                        <Tooltip text="%titulos.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+
+                <Label text="%peso.label" GridPane.columnIndex="2" GridPane.rowIndex="13" >
+                    <GridPane.margin>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <TextField fx:id="pesoField" promptText="70kg" GridPane.columnIndex="3" GridPane.rowIndex="13">
+                    <tooltip>
+                        <Tooltip text="%peso.textfield.tooltip" />
+                    </tooltip>
+                </TextField>
+            </GridPane>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="10">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <Button fx:id="cancelarButton" onAction="#onCancelar" text="%cancelar.button">
+            <tooltip>
+               <Tooltip text="%cancelar.button.tooltip" />
+            </tooltip></Button>
+            <Button fx:id="agregarButton" onAction="#onAgregar" text="%agregar.button">
+            <tooltip>
+               <Tooltip text="%agregar.button.tooltip" />
+            </tooltip></Button>
+        </HBox>
+    </bottom>
+</BorderPane>
