@@ -73,7 +73,7 @@
             <VBox VBox.vgrow="ALWAYS">
                 <HBox prefHeight="94.0" prefWidth="900.0" spacing="10.0" styleClass="search-container">
 
-                       <ImageView fitHeight="37.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                    <ImageView fitHeight="37.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                         <image>
                             <Image url="@../img/gafas.png" />
                         </image>
@@ -81,13 +81,13 @@
                             <Insets bottom="2.0" right="5.0" top="10.0" /> </HBox.margin>
                     </ImageView>
 
-                    <VBox fx:id="searchContainerVBox" alignment="CENTER_LEFT" spacing="-8.0" HBox.hgrow="ALWAYS">
-                        <TextField fx:id="searchField" prefHeight="24.0" prefWidth="700.0" promptText="%visualizar.search.prompt" styleClass="hogwarts-search-field">
+                    <VBox fx:id="searchContainerVBox" alignment="CENTER_LEFT" spacing="-8.0" HBox.hgrow="ALWAYS" minWidth="0.0">
+                        <TextField fx:id="searchField" maxWidth="Infinity" minWidth="0.0" prefHeight="24.0" promptText="%visualizar.search.prompt" styleClass="hogwarts-search-field">
                             <tooltip><Tooltip text="%buscar.tooltip" /></tooltip>
                             <font><Font name="System Italic" size="20.0" /></font>
                         </TextField>
 
-                        <ImageView fitHeight="25.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="false">
+                        <ImageView fitHeight="25.0" fitWidth="${searchField.width}" pickOnBounds="true" preserveRatio="false">
                             <image>
                                 <Image url="@../img/varita.png" />
                             </image>
@@ -95,9 +95,9 @@
                                 <Insets top="6.0" />
                             </VBox.margin>
                         </ImageView>
-                  <HBox.margin>
-                     <Insets top="10.0" />
-                  </HBox.margin>
+                        <HBox.margin>
+                            <Insets top="10.0" />
+                        </HBox.margin>
                     </VBox>
 
                     <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#toggleFilterPanel" styleClass="filter-button" text="%visualizar.filtro.titulo">
