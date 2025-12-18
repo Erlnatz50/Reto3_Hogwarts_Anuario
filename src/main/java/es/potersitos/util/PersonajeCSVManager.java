@@ -9,44 +9,62 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Gestor de personajes desde un CSV.
+ * Proporciona lectura, eliminación y actualización de registros de personajes.
+ *
+ * @author Nizam
+ * @version 1.0
+ */
 public class PersonajeCSVManager {
 
+    /** Logger para la clase. */
     private static final Logger logger = LoggerFactory.getLogger(PersonajeCSVManager.class);
+
+    /** Nombre de la carpeta donde se almacena el CSV. */
     private static final String NOMBRE_CARPETA = "Reto3_Hogwarts_Anuario";
+
+    /** Nombre del archivo CSV */
     private static final String NOMBRE_ARCHIVO = "todosPersonajes.csv";
 
-    // ORDEN EXACTO basado en tu captura de pantalla
+    /** Claves/columnas esperadas en el CSV. */
     private static final String[] CLAVES_PERSONAJE = {
-            "id", // 0
-            "type", // 1 (Aquí dice 'character', por eso te salía mal antes)
-            "slug", // 2
-            "alias_names", // 3
-            "animagus", // 4
-            "blood_status", // 5
-            "boggart", // 6
-            "born", // 7
-            "died", // 8
-            "eye_color", // 9
-            "family_members", // 10
-            "gender", // 11
-            "hair_color", // 12
-            "height", // 13
-            "house", // 14
-            "image", // 15
-            "jobs", // 16
-            "marital_status", // 17
-            "name", // 18 <-- AQUÍ está el nombre real
-            "nationality", // 19
-            "patronus", // 20
-            "romances", // 21
-            "skin_color", // 22
-            "species", // 23
-            "titles", // 24
-            "wands", // 25
-            "weight", // 26
-            "wiki" // 27
+            "id",
+            "type",
+            "slug",
+            "alias_names",
+            "animagus",
+            "blood_status",
+            "boggart",
+            "born",
+            "died",
+            "eye_color",
+            "family_members",
+            "gender",
+            "hair_color",
+            "height",
+            "house",
+            "image",
+            "jobs",
+            "marital_status",
+            "name",
+            "nationality",
+            "patronus",
+            "romances",
+            "skin_color",
+            "species",
+            "titles",
+            "wands",
+            "weight",
+            "wiki"
     };
 
+    /**
+     * Lee todos los personajes desde el CSV.
+     *
+     * @return Lista de mapas, donde cada mapa representa un personaje con claves de CLAVES_PERSONAJE.
+     * @author Nizam
+     */
     public static List<Map<String, String>> leerTodosLosPersonajes() {
         List<Map<String, String>> personajes = new ArrayList<>();
         String rutaCompleta = obtenerRutaCompletaCSV();
@@ -62,7 +80,6 @@ public class PersonajeCSVManager {
             boolean esEncabezado = true;
 
             while ((linea = reader.readLine()) != null) {
-                // Saltamos la primera línea de títulos
                 if (esEncabezado) {
                     esEncabezado = false;
                     continue;
@@ -77,48 +94,67 @@ public class PersonajeCSVManager {
         return personajes;
     }
 
+    /**
+     * Procesa una línea del CSV y la añade a la lista de personajes.
+     *
+     * @param linea Línea del CSV.
+     * @param personajes Lista donde se almacenarán los mapas de personajes.
+     * @author Nizam
+     */
     private static void procesarLineaCSV(String linea, List<Map<String, String>> personajes) {
-        if (linea.trim().isEmpty())
+        if (linea == null || linea.trim().isEmpty()){
             return;
+        }
 
-        // Regex para separar por comas ignorando las que están entre comillas
         String[] datos = linea.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 
         Map<String, String> personaje = new HashMap<>();
 
-        // Mapeamos cada valor a su columna correspondiente
         int totalColumnas = Math.min(CLAVES_PERSONAJE.length, datos.length);
 
         for (int i = 0; i < totalColumnas; i++) {
-            // Quitamos espacios y comillas extra
             String valor = datos[i].trim().replace("\"", "");
             personaje.put(CLAVES_PERSONAJE[i], valor);
         }
 
-        // Valores por defecto para evitar errores visuales
         personaje.putIfAbsent("name", "Sin Nombre");
         personaje.putIfAbsent("house", "Sin Casa");
 
         personajes.add(personaje);
     }
 
-    // --- Métodos de eliminación y utilidades ---
-
+    /**
+     * Elimina un personaje por su slug.
+     *
+     * @param slug Slug del personaje a eliminar.
+     * @return true si se eliminó correctamente, false en caso contrario.
+     * @author Telmo
+     */
     public static boolean eliminarPersonajePorSlug(String slug) {
-        if (slug == null || slug.trim().isEmpty())
+        if (slug == null || slug.trim().isEmpty()) {
             return false;
+        }
         String rutaCSV = obtenerRutaCompletaCSV();
         List<Map<String, String>> personajes = leerTodosLosPersonajes();
         boolean eliminado = personajes.removeIf(p -> slug.equalsIgnoreCase(p.getOrDefault("slug", "")));
-        if (eliminado)
+        if (eliminado) {
             return reescribirCSV(personajes, rutaCSV);
+        }
         return false;
     }
 
+    /**
+     * Actualiza un personaje con nuevos datos, identificado por su slug.
+     *
+     * @param nuevosDatos Mapa con los datos actualizados del personaje. Debe contener la clave "slug".
+     * @return true si se actualizó correctamente, false en caso contrario.
+     * @author Telmo
+     */
     public static boolean actualizarPersonaje(Map<String, String> nuevosDatos) {
         String slug = nuevosDatos.get("slug");
-        if (slug == null || slug.isEmpty())
+        if (slug == null || slug.isEmpty()){
             return false;
+        }
 
         String rutaCSV = obtenerRutaCompletaCSV();
         List<Map<String, String>> personajes = leerTodosLosPersonajes();
@@ -127,7 +163,7 @@ public class PersonajeCSVManager {
         for (int i = 0; i < personajes.size(); i++) {
             Map<String, String> p = personajes.get(i);
             if (slug.equalsIgnoreCase(p.get("slug"))) {
-                personajes.set(i, nuevosDatos); // Reemplazamos
+                personajes.set(i, nuevosDatos);
                 encontrado = true;
                 break;
             }
@@ -139,6 +175,14 @@ public class PersonajeCSVManager {
         return false;
     }
 
+    /**
+     * Reescribe el CSV a partir de la lista de personajes.
+     *
+     * @param lista Lista de personajes (maps).
+     * @param ruta Ruta completa del CSV.
+     * @return true si se escribió correctamente, false en caso contrario.
+     * @author Nizam
+     */
     private static boolean reescribirCSV(List<Map<String, String>> lista, String ruta) {
         try (FileWriter writer = new FileWriter(ruta)) {
             writer.write(String.join(",", CLAVES_PERSONAJE) + "\n");
@@ -154,10 +198,17 @@ public class PersonajeCSVManager {
             }
             return true;
         } catch (IOException e) {
+            logger.error("Error al escribir en el CSV: {}", e.getMessage(), e);
             return false;
         }
     }
 
+    /**
+     * Obtiene la ruta completa del CSV a partir del directorio del usuario.
+     *
+     * @return Ruta completa del CSV.
+     * @author Erlantz
+     */
     private static String obtenerRutaCompletaCSV() {
         String userHome = System.getProperty("user.home");
         return userHome + File.separator + NOMBRE_CARPETA + File.separator + NOMBRE_ARCHIVO;

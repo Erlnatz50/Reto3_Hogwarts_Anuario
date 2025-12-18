@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
-import javafx.stage.StageStyle;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
@@ -28,7 +28,7 @@ import net.sf.jasperreports.view.JasperViewer;
  * Gestiona la interacción con los elementos del FXML y soporta multiidioma.
  *
  * @author Marco
- * @version 1.2
+ * @version 1.0
  */
 public class ControladorDatos {
 
@@ -55,10 +55,10 @@ public class ControladorDatos {
 
     /** Botones principales de acción */
     @FXML
-    private Button actualizarButton, exportarButton, eliminarButton, closeButton;
+    private Button actualizarButton, exportarButton, eliminarButton;
 
-    // ✅ NUEVO: La ruta donde están tus imágenes arregladas
-    private static final String RUTA_LOCAL_IMAGENES = "C:\\Users\\dm2\\Reto3_Hogwarts_Anuario\\imagenes\\";
+    /** Ruta local donde se buscan imágenes de personajes */
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Metodo de inicialización del controlador.
@@ -68,18 +68,15 @@ public class ControladorDatos {
      */
     @FXML
     public void initialize() {
-        if (this.resources == null) {
+        if (resources == null) {
             try {
-                this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
+                resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
             } catch (Exception e) {
                 logger.error("No se pudo cargar ResourceBundle por defecto.", e);
             }
         }
-
-        logger.info("ControladorDatos inicializado. Idioma: {}",
-                resources != null ? resources.getLocale() : "Desconocido");
-
         configurarTextosBotones();
+        logger.info("ControladorDatos inicializado. Idioma: {}", resources != null ? resources.getLocale() : "Desconocido");
     }
 
     /**
@@ -88,41 +85,41 @@ public class ControladorDatos {
      * @author Marco
      */
     private void configurarTextosBotones() {
-        if (resources == null)
+        if (resources == null) {
             return;
+        }
 
-        try {
-            if (actualizarButton != null) {
-                actualizarButton.setText(getStringSafe("actualizar.button"));
-                actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
-            }
-            if (exportarButton != null) {
-                exportarButton.setText(getStringSafe("exportar.button"));
-                exportarButton.setTooltip(new Tooltip(getStringSafe("exportar.tooltip")));
-            }
-            if (eliminarButton != null) {
-                eliminarButton.setText(getStringSafe("eliminar.button"));
-                eliminarButton.setTooltip(new Tooltip(getStringSafe("eliminar.tooltip")));
-            }
-        } catch (Exception e) {
-            logger.warn("Error configurando botones: {}", e.getMessage());
+        if (actualizarButton != null) {
+            actualizarButton.setText(getStringSafe("actualizar.button"));
+            actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
+        }
+
+        if (exportarButton != null) {
+            exportarButton.setText(getStringSafe("exportar.button"));
+            exportarButton.setTooltip(new Tooltip(getStringSafe("exportar.tooltip")));
+        }
+
+        if (eliminarButton != null) {
+            eliminarButton.setText(getStringSafe("eliminar.button"));
+            eliminarButton.setTooltip(new Tooltip(getStringSafe("eliminar.tooltip")));
         }
     }
 
     /**
-     * Asigna el identificador único (slug) del personaje actual y dispara la carga
-     * de datos.
+     * Asigna el slug del personaje y carga sus datos.
      *
+     * @param slug identificador único del personaje
      * @author Marco
      */
     public void setPersonajeSlug(String slug) {
-        this.personajeSlug = slug;
+        personajeSlug = slug;
         cargarDatosPersonaje(slug);
     }
 
     /**
-     * Carga el personaje completo usando el SLUG de la lista de datos.
+     * Carga los datos de un personaje desde el CSV a partir de su slug.
      *
+     * @param slug identificador único del personaje
      * @author Nizam
      */
     private void cargarDatosPersonaje(String slug) {
@@ -148,6 +145,7 @@ public class ControladorDatos {
     /**
      * Rellena las etiquetas FXML con los valores del mapa del personaje.
      *
+     * @param p mapa con los datos del personaje
      * @author Nizam
      */
     private void rellenarInterfaz(Map<String, String> p) {
@@ -156,43 +154,29 @@ public class ControladorDatos {
 
         boolean imagenCargada = false;
 
-        // 1. INTENTO LOCAL (PRIORIDAD): Buscar en tu carpeta C:\...\imagenes
-        // Formateamos el nombre (Ej: "Harry Potter") para buscar el archivo
-        String nombreBonito = formatearTexto(nombre);
-        if (!nombreBonito.isEmpty()) {
-            // Prueba 1: Nombre bonito (Ej: Harry Potter.png)
-            if (intentarCargarVariasExtensiones(nombreBonito)) imagenCargada = true;
-
-            // Prueba 2: Nombre con guiones (Ej: harry-potter.png)
-            if (!imagenCargada) {
-                String nombreGuiones = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
-                if (intentarCargarVariasExtensiones(nombreGuiones)) imagenCargada = true;
-            }
+        String nombreFormateado = formatearTexto(nombre);
+        if (!nombreFormateado.isEmpty()) {
+            imagenCargada = intentarCargarVariasExtensiones(nombreFormateado) || intentarCargarVariasExtensiones(nombre.toLowerCase().replaceAll("\\s+", "-"));
         }
 
-        // 2. INTENTO CSV (FALLBACK): Si no está en local, probamos la ruta del CSV
-        if (!imagenCargada && !imagePathCSV.isEmpty()) {
-            // Intento limpiar nombre del archivo del CSV
-            String nombreArchivoCSV = limpiaNombreArchivo(imagePathCSV);
-            if (intentarCargarVariasExtensiones(nombreArchivoCSV)) {
-                imagenCargada = true;
-            }
-            // Si es una URL web real (http...), intentamos cargarla (opcional)
-            else if (imagePathCSV.startsWith("http")) {
+        if (!imagenCargada && !imagePathCSV.isBlank()) {
+            String base = limpiaNombreArchivo(imagePathCSV);
+            imagenCargada = intentarCargarVariasExtensiones(base);
+
+            if (!imagenCargada && imagePathCSV.startsWith("http")) {
                 try {
                     imageView.setImage(new Image(imagePathCSV, true));
                     imagenCargada = true;
-                } catch (Exception e) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
-        // 3. IMAGEN POR DEFECTO: Si todo falla
         if (!imagenCargada) {
             cargarImagenPorDefecto();
         }
 
-        // Relleno de textos
-        establecerTexto(nombreLabel, "nombre.label", p.getOrDefault("name", "N/A"));
+        establecerTexto(nombreLabel, "nombre.label",nombre);
         establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
         establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
         establecerTexto(bloodStatusLabel, "bloodStatus.label", p.getOrDefault("blood_status", "N/A"));
@@ -217,53 +201,78 @@ public class ControladorDatos {
         establecerTexto(varitasLabel, "varitas.label", p.getOrDefault("wands", "N/A"));
         establecerTexto(pesoLabel, "peso.label", p.getOrDefault("weight", "N/A"));
 
-        this.personajeSlug = p.get("slug");
+        personajeSlug = p.get("slug");
     }
 
-    // ✅ METODOS AUXILIARES DE CARGA DE IMAGEN (Traídos del otro controlador)
-
-    private boolean intentarCargarVariasExtensiones(String nombreBase) {
-        if (cargarImagenFuerzaBruta(nombreBase + ".png")) return true;
-        if (cargarImagenFuerzaBruta(nombreBase + ".jpg")) return true;
-        return cargarImagenFuerzaBruta(nombreBase + ".jpeg");
+    /**
+     * Intenta cargar una imagen probando varias extensiones comunes.
+     *
+     * @param base nombre base del archivo sin extensión
+     * @return {@code true} si la imagen se ha cargado correctamente, {@code false} en caso contrario
+     * @author Nizam
+     */
+    private boolean intentarCargarVariasExtensiones(String base) {
+        return cargarImagenLocal(base + ".png") || cargarImagenLocal(base + ".jpg") || cargarImagenLocal(base + ".jpeg");
     }
 
-    private boolean cargarImagenFuerzaBruta(String nombreArchivo) {
+    /**
+     * Carga una imagen local forzando su lectura desde disco.
+     *
+     * @param nombreArchivo nombre del archivo de imagen (incluida la extensión)
+     * @return {@code true} si la imagen existe y se ha cargado correctamente, {@code false} si no existe o ocurre un error
+     * @author Nizam
+     */
+    private boolean cargarImagenLocal(String nombreArchivo) {
         File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
-        if (archivo.exists()) {
-            try (FileInputStream fis = new FileInputStream(archivo)) {
-                imageView.setImage(new Image(fis));
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
+        if (!archivo.exists()) return false;
+
+        try (FileInputStream fis = new FileInputStream(archivo)) {
+            imageView.setImage(new Image(fis));
+            return true;
+        } catch (Exception e) {
+            logger.warn("No se ha podido cargar la imagen {}", nombreArchivo);
+            return false;
         }
-        return false;
     }
 
+    /**
+     * Carga la imagen por defecto del proyecto.
+     *
+     * @author Nizam
+     */
     private void cargarImagenPorDefecto() {
-        try {
-            InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+        try (InputStream imgStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png")) {
             if (imgStream != null) {
                 imageView.setImage(new Image(imgStream));
             }
-        } catch (Exception ex) {
-            logger.error("No se pudo cargar la imagen por defecto.", ex);
+        } catch (Exception e) {
+            logger.error("No se ha podido cargar la imagen por defecto.", e);
         }
     }
 
+    /**
+     * Capitaliza palabras de un texto.
+     *
+     * @param texto texto original a formatear
+     * @return texto con cada palabra capitalizada, o cadena vacía si es nulo
+     * @author Nizam
+     */
     private String formatearTexto(String texto) {
-        if (texto == null || texto.isEmpty()) return "";
-        String[] palabras = texto.trim().split("\\s+");
-        StringBuilder res = new StringBuilder();
-        for (String p : palabras) if (!p.isEmpty()) {
-            res.append(Character.toUpperCase(p.charAt(0)))
-                    .append(p.substring(1).toLowerCase())
-                    .append(" ");
+        if (texto == null || texto.isBlank()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (String p : texto.trim().split("\\s+")) {
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1).toLowerCase()).append(" ");
         }
-        return res.toString().trim();
+        return sb.toString().trim();
     }
 
+    /**
+     * Limpia una ruta o URL dejando solo el nombre base del archivo.
+     *
+     * @param ruta ruta completa o URL de una imagen
+     * @return nombre base del archivo sin extensión ni parámetros
+     * @author Nizam
+     */
     private String limpiaNombreArchivo(String ruta) {
         String nombre = ruta;
         if (nombre.contains("/")) nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
@@ -272,11 +281,12 @@ public class ControladorDatos {
         return nombre.replace("%20", " ");
     }
 
-    // -------------------------------------------------------------
-
     /**
-     * Metodo auxiliar para establecer texto en Labels de forma segura y traducida.
+     * Establece texto traducido en una etiqueta.
      *
+     * @param label etiqueta JavaFX a modificar
+     * @param key clave del {@link ResourceBundle} para el texto base
+     * @param valor valor a mostrar junto a la clave traducida
      * @author Marco
      */
     private void establecerTexto(Label label, String key, String valor) {
@@ -286,13 +296,14 @@ public class ControladorDatos {
     }
 
     /**
-     * Helper para obtener strings del resource bundle evitando excepciones.
+     * Obtiene un texto del ResourceBundle sin lanzar excepciones.
      *
+     * @param key clave del texto a recuperar
+     * @return texto traducido si existe, o la propia clave si no se encuentra
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null)
-            return key;
+        if (resources == null) return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -307,93 +318,72 @@ public class ControladorDatos {
      */
     @FXML
     private void cerrarVentana(ActionEvent event) {
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        stage.close();
+        ((Stage) ((Button) event.getSource()).getScene().getWindow()).close();
     }
 
     /**
-     * Maneja la acción del botón de actualización.
+     * Abre la ventana de edición del personaje actual.
      *
      * @author Nizam
      */
     @FXML
     public void handleActualizar() {
-        if (personajeSlug == null || personajeSlug.isEmpty()) {
-            return;
-        }
+        if (personajeSlug == null || personajeSlug.isBlank()) return;
 
         try {
-            // 1. Obtener datos actuales del personaje desde el CSV (para tener todos los
-            // campos)
-            List<Map<String, String>> todos = PersonajeCSVManager.leerTodosLosPersonajes();
-            Optional<Map<String, String>> optPersonaje = todos.stream()
+            Optional<Map<String, String>> personaje = PersonajeCSVManager.leerTodosLosPersonajes().stream()
                     .filter(p -> personajeSlug.equalsIgnoreCase(p.getOrDefault("slug", "")))
                     .findFirst();
 
-            if (optPersonaje.isEmpty()) {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "",
-                        "No se encontraron datos para editar.");
+            if (personaje.isEmpty()) {
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.datos.editar"));
                 return;
             }
 
-            // 2. Cargar la vista de edición (reutilizando nuevoPersonaje.fxml)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"));
-            if (resources != null) {
-                loader.setResources(resources);
-            }
+            ResourceBundle bundle = resources != null ? resources : ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
             Parent root = loader.load();
 
-            // 3. Pasar los datos al controlador
             ControladorNuevoPersonaje controller = loader.getController();
-            controller.setDatosPersonaje(optPersonaje.get());
+            controller.setDatosPersonaje(personaje.get());
 
-            // 4. Mostrar ventana modal
             Stage stage = new Stage();
             stage.setTitle(getStringSafe("menu.archivo.editar"));
-            stage.setScene(new Scene(root));
 
-            // Intentar cargar icono y estilos si es necesario (copiado de
-            // ControladorVisualizarPersonajes)
-            try {
-                stage.getIcons().add(new Image(
-                        Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
-            } catch (Exception ignored) {
-            }
+            Scene scene = new Scene(root);
 
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
-                if (archivoCSS != null)
-                    root.getStylesheets().add(archivoCSS.toExternalForm());
-            } catch (Exception ignored) {
+                if (archivoCSS != null) {
+                    scene.getStylesheets().add(archivoCSS.toExternalForm());
+                }
+            } catch (Exception e) {
+                logger.warn("Error al aplicar CSS: {}", e.getMessage());
             }
 
+            stage.setScene(scene);
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.TRANSPARENT);
             stage.showAndWait();
 
-            // 5. Al cerrar, recargar los datos en esta misma vista
             cargarDatosPersonaje(personajeSlug);
-
-            // Opcional: Feedback visual o log
-            logger.info("Regresando de edición para {}", personajeSlug);
 
         } catch (Exception e) {
             logger.error("Error al abrir ventana de edición", e);
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "Fallo al abrir editor", e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), getStringSafe("fallo.abrir.editor"), e.getMessage());
         }
     }
 
     /**
-     * Maneja la acción del botón de exportación.
+     * Exporta la ficha del personaje mediante JasperReports.
      *
-     * @author Nizam
+     * @author Telmo
      */
     @FXML
     public void handleExportar() {
-        logger.info("Botón 'Exportar' presionado");
-
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "No se encuentra el archivo .jrxml");
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.encuentra.jrxml"));
                 return;
             }
 
@@ -410,7 +400,6 @@ public class ControladorDatos {
             parameters.put("Piel", obtenerValor(colorPielLabel));
             parameters.put("Patronus", obtenerValor(patronusLabel));
 
-            // Para el reporte también pasamos la imagen si la tenemos cargada en el ImageView
             if (imageView.getImage() != null) {
                 parameters.put("Imagen", imageView.getImage());
             } else {
@@ -425,26 +414,21 @@ public class ControladorDatos {
 
             logger.info("Reporte PDF generado exitosamente");
 
-        } catch (NoClassDefFoundError e) {
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "",
-                    "Falta la librería JasperReports. Comente la funcionalidad si no la usa.");
         } catch (Exception e) {
-            logger.error("Error Jasper", e);
+            logger.error("Error al exportar el jasper", e);
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
         }
     }
 
     /**
-     * Maneja la acción del botón de eliminación de un personaje.
+     * Elimina el personaje actual tras confirmación del usuario.
      *
+     * @param event evento de acción generado por el botón de eliminación
      * @author Marco
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        if (personajeSlug == null || personajeSlug.isEmpty()) {
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", "Slug vacío.");
-            return;
-        }
+        if (personajeSlug == null || personajeSlug.isBlank()) return;
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle(getStringSafe("eliminar.confirm.titulo"));
@@ -454,7 +438,6 @@ public class ControladorDatos {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-
             boolean exito = false;
             try {
                 exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
@@ -491,9 +474,11 @@ public class ControladorDatos {
     }
 
     /**
-     * Obtiene el valor textual de una etiqueta.
+     * Extrae el valor real de un {@link Label} con formato {@code "Clave: Valor"}.
      *
-     * @author Marco
+     * @param label label etiqueta de la cual se extraerá el valor
+     * @return valor textual sin la clave ni el separador, o cadena vacía si el label es nulo
+     * @author Telmo
      */
     private String obtenerValor(Label label) {
         if (label == null)

@@ -8,7 +8,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.slf4j.Logger;
@@ -31,10 +30,6 @@ import java.util.ResourceBundle;
  * @version 1.0
  */
 public class ControladorFichaPersonaje {
-
-    /** Contenedor principal del diseño de la tarjeta del personaje. */
-    @FXML
-    private VBox cardBox;
 
     /** Imagen del personaje mostrada en la tarjeta. */
     @FXML
@@ -64,10 +59,11 @@ public class ControladorFichaPersonaje {
     /** Acción a ejecutar cuando cambia el estado del checkbox. */
     private Runnable onSelectionChanged;
 
+    /** Acción a ejecutar al cerrar la ventana de detalles para refrescar datos. */
     private Runnable onRefresh;
 
-    /** Ruta local donde se encuentran las imágenes de personajes. */
-    private static final String RUTA_LOCAL_IMAGENES = "C:\\Users\\dm2\\Reto3_Hogwarts_Anuario\\imagenes\\";
+    /** Ruta local donde se buscan imágenes de personajes */
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Inicializa el controlador y asigna el {@link ResourceBundle} de idioma.
@@ -77,10 +73,11 @@ public class ControladorFichaPersonaje {
      */
     @FXML
     public void initialize() {
-        if (this.resources == null) {
+        if (resources == null) {
             try {
-                this.resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-            } catch (Exception _) {
+                resources = ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
+            } catch (Exception e) {
+                logger.warn("No se ha podido cargar el ResourceBundle por defecto", e);
             }
         }
     }
@@ -92,7 +89,7 @@ public class ControladorFichaPersonaje {
      * @author Erlantz
      */
     public void setPersonajeSlug(String slug) {
-        this.personajeSlug = slug;
+        personajeSlug = slug;
     }
 
     /**
@@ -104,35 +101,34 @@ public class ControladorFichaPersonaje {
      * @author Nizam
      */
     public void setData(String nombre, String casa, String imagePath) {
-        String nombreBonito = formatearTexto(nombre);
-        labelNombre.setText(nombreBonito);
+        String nombreFormateado = formatearTexto(nombre);
+        labelNombre.setText(nombreFormateado);
         labelCasa.setText(formatearTexto(casa));
         aplicarEstiloCasa(casa);
 
+        boolean imagenCargada = false;
+
         try {
-            boolean encontrado = false;
-
             if (nombre != null && !nombre.isBlank()) {
-                String base1 = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
-                encontrado = intentarCargarVariasExtensiones(base1);
+                String base = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
+                imagenCargada = intentarCargarVariasExtensiones(base);
             }
 
-            if (!encontrado && !nombreBonito.isEmpty()) {
-                String base2 = nombreBonito.replaceAll("\\s+", "-");
-                encontrado = intentarCargarVariasExtensiones(base2) || intentarCargarVariasExtensiones(nombreBonito);
+            if (!imagenCargada && !nombreFormateado.isBlank()) {
+                String base = nombreFormateado.replaceAll("\\s+", "-");
+                imagenCargada = intentarCargarVariasExtensiones(base) || intentarCargarVariasExtensiones(nombreFormateado);
             }
 
-            if (!encontrado && imagePath != null && !imagePath.isBlank() && !"null".equalsIgnoreCase(imagePath)) {
+            if (!imagenCargada && imagePath != null && !imagePath.isBlank() && !"null".equalsIgnoreCase(imagePath)) {
                 String baseCSV = limpiaNombreArchivo(imagePath);
-                encontrado = intentarCargarVariasExtensiones(baseCSV);
-            }
-
-            if (!encontrado) {
-                cargarImagenPorDefecto();
+                imagenCargada = intentarCargarVariasExtensiones(baseCSV);
             }
 
         } catch (Exception e) {
             logger.error("Error al cargar la imagen del personaje", e);
+        }
+
+        if (!imagenCargada) {
             cargarImagenPorDefecto();
         }
     }
@@ -146,32 +142,45 @@ public class ControladorFichaPersonaje {
      * @author Nizam
      */
     private boolean intentarCargarVariasExtensiones(String nombreBase) {
-        if (cargarImagenFuerzaBruta(nombreBase + ".png"))
-            return true;
-        if (cargarImagenFuerzaBruta(nombreBase + ".jpg"))
-            return true;
-        return cargarImagenFuerzaBruta(nombreBase + ".jpeg");
+        return cargarImagenLocal(nombreBase + ".png") || cargarImagenLocal(nombreBase + ".jpg") || cargarImagenLocal(nombreBase + ".jpeg");
     }
 
     /**
-     * Carga el archivo de imagen desde disco usando {@link FileInputStream}.
+     * Carga una imagen local desde el sistema de archivos.
      *
-     * @param nombreArchivo Nombre del archivo a buscar en la ruta local.
-     * @return {@code true} si la imagen fue cargada correctamente.
+     * @param nombreArchivo nombre del archivo de imagen
+     * @return {@code true} si la imagen se carga correctamente
      * @author Nizam
      */
-    private boolean cargarImagenFuerzaBruta(String nombreArchivo) {
+    private boolean cargarImagenLocal(String nombreArchivo) {
         File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
-        if (archivo.exists()) {
-            try (FileInputStream fis = new FileInputStream(archivo)) {
-                imagePersonaje.setImage(new Image(fis));
-                return true;
-            } catch (IOException e) {
-                logger.warn("No se ha podido cargar la imagen: {}", archivo.getName());
-                return false;
-            }
+        if (!archivo.exists()) {
+            return false;
         }
-        return false;
+
+        try (FileInputStream fis = new FileInputStream(archivo)) {
+            imagePersonaje.setImage(new Image(fis));
+            return true;
+        } catch (IOException e) {
+            logger.warn("No se ha podido cargar la imagen {}", nombreArchivo);
+            return false;
+        }
+    }
+
+    /**
+     * Carga una imagen por defecto si no se encuentra imagen específica del
+     * personaje.
+     *
+     * @author Nizam
+     */
+    private void cargarImagenPorDefecto() {
+        try (InputStream stream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png")) {
+            if (stream != null) {
+                imagePersonaje.setImage(new Image(stream));
+            }
+        } catch (Exception e) {
+            logger.warn("No se ha podido cargar la imagen por defecto", e);
+        }
     }
 
     /**
@@ -182,17 +191,14 @@ public class ControladorFichaPersonaje {
      * @author Nizam
      */
     private String formatearTexto(String texto) {
-        if (texto == null || texto.isEmpty())
+        if (texto == null || texto.isEmpty()) {
             return "";
-        String[] palabras = texto.trim().split("\\s+");
-        StringBuilder res = new StringBuilder();
-        for (String p : palabras)
-            if (!p.isEmpty()) {
-                res.append(Character.toUpperCase(p.charAt(0)))
-                        .append(p.substring(1).toLowerCase())
-                        .append(" ");
-            }
-        return res.toString().trim();
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String palabra : texto.trim().split("\\s+")) {
+            sb.append(Character.toUpperCase(palabra.charAt(0))).append(palabra.substring(1).toLowerCase()).append(" ");
+        }
+        return sb.toString().trim();
     }
 
     /**
@@ -205,48 +211,35 @@ public class ControladorFichaPersonaje {
      */
     private String limpiaNombreArchivo(String ruta) {
         String nombre = ruta;
-        if (nombre.contains("/"))
+        if (nombre.contains("/")) {
             nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        if (nombre.contains("?"))
+        }
+        if (nombre.contains("?")) {
             nombre = nombre.substring(0, nombre.indexOf("?"));
-        if (nombre.contains("."))
+        }
+        if (nombre.contains(".")) {
             nombre = nombre.substring(0, nombre.lastIndexOf("."));
+        }
         return nombre.replace("%20", " ");
     }
 
     /**
      * Aplica un color distintivo a la etiqueta de casa según la casa del personaje.
      *
-     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y
-     *             Hufflepuff).
+     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y Hufflepuff).
      * @author Nizam
      */
     private void aplicarEstiloCasa(String casa) {
-        if (casa == null)
+        if (casa == null) {
             return;
-        String estilo = "-fx-font-weight: bold; -fx-text-fill: ";
-        switch (casa.toLowerCase().trim()) {
-            case "gryffindor" -> labelCasa.setStyle(estilo + "#740001;");
-            case "slytherin" -> labelCasa.setStyle(estilo + "#1a472a;");
-            case "ravenclaw" -> labelCasa.setStyle(estilo + "#0e1a40;");
-            case "hufflepuff" -> labelCasa.setStyle(estilo + "#ecb939;");
-            default -> labelCasa.setStyle(estilo + "#555555;");
         }
-    }
-
-    /**
-     * Carga una imagen por defecto si no se encuentra imagen específica del
-     * personaje.
-     *
-     * @author Nizam
-     */
-    private void cargarImagenPorDefecto() {
-        try {
-            InputStream stream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-            if (stream != null)
-                imagePersonaje.setImage(new Image(stream));
-        } catch (Exception e) {
-            logger.warn("No se ha podido cargar la imagen por defecto");
+        String estiloBase = "-fx-font-weight: bold; -fx-text-fill: ";
+        switch (casa.toLowerCase().trim()) {
+            case "gryffindor" -> labelCasa.setStyle(estiloBase + "#740001;");
+            case "slytherin" -> labelCasa.setStyle(estiloBase + "#1a472a;");
+            case "ravenclaw" -> labelCasa.setStyle(estiloBase + "#0e1a40;");
+            case "hufflepuff" -> labelCasa.setStyle(estiloBase + "#ecb939;");
+            default -> labelCasa.setStyle(estiloBase + "#555555;");
         }
     }
 
@@ -274,15 +267,11 @@ public class ControladorFichaPersonaje {
     private void abrirDetalles() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
-            if (resources != null) {
-                loader.setResources(resources);
-            }
+            loader.setResources(resources);
 
             Parent root = loader.load();
             ControladorDatos cd = loader.getController();
-            if (personajeSlug != null) {
-                cd.setPersonajeSlug(personajeSlug);
-            }
+            cd.setPersonajeSlug(personajeSlug);
 
             Scene scene = new Scene(root);
             var css = getClass().getResource("/es/potersitos/css/estiloDatos.css");
@@ -294,8 +283,9 @@ public class ControladorFichaPersonaje {
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);
             stage.setOnHidden(e -> {
-                if (onRefresh != null)
+                if (onRefresh != null) {
                     onRefresh.run();
+                }
             });
             stage.show();
 
@@ -307,35 +297,30 @@ public class ControladorFichaPersonaje {
     /**
      * Activa o desactiva el modo selección de la tarjeta.
      *
-     * @param active {@code true} para mostrar el checkbox, {@code false} para
-     *               ocultarlo.
+     * @param active {@code true} para mostrar el checkbox, {@code false} para ocultarlo.
      * @author Telmo
      */
     public void setSelectionMode(boolean active) {
         isSelectionMode = active;
-        if (checkBoxSeleccionar != null) {
-            checkBoxSeleccionar.setVisible(active);
-            if (!active)
-                checkBoxSeleccionar.setSelected(false);
+        checkBoxSeleccionar.setVisible(active);
+        if (!active) {
+            checkBoxSeleccionar.setSelected(false);
         }
     }
 
     /**
-     * Establece una acción (callback) a ejecutar cuando cambia la selección del
-     * checkbox.
+     * Establece una acción (callback) a ejecutar cuando cambia la selección del checkbox.
      *
      * @param listener Acción a ejecutar al cambiar el estado del checkbox.
      * @author Telmo
      */
     public void setOnSelectionChanged(Runnable listener) {
-        this.onSelectionChanged = listener;
-        if (checkBoxSeleccionar != null) {
-            checkBoxSeleccionar.selectedProperty().addListener((o, ov, nv) -> {
-                if (onSelectionChanged != null) {
-                    onSelectionChanged.run();
-                }
-            });
-        }
+        onSelectionChanged = listener;
+        checkBoxSeleccionar.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (onSelectionChanged != null) {
+                onSelectionChanged.run();
+            }
+        });
     }
 
     /**
@@ -345,7 +330,7 @@ public class ControladorFichaPersonaje {
      * @author Marco
      */
     public boolean isSelected() {
-        return checkBoxSeleccionar != null && checkBoxSeleccionar.isSelected();
+        return checkBoxSeleccionar.isSelected();
     }
 
     /**
@@ -365,12 +350,17 @@ public class ControladorFichaPersonaje {
      * @author Erlantz
      */
     public void setSelected(boolean value) {
-        if (checkBoxSeleccionar != null) {
-            checkBoxSeleccionar.setSelected(value);
-        }
+        checkBoxSeleccionar.setSelected(value);
     }
 
+    /**
+     * Establece un listener que se ejecutará al cerrar la ventana de detalles
+     * para refrescar la vista principal.
+     *
+     * @param recargarListaCompleta acción de refresco
+     * @author Telmo
+     */
     public void setOnRefreshListener(Runnable recargarListaCompleta) {
-        this.onRefresh = recargarListaCompleta;
+        onRefresh = recargarListaCompleta;
     }
 }
