@@ -58,7 +58,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Elementos del menú superior. */
     @FXML
-    private MenuItem menuSalir, menuNuevo, menuGuardar, acerca, manual, euskera, ingles, espaniol;
+    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol;
 
     /** Contenedor que aloja las fichas de los personajes. */
     @FXML
@@ -146,6 +146,8 @@ public class ControladorVisualizarPersonajes {
         menuNuevo.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         menuGuardar.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
+        menuAcercaDe.setAccelerator(KeyCombination.keyCombination("Ctrl+D"));
+        menuManual.setAccelerator(KeyCombination.keyCombination("Ctrl+M"));
     }
 
     /**
@@ -260,11 +262,11 @@ public class ControladorVisualizarPersonajes {
         menuNuevo.setText(resources.getString("menu.archivo.nuevo"));
         menuGuardar.setText(resources.getString("menu.archivo.guardar"));
         menuSalir.setText(resources.getString("menu.archivo.salir"));
-        acerca.setText(resources.getString("menu.ayuda.acercade"));
-        manual.setText(resources.getString("menu.ayuda.documentacion"));
-        euskera.setText(resources.getString("menu.idioma.euskera"));
-        ingles.setText(resources.getString("menu.idioma.ingles"));
-        espaniol.setText(resources.getString("menu.idioma.espanol"));
+        menuAcercaDe.setText(resources.getString("menu.ayuda.acercade"));
+        menuManual.setText(resources.getString("menu.ayuda.documentacion"));
+        menuEuskera.setText(resources.getString("menu.idioma.euskera"));
+        menuIngles.setText(resources.getString("menu.idioma.ingles"));
+        menuEspaniol.setText(resources.getString("menu.idioma.espanol"));
         botonImportar.setText(resources.getString("importar"));
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
@@ -1085,7 +1087,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void documentacion() {
         try {
-            Path manualPath = Paths.get("docs/manual_ejemplo.pdf");
+            Path manualPath = Paths.get("docs/Manual de usuario - Anuario Hogwarts.pdf");
 
             if (!Files.exists(manualPath)) {
                 mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);

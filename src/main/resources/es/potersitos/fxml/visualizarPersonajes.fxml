@@ -36,21 +36,21 @@
                 <MenuItem fx:id="menuSalir" onAction="#salir" text="%menu.archivo.salir" />
             </Menu>
             <Menu text="%menu.idioma">
-                <MenuItem fx:id="espaniol" onAction="#idiomaEspaniol" text="%menu.idioma.espanol">
+                <MenuItem fx:id="menuEspaniol" onAction="#idiomaEspaniol" text="%menu.idioma.espanol">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../img/logo_españa.png" />
                         </ImageView>
                     </graphic>
                 </MenuItem>
-                <MenuItem fx:id="ingles" onAction="#idiomaIngles" text="%menu.idioma.ingles">
+                <MenuItem fx:id="menuIngles" onAction="#idiomaIngles" text="%menu.idioma.ingles">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../img/logo_ingles.png" />
                         </ImageView>
                     </graphic>
                 </MenuItem>
-                <MenuItem fx:id="euskera" onAction="#idiomaEuskera" text="%menu.idioma.euskera">
+                <MenuItem fx:id="menuEuskera" onAction="#idiomaEuskera" text="%menu.idioma.euskera">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="24" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../img/logo_euskera.png" />
@@ -59,8 +59,8 @@
                 </MenuItem>
             </Menu>
             <Menu text="%menu.ayuda">
-                <MenuItem fx:id="manual" onAction="#documentacion" text="%menu.ayuda.documentacion" />
-                <MenuItem fx:id="acerca" onAction="#acercaDe" text="%menu.ayuda.acercade" />
+                <MenuItem fx:id="menuManual" onAction="#documentacion" text="%menu.ayuda.documentacion" />
+                <MenuItem fx:id="menuAcercaDe" onAction="#acercaDe" text="%menu.ayuda.acercade" />
             </Menu>
         </MenuBar>
     </top>
