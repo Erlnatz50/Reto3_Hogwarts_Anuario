@@ -42,7 +42,8 @@ public class ControladorVisualizarPersonajes {
 
     /** Botones generales de la interfaz. */
     @FXML
-    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro, botonImportar;
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro,
+            botonImportar, btnEliminarSeleccionados, btnNuevoRapido;
 
     /** Indica si el modo selección está activo. */
     private boolean selectionModeActive = false;
@@ -207,16 +208,17 @@ public class ControladorVisualizarPersonajes {
         try {
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", nuevoLocale);
             actualizarTextosUI();
-            if (listaPersonajesMapeados.isEmpty()){
+            if (listaPersonajesMapeados.isEmpty()) {
                 mostrarMensajeImportar();
-            } else{
+            } else {
                 cargarPersonajes(listaPersonajesMapeados);
             }
             filtrarPersonajes();
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                    resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
         }
     }
 
@@ -295,7 +297,8 @@ public class ControladorVisualizarPersonajes {
             tilePanePersonajes.getChildren().clear();
 
             mensaje.setText(resources.getString("no.se.encontraron.personajes"));
-            mensaje.setStyle("-fx-text-fill: black; -fx-text-alignment: center; -fx-font-size: 18px; -fx-padding: 40px;");
+            mensaje.setStyle(
+                    "-fx-text-fill: black; -fx-text-alignment: center; -fx-font-size: 18px; -fx-padding: 40px;");
             mensaje.setWrapText(true);
 
             VBox contenedor = new VBox(mensaje);
@@ -385,6 +388,7 @@ public class ControladorVisualizarPersonajes {
 
                 controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
 
+
                 if (selectionModeActive) {
                     controller.setSelectionMode(true);
                     if (selectedSlugs.contains(slug)) {
@@ -427,8 +431,8 @@ public class ControladorVisualizarPersonajes {
 
         for (ControladorFichaPersonaje controller : listaControladores) {
             controller.setSelectionMode(selectionModeActive);
-            if (!selectionModeActive){
-                 controller.setSelected(false);
+            if (!selectionModeActive) {
+                controller.setSelected(false);
             }
         }
 
@@ -442,16 +446,17 @@ public class ControladorVisualizarPersonajes {
      * @author Telmo
      */
     private void actualizarEstadoBotonExportar() {
-        if (btnExportar == null)
-            return;
-
-        btnExportar.setDisable(selectedSlugs.isEmpty());
+        if (btnExportar != null)
+            btnExportar.setDisable(selectedSlugs.isEmpty());
+        if (btnEliminarSeleccionados != null)
+            btnEliminarSeleccionados.setDisable(selectedSlugs.isEmpty());
     }
 
     /**
      * Gestiona los cambios en la selección de personajes.
      *
-     * @param controller Instancia del controlador {@link ControladorFichaPersonaje} cuyo estado de selección ha cambiado.
+     * @param controller Instancia del controlador {@link ControladorFichaPersonaje}
+     *                   cuyo estado de selección ha cambiado.
      * @author Telmo
      */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
@@ -472,20 +477,23 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private void exportarSeleccionados() {
         if (selectedSlugs.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No hay personajes seleccionados.");
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No hay personajes seleccionados.");
             return;
         }
 
         JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "No se encuentra el archivo .jrxml");
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        "No se encuentra el archivo .jrxml");
                 return;
             }
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al cargar plantilla de reporte: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al cargar plantilla de reporte: " + e.getMessage());
             return;
         }
 
@@ -530,7 +538,8 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No se pudo generar ningún reporte.");
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No se pudo generar ningún reporte.");
             return;
         }
 
@@ -547,12 +556,66 @@ public class ControladorVisualizarPersonajes {
             JasperViewer.viewReport(mergedPrint, false);
 
             if (exportados > 0) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", "Se han exportado " + exportados + " fichas en un único documento.");
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                        "Se han exportado " + exportados + " fichas en un único documento.");
             }
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al unificar/mostrar el reporte: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al unificar/mostrar el reporte: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Elimina los personajes seleccionados de la lista y del CSV.
+     * Muestra alerta de confirmación antes de proceder.
+     *
+     * @author Erlantz
+     */
+    @FXML
+    private void eliminarSeleccionados() {
+        if (selectedSlugs.isEmpty())
+            return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resources.getString("eliminar.confirm.titulo"));
+        alert.setHeaderText(null);
+        alert.setContentText(
+                "¿Estás seguro de que deseas eliminar " + selectedSlugs.size() + " personajes seleccionados?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean algunError = false;
+            int eliminados = 0;
+
+            // Evitar ConcurrentModificationException copiando el set
+            Set<String> slugsParaBorrar = new HashSet<>(selectedSlugs);
+
+            for (String slug : slugsParaBorrar) {
+                if (PersonajeCSVManager.eliminarPersonajePorSlug(slug)) {
+                    eliminados++;
+                } else {
+                    algunError = true;
+                }
+            }
+
+            if (eliminados > 0) {
+                // Limpiar selección y recargar
+                selectedSlugs.clear();
+                if (selectionModeActive) {
+                    actualizarEstadoBotonExportar();
+                }
+                recargarListaCompleta();
+
+                String msg = "Se han eliminado " + eliminados + " personajes correctamente.";
+                if (algunError)
+                    msg += "\nAlgunos personajes no pudieron comprobarse.";
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", msg);
+            } else {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        "No se pudo eliminar ningún personaje.");
+            }
         }
     }
 
@@ -637,9 +700,11 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Crea y agrega dinámicamente un botón de paginación para una página específica.
+     * Crea y agrega dinámicamente un botón de paginación para una página
+     * específica.
      *
-     * @param numeroPagina Número de página que representa este botón. Debe estar dentro del rango válido de paginación.
+     * @param numeroPagina Número de página que representa este botón. Debe estar
+     *                     dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
@@ -775,6 +840,17 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
+     * Recarga toda la lista desde CSV y reaplica filtros.
+     * Usado cuando se elimina un personaje desde la ficha.
+     */
+    private void recargarListaCompleta() {
+        logger.info("Recargando lista completa de personajes desde disco...");
+        listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
+        // Replicar filtros actuales
+        filtrarPersonajes();
+    }
+
+    /**
      * Abre el formulario FXML para crear un nuevo personaje.
      *
      * @author Erlantz
@@ -807,11 +883,17 @@ public class ControladorVisualizarPersonajes {
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
             stage.getIcons().add(
-                    new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-            );
+                    new Image(Objects
+                            .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setResizable(false);
-            stage.show();
+            stage.showAndWait();
+
+            // Recargar datos y limpiar filtros para mostrar el nuevo personaje
+            listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
+            limpiarFiltros();
+            calcularTotalPaginas();
+            setPaginaActual(totalPaginas);
 
         } catch (Exception e) {
             logger.error("Error al abrir el formulario de nuevo personaje", e);
@@ -901,7 +983,8 @@ public class ControladorVisualizarPersonajes {
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", "Error al cargar plantilla: " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    "Error al cargar plantilla: " + e.getMessage());
             return;
         }
 
@@ -939,7 +1022,8 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", "No se pudo generar ningún reporte.");
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    "No se pudo generar ningún reporte.");
             return;
         }
 

@@ -64,6 +64,8 @@ public class ControladorFichaPersonaje {
     /** Acción a ejecutar cuando cambia el estado del checkbox. */
     private Runnable onSelectionChanged;
 
+    private Runnable onRefresh;
+
     /** Ruta local donde se encuentran las imágenes de personajes. */
     private static final String RUTA_LOCAL_IMAGENES = "C:\\Users\\dm2\\Reto3_Hogwarts_Anuario\\imagenes\\";
 
@@ -345,5 +347,9 @@ public class ControladorFichaPersonaje {
         if (checkBoxSeleccionar != null) {
             checkBoxSeleccionar.setSelected(value);
         }
+    }
+
+    public void setOnRefreshListener(Object recargarListaCompleta) {
+        this.onRefresh = (Runnable) recargarListaCompleta;
     }
 }
