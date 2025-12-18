@@ -385,6 +385,7 @@ public class ControladorVisualizarPersonajes {
 
                 controller.setData(nombre, casa, imagePath);
                 controller.setPersonajeSlug(slug);
+                controller.setOnRefreshListener((Runnable) this::recargarListaCompleta);
 
                 controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
 
@@ -455,7 +456,7 @@ public class ControladorVisualizarPersonajes {
      * Gestiona los cambios en la selección de personajes.
      *
      * @param controller Instancia del controlador {@link ControladorFichaPersonaje}
-     * cuyo estado de selección ha cambiado.
+     *                   cuyo estado de selección ha cambiado.
      * @author Telmo
      */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
@@ -703,7 +704,7 @@ public class ControladorVisualizarPersonajes {
      * específica.
      *
      * @param numeroPagina Número de página que representa este botón. Debe estar
-     * dentro del rango válido de paginación.
+     *                     dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
