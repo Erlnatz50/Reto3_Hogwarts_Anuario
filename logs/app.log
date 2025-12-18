@@ -1,5 +1,0 @@
-2025-12-03 10:10:24 INFO  es.potersitos.App - Aplicación finalizada correctamente
-2025-12-03 10:18:34 DEBUG es.potersitos.App - Cargando el archivo FXML: ventana.fxml
-2025-12-03 10:18:35 INFO  es.potersitos.dao.UsuariosDAO - UsuariosDAO inicializado. Preparado para ejecución de script Python.
-2025-12-03 10:18:35 INFO  e.p.c.ControladorVisualizarPersonajes - Inicializando ControladorVisualizarPersonajes...
-2025-12-03 10:18:35 INFO  es.potersitos.dao.UsuariosDAO - DAO: Llamando a script Python para obtener/actualizar datos.
