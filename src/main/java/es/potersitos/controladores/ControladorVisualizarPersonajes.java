@@ -42,7 +42,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Botones generales de la interfaz. */
     @FXML
-    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnAplicarFiltro, btnLimpiarFiltro,
+    public Button btnFiltrar, btnCerrarFiltro, btnSeleccionar, btnExportar, btnLimpiarFiltro,
             botonImportar, btnEliminarSeleccionados, btnNuevoRapido;
 
     /** Indica si el modo selección está activo. */
@@ -242,7 +242,7 @@ public class ControladorVisualizarPersonajes {
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
         btnExportar.setText(resources.getString("visualizar.btn.exportar"));
-        btnAplicarFiltro.setText(resources.getString("visualizar.filtro.aplicar"));
+        btnExportar.setText(resources.getString("visualizar.btn.exportar"));
         btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
 
         if (selectionModeActive) {
@@ -387,7 +387,6 @@ public class ControladorVisualizarPersonajes {
                 controller.setPersonajeSlug(slug);
 
                 controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
-
 
                 if (selectionModeActive) {
                     controller.setSelectionMode(true);
@@ -733,17 +732,20 @@ public class ControladorVisualizarPersonajes {
      *
      * @author Marco
      */
+    /**
+     * Activa filtrado automático al seleccionar/des seleccionar cualquier opción.
+     *
+     * @author Marco
+     */
     private void configurarListenersFiltros() {
         if (accordionFiltros != null) {
             for (TitledPane pane : accordionFiltros.getPanes()) {
-                if (resources != null && pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
-                    Node content = pane.getContent();
-                    if (content instanceof VBox) {
-                        for (Node node : ((VBox) content).getChildren()) {
-                            if (node instanceof CheckBox cb) {
-                                cb.selectedProperty()
-                                        .addListener((o, ov, nv) -> filtrarPersonajes());
-                            }
+                Node content = pane.getContent();
+                if (content instanceof VBox) {
+                    for (Node node : ((VBox) content).getChildren()) {
+                        if (node instanceof CheckBox cb) {
+                            cb.selectedProperty()
+                                    .addListener((o, ov, nv) -> filtrarPersonajes());
                         }
                     }
                 }
@@ -790,44 +792,126 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Aplica manualmente los filtros actuales del panel.
+     * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de casas.
      *
      * @author Telmo
      */
-    @FXML
-    private void aplicarFiltros() {
-        filtrarPersonajes();
-    }
-
     /**
-     * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de casas.
+     * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de múltiples
+     * categorías.
      *
      * @author Telmo
      */
     private void filtrarPersonajes() {
         String searchText = (searchField != null) ? searchField.getText().toLowerCase() : "";
-        List<String> selectedCasas = new ArrayList<>();
+
+        // Listas para almacenar los índices seleccionados de cada categoría
+        Set<Integer> selectedHousesIndices = new HashSet<>();
+        Set<Integer> selectedNationalityIndices = new HashSet<>();
+        Set<Integer> selectedSpeciesIndices = new HashSet<>();
+        Set<Integer> selectedGenderIndices = new HashSet<>();
 
         if (accordionFiltros != null) {
-            for (TitledPane pane : accordionFiltros.getPanes()) {
-                if (resources != null && pane.getText().equals(resources.getString("filtro.titulo.casa"))) {
-                    Node content = pane.getContent();
-                    if (content instanceof VBox) {
-                        for (Node node : ((VBox) content).getChildren()) {
-                            if (node instanceof CheckBox cb) {
-                                if (cb.isSelected()) {
-                                    selectedCasas.add(cb.getText());
-                                }
+            List<TitledPane> panes = accordionFiltros.getPanes();
+            for (int i = 0; i < panes.size(); i++) {
+                TitledPane pane = panes.get(i);
+                Node content = pane.getContent();
+                if (content instanceof VBox) {
+                    int checkBoxIndex = 0;
+                    for (Node node : ((VBox) content).getChildren()) {
+                        if (node instanceof CheckBox cb && cb.isSelected()) {
+                            switch (i) {
+                                case 0 -> selectedHousesIndices.add(checkBoxIndex);
+                                case 1 -> selectedNationalityIndices.add(checkBoxIndex);
+                                case 2 -> selectedSpeciesIndices.add(checkBoxIndex);
+                                case 3 -> selectedGenderIndices.add(checkBoxIndex);
                             }
                         }
+                        if (node instanceof CheckBox)
+                            checkBoxIndex++;
                     }
                 }
             }
         }
 
         List<Map<String, String>> filtrados = listaPersonajesMapeados.stream()
-                .filter(p -> p.getOrDefault("name", "").toLowerCase().contains(searchText))
-                .filter(p -> selectedCasas.isEmpty() || selectedCasas.contains(p.get("house")))
+                .filter(p -> {
+                    // Filtro de Texto
+                    if (!p.getOrDefault("name", "").toLowerCase().contains(searchText)) {
+                        return false;
+                    }
+
+                    // Filtro de Casa
+                    // Indices: 0:Gryffindor, 1:Slytherin, 2:Hufflepuff, 3:Ravenclaw
+                    if (!selectedHousesIndices.isEmpty()) {
+                        String house = p.getOrDefault("house", "").toLowerCase();
+                        boolean match = false;
+                        if (selectedHousesIndices.contains(0) && house.contains("gryffindor"))
+                            match = true;
+                        if (selectedHousesIndices.contains(1) && house.contains("slytherin"))
+                            match = true;
+                        if (selectedHousesIndices.contains(2) && house.contains("hufflepuff"))
+                            match = true;
+                        if (selectedHousesIndices.contains(3) && house.contains("ravenclaw"))
+                            match = true;
+                        if (!match)
+                            return false;
+                    }
+
+                    // Filtro de Nacionalidad
+                    // Indices: 0:Britanico, 1:Irlandes, 2:Frances, 3:Bulgaro
+                    if (!selectedNationalityIndices.isEmpty()) {
+                        String nac = p.getOrDefault("nationality", "").toLowerCase();
+                        boolean match = false;
+                        if (selectedNationalityIndices.contains(0) && (nac.contains("brit") || nac.contains("kingdom")
+                                || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")))
+                            match = true;
+                        if (selectedNationalityIndices.contains(1)
+                                && (nac.contains("irish") || nac.contains("ireland")))
+                            match = true;
+                        if (selectedNationalityIndices.contains(2)
+                                && (nac.contains("french") || nac.contains("france")))
+                            match = true;
+                        if (selectedNationalityIndices.contains(3)
+                                && (nac.contains("bulgar") || nac.contains("bulgaria")))
+                            match = true;
+                        if (!match)
+                            return false;
+                    }
+
+                    // Filtro de Especie
+                    // Indices: 0:Humano, 1:Mestizo, 2:Elfo, 3:Gigante
+                    if (!selectedSpeciesIndices.isEmpty()) {
+                        String species = p.getOrDefault("species", "").toLowerCase();
+                        boolean match = false;
+                        if (selectedSpeciesIndices.contains(0) && species.equals("human"))
+                            match = true;
+                        if (selectedSpeciesIndices.contains(1)
+                                && (species.contains("half") || species.contains("mixed")))
+                            match = true;
+                        if (selectedSpeciesIndices.contains(2) && (species.contains("elf")))
+                            match = true;
+                        if (selectedSpeciesIndices.contains(3) && (species.contains("giant")))
+                            match = true;
+                        if (!match)
+                            return false;
+                    }
+
+                    // Filtro de Genero
+                    // Indices: 0:Masculino, 1:Femenino
+                    if (!selectedGenderIndices.isEmpty()) {
+                        String gender = p.getOrDefault("gender", "").toLowerCase();
+                        boolean match = false;
+                        if (selectedGenderIndices.contains(0) && gender.equals("male"))
+                            match = true;
+                        if (selectedGenderIndices.contains(1) && gender.equals("female"))
+                            match = true;
+                        if (!match)
+                            return false;
+                    }
+
+                    return true;
+                })
                 .collect(Collectors.toList());
 
         logger.debug("Filtro aplicado. Coincidencias encontradas: {}", filtrados.size());
@@ -893,8 +977,8 @@ public class ControladorVisualizarPersonajes {
             // Cargar icono
             try {
                 stage.getIcons().add(
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-                );
+                        new Image(Objects
+                                .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
             } catch (Exception e) {
                 logger.warn("No se pudo cargar el icono de la ventana");
             }
