@@ -870,6 +870,10 @@ public class ControladorVisualizarPersonajes {
 
             Scene scene = new Scene(root);
 
+            // --- CORRECCIÓN: Fondo de la escena transparente ---
+            // Esto elimina las esquinas blancas detrás de los bordes redondeados
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
                 if (archivoCSS != null) {
@@ -882,11 +886,22 @@ public class ControladorVisualizarPersonajes {
             Stage stage = new Stage();
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
-            stage.getIcons().add(
-                    new Image(Objects
-                            .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
-            stage.initStyle(StageStyle.UNDECORATED);
+
+            // Quitar la decoración de la ventana del sistema operativo
+            stage.initStyle(StageStyle.TRANSPARENT);
+
+            // Cargar icono
+            try {
+                stage.getIcons().add(
+                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+                );
+            } catch (Exception e) {
+                logger.warn("No se pudo cargar el icono de la ventana");
+            }
+
             stage.setResizable(false);
+
+            // Usamos showAndWait para bloquear la ejecución hasta que se cierre la ventana
             stage.showAndWait();
 
             // Recargar datos y limpiar filtros para mostrar el nuevo personaje
