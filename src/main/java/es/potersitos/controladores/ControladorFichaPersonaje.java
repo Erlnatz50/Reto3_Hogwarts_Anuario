@@ -275,7 +275,7 @@ public class ControladorFichaPersonaje {
             if (css != null){
                 scene.getStylesheets().add(css.toExternalForm());
             }
-
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);

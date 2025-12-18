@@ -455,7 +455,7 @@ public class ControladorVisualizarPersonajes {
      * Gestiona los cambios en la selección de personajes.
      *
      * @param controller Instancia del controlador {@link ControladorFichaPersonaje}
-     *                   cuyo estado de selección ha cambiado.
+     * cuyo estado de selección ha cambiado.
      * @author Telmo
      */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
@@ -703,7 +703,7 @@ public class ControladorVisualizarPersonajes {
      * específica.
      *
      * @param numeroPagina Número de página que representa este botón. Debe estar
-     *                     dentro del rango válido de paginación.
+     * dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
@@ -949,29 +949,35 @@ public class ControladorVisualizarPersonajes {
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlResource, this.resources);
-
             Parent root = loader.load();
-
             Scene scene = new Scene(root);
 
-            // --- CORRECCIÓN: Fondo de la escena transparente ---
-            // Esto elimina las esquinas blancas detrás de los bordes redondeados
+            // 1. Configuramos el fondo transparente
             scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
 
-            try {
-                var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
-                if (archivoCSS != null) {
-                    scene.getStylesheets().add(archivoCSS.toExternalForm());
+            // 2. Cargamos el CSS de forma robusta
+            // Asegúrate de que el archivo se llame "nuevoPersonaje.css" en tu carpeta css
+            var cssPath = "/es/potersitos/css/nuevoPersonaje.css";
+            var archivoCSS = getClass().getResource(cssPath);
+
+            if (archivoCSS != null) {
+                scene.getStylesheets().add(archivoCSS.toExternalForm());
+                logger.info("CSS cargado correctamente desde: {}", cssPath);
+            } else {
+                logger.error("!!! ERROR CRÍTICO: No se encuentra el archivo CSS en: {}", cssPath);
+                // Intento de fallback por si acaso se llama estiloNuevo.css
+                var cssBackup = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
+                if (cssBackup != null) {
+                    scene.getStylesheets().add(cssBackup.toExternalForm());
+                    logger.info("CSS cargado usando nombre alternativo (estiloNuevo.css)");
                 }
-            } catch (Exception e) {
-                logger.warn("Error al aplicar CSS: {}", e.getMessage());
             }
 
             Stage stage = new Stage();
             stage.setTitle(resources.getString("menu.archivo.nuevo"));
             stage.setScene(scene);
 
-            // Quitar la decoración de la ventana del sistema operativo
+            // Quitar la decoración de la ventana del sistema operativo (Bordes Windows)
             stage.initStyle(StageStyle.TRANSPARENT);
 
             // Cargar icono
@@ -984,11 +990,9 @@ public class ControladorVisualizarPersonajes {
             }
 
             stage.setResizable(false);
-
-            // Usamos showAndWait para bloquear la ejecución hasta que se cierre la ventana
             stage.showAndWait();
 
-            // Recargar datos y limpiar filtros para mostrar el nuevo personaje
+            // Recargar datos tras cerrar
             listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
             limpiarFiltros();
             calcularTotalPaginas();
@@ -996,6 +1000,7 @@ public class ControladorVisualizarPersonajes {
 
         } catch (Exception e) {
             logger.error("Error al abrir el formulario de nuevo personaje", e);
+            mandarAlertas(Alert.AlertType.ERROR, "Error", "Fallo al abrir ventana", e.getMessage());
         }
     }
 
