@@ -16,6 +16,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
@@ -313,8 +318,68 @@ public class ControladorDatos {
      */
     @FXML
     public void handleActualizar() {
-        mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("actualizar.button"), "",
-                getStringSafe("actualizar.msg"));
+        if (personajeSlug == null || personajeSlug.isEmpty()) {
+            return;
+        }
+
+        try {
+            // 1. Obtener datos actuales del personaje desde el CSV (para tener todos los
+            // campos)
+            List<Map<String, String>> todos = PersonajeCSVManager.leerTodosLosPersonajes();
+            Optional<Map<String, String>> optPersonaje = todos.stream()
+                    .filter(p -> personajeSlug.equalsIgnoreCase(p.getOrDefault("slug", "")))
+                    .findFirst();
+
+            if (optPersonaje.isEmpty()) {
+                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "",
+                        "No se encontraron datos para editar.");
+                return;
+            }
+
+            // 2. Cargar la vista de edición (reutilizando nuevoPersonaje.fxml)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"));
+            if (resources != null) {
+                loader.setResources(resources);
+            }
+            Parent root = loader.load();
+
+            // 3. Pasar los datos al controlador
+            ControladorNuevoPersonaje controller = loader.getController();
+            controller.setDatosPersonaje(optPersonaje.get());
+
+            // 4. Mostrar ventana modal
+            Stage stage = new Stage();
+            stage.setTitle(getStringSafe("menu.archivo.editar"));
+            stage.setScene(new Scene(root));
+
+            // Intentar cargar icono y estilos si es necesario (copiado de
+            // ControladorVisualizarPersonajes)
+            try {
+                stage.getIcons().add(new Image(
+                        Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+            } catch (Exception ignored) {
+            }
+
+            try {
+                var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
+                if (archivoCSS != null)
+                    root.getStylesheets().add(archivoCSS.toExternalForm());
+            } catch (Exception ignored) {
+            }
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+            // 5. Al cerrar, recargar los datos en esta misma vista
+            cargarDatosPersonaje(personajeSlug);
+
+            // Opcional: Feedback visual o log
+            logger.info("Regresando de edición para {}", personajeSlug);
+
+        } catch (Exception e) {
+            logger.error("Error al abrir ventana de edición", e);
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "Fallo al abrir editor", e.getMessage());
+        }
     }
 
     /**
@@ -393,8 +458,6 @@ public class ControladorDatos {
             boolean exito = false;
             try {
                 exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
-                logger.warn("Simulando eliminación de: {}", personajeSlug);
-                exito = true;
             } catch (Exception e) {
                 logger.error("Error real al eliminar el personaje.", e);
             }

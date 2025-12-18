@@ -27,8 +27,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import es.potersitos.util.PersonajeCSVManager;
 
 /**
  * Controlador FXML para crear nuevos personajes de Hogwarts Anuario.
@@ -48,7 +52,8 @@ public class ControladorNuevoPersonaje {
     public TextField idField, typeField, slugField, aliasNamesField, animagusField, bloodStatusField,
             boggartField, bornField, diedField, eyeColorField, trabajoField, miembrosFamiliaField, colorPielField,
             varitaField, genderField, hairColorField, heightField, houseField, imageField, maritalStatusField,
-            nameField, nationalityField, patronusField, speciesField, wikipediaField, romancesField, titulosField, pesoField;
+            nameField, nationalityField, patronusField, speciesField, wikipediaField, romancesField, titulosField,
+            pesoField;
 
     /** Botones del formulario FXML */
     @FXML
@@ -56,6 +61,8 @@ public class ControladorNuevoPersonaje {
 
     /** Bundle del sistema de internacionalización */
     private ResourceBundle resources;
+
+    private boolean editMode = false;
 
     /**
      * Inicializa el controlador.
@@ -71,7 +78,8 @@ public class ControladorNuevoPersonaje {
             }
         }
 
-        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}", resources != null ? resources.getLocale() : "Desconocido");
+        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}",
+                resources != null ? resources.getLocale() : "Desconocido");
     }
 
     /**
@@ -93,62 +101,171 @@ public class ControladorNuevoPersonaje {
     @FXML
     public void onAgregar() {
         try {
+            // Recoger datos en una estrucutra Map para el CSVManager (actualización)
+            Map<String, String> mapaDatos = new HashMap<>();
+
+            mapaDatos.put("id", idField.getText().trim());
+            mapaDatos.put("type", typeField.getText().trim());
+            mapaDatos.put("slug", slugField.getText().trim());
+            mapaDatos.put("alias_names", aliasNamesField.getText().trim());
+            mapaDatos.put("animagus", animagusField.getText().trim());
+            mapaDatos.put("blood_status", bloodStatusField.getText().trim());
+            mapaDatos.put("boggart", boggartField.getText().trim());
+            mapaDatos.put("born", bornField.getText().trim());
+            mapaDatos.put("died", diedField.getText().trim());
+            mapaDatos.put("eye_color", eyeColorField.getText().trim());
+            mapaDatos.put("jobs", trabajoField.getText().trim()); // OJO: jobs vs trabajoField
+            mapaDatos.put("family_members", miembrosFamiliaField.getText().trim());
+            mapaDatos.put("skin_color", colorPielField.getText().trim());
+            mapaDatos.put("wands", varitaField.getText().trim());
+            mapaDatos.put("gender", genderField.getText().trim());
+            mapaDatos.put("hair_color", hairColorField.getText().trim());
+            mapaDatos.put("height", heightField.getText().trim());
+            mapaDatos.put("house", houseField.getText().trim());
+            mapaDatos.put("image", imageField.getText().trim());
+            mapaDatos.put("marital_status", maritalStatusField.getText().trim());
+            mapaDatos.put("name", nameField.getText().trim());
+            mapaDatos.put("nationality", nationalityField.getText().trim());
+            mapaDatos.put("patronus", patronusField.getText().trim());
+            mapaDatos.put("species", speciesField.getText().trim());
+            mapaDatos.put("wiki", wikipediaField.getText().trim());
+            mapaDatos.put("romances", romancesField.getText().trim());
+            mapaDatos.put("titles", titulosField.getText().trim());
+            mapaDatos.put("weight", pesoField.getText().trim());
+
+            // Array para los métodos legacy (guardarXML, guardarBinario, y guardarCSV
+            // antiguo)
+            // Se mantiene el orden EXACTO que tenías antes
             String[] datos = {
-                    idField.getText().trim(),
-                    typeField.getText().trim(),
-                    slugField.getText().trim(),
-                    aliasNamesField.getText().trim(),
-                    animagusField.getText().trim(),
-                    bloodStatusField.getText().trim(),
-                    boggartField.getText().trim(),
-                    bornField.getText().trim(),
-                    diedField.getText().trim(),
-                    eyeColorField.getText().trim(),
-                    trabajoField.getText().trim(),
-                    miembrosFamiliaField.getText().trim(),
-                    colorPielField.getText().trim(),
-                    varitaField.getText().trim(),
-                    genderField.getText().trim(),
-                    hairColorField.getText().trim(),
-                    heightField.getText().trim(),
-                    houseField.getText().trim(),
-                    imageField.getText().trim(),
-                    maritalStatusField.getText().trim(),
-                    nameField.getText().trim(),
-                    nationalityField.getText().trim(),
-                    patronusField.getText().trim(),
-                    speciesField.getText().trim(),
-                    wikipediaField.getText().trim(),
-                    romancesField.getText().trim(),
-                    titulosField.getText().trim(),
-                    pesoField.getText().trim()
+                    mapaDatos.get("id"),
+                    mapaDatos.get("type"),
+                    mapaDatos.get("slug"),
+                    mapaDatos.get("alias_names"),
+                    mapaDatos.get("animagus"),
+                    mapaDatos.get("blood_status"),
+                    mapaDatos.get("boggart"),
+                    mapaDatos.get("born"),
+                    mapaDatos.get("died"),
+                    mapaDatos.get("eye_color"),
+                    mapaDatos.get("jobs"),
+                    mapaDatos.get("family_members"),
+                    mapaDatos.get("skin_color"),
+                    mapaDatos.get("wands"),
+                    mapaDatos.get("gender"),
+                    mapaDatos.get("hair_color"),
+                    mapaDatos.get("height"),
+                    mapaDatos.get("house"),
+                    mapaDatos.get("image"),
+                    mapaDatos.get("marital_status"),
+                    mapaDatos.get("name"),
+                    mapaDatos.get("nationality"),
+                    mapaDatos.get("patronus"),
+                    mapaDatos.get("species"),
+                    mapaDatos.get("wiki"),
+                    mapaDatos.get("romances"),
+                    mapaDatos.get("titles"),
+                    mapaDatos.get("weight")
             };
 
             Path baseDir = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario");
             Files.createDirectories(baseDir);
-            logger.debug("Directorio verificado/creado: {}", baseDir);
 
-            guardarCSV(baseDir, datos);
-            guardarXML(baseDir, datos);
-            guardarBinario(baseDir, datos);
+            if (editMode) {
+                // Modo Edición: Usamos el Manager para actualizar el CSV
+                boolean exito = PersonajeCSVManager.actualizarPersonaje(mapaDatos);
+                if (exito) {
+                    // TODO: Actualizar también XML y Binario si fuera necesario.
+                    // Para este requisito, priorizamos CSV.
+                    logger.info("Personaje actualizado en CSV: {}", mapaDatos.get("name"));
+                    mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
+                            "Personaje Actualizado", "El personaje ha sido modificado correctamente en el CSV.");
+                } else {
+                    throw new Exception("No se pudo actualizar el CSV (quizás el slug no coincide).");
+                }
+            } else {
+                // Modo Creación: Comportamiento original (append)
+                guardarCSV(baseDir, datos);
+                guardarXML(baseDir, datos);
+                guardarBinario(baseDir, datos);
 
-            logger.info("Personaje creado correctamente: {}", datos[20]);
+                logger.info("Personaje creado correctamente: {}", datos[20]); // datos[20] era name en tu array
+                                                                              // original... espera
+                // Re-verificando índices del array original: 20 -> patronus??
+                // En tu código original: 20 -> nameField (línea 117 de array declaration era
+                // index 20 en la lista visual, pero en java array es index 20)
+                // Espera, el array original línea 96 tiene 28 elementos.
+                // index 20 es "name"?
+                // 0:id, 1:type, 2:slug... 18:name, 19:nationality, 20:patronus.
+                // En el codigo original:
+                // 117: nameField.getText().trim(),
+                // nombre es el index 20 en la lista de definicion de arriba:
+                // idField (0), type (1), slug (2), alias (3), animagus (4), blood (5), boggart
+                // (6), born (7), died (8), eye (9), trabajo (10), miembros (11), colorPiel
+                // (12), varita (13), gender (14), hair (15), height (16), house (17), image
+                // (18), marital (19), name (20).
+                // Sí, name está en posición 20. Correcto.
 
-            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
+                        resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
+            }
 
             cancelarButton.getScene().getWindow().hide();
 
         } catch (Exception e) {
             logger.error("Error al guardar el personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("falloAlGuardarPersonaje"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
+                    resources.getString("falloAlGuardarPersonaje"), e.getMessage());
         }
+    }
+
+    public void setDatosPersonaje(Map<String, String> datos) {
+        this.editMode = true;
+        if (agregarButton != null) {
+            agregarButton.setText(resources != null ? resources.getString("menu.archivo.guardar") : "Guardar");
+        }
+
+        idField.setText(datos.getOrDefault("id", ""));
+        typeField.setText(datos.getOrDefault("type", ""));
+        slugField.setText(datos.getOrDefault("slug", ""));
+        // El slug no debería editarse si es la clave, pero lo dejamos editable si el
+        // usuario sabe lo que hace,
+        // OJO: Si cambia el slug, actualizarPersonaje fallará porque busca por slug
+        // viejo.
+        // Lo ideal sería deshabilitar el slug o guardarlo aparte.
+        slugField.setEditable(false); // Recomendación: bloquear slug en edición
+
+        aliasNamesField.setText(datos.getOrDefault("alias_names", ""));
+        animagusField.setText(datos.getOrDefault("animagus", ""));
+        bloodStatusField.setText(datos.getOrDefault("blood_status", ""));
+        boggartField.setText(datos.getOrDefault("boggart", ""));
+        bornField.setText(datos.getOrDefault("born", ""));
+        diedField.setText(datos.getOrDefault("died", ""));
+        eyeColorField.setText(datos.getOrDefault("eye_color", ""));
+        trabajoField.setText(datos.getOrDefault("jobs", ""));
+        miembrosFamiliaField.setText(datos.getOrDefault("family_members", ""));
+        colorPielField.setText(datos.getOrDefault("skin_color", ""));
+        varitaField.setText(datos.getOrDefault("wands", ""));
+        genderField.setText(datos.getOrDefault("gender", ""));
+        hairColorField.setText(datos.getOrDefault("hair_color", ""));
+        heightField.setText(datos.getOrDefault("height", ""));
+        houseField.setText(datos.getOrDefault("house", ""));
+        imageField.setText(datos.getOrDefault("image", ""));
+        maritalStatusField.setText(datos.getOrDefault("marital_status", ""));
+        nameField.setText(datos.getOrDefault("name", ""));
+        nationalityField.setText(datos.getOrDefault("nationality", ""));
+        patronusField.setText(datos.getOrDefault("patronus", ""));
+        speciesField.setText(datos.getOrDefault("species", ""));
+        wikipediaField.setText(datos.getOrDefault("wiki", ""));
+        romancesField.setText(datos.getOrDefault("romances", ""));
+        titulosField.setText(datos.getOrDefault("titles", ""));
+        pesoField.setText(datos.getOrDefault("weight", ""));
     }
 
     /**
      * Guardar personaje en formato CSV (append).
      *
      * @param baseDir Directorio base
-     * @param datos Array de datos del personaje
+     * @param datos   Array de datos del personaje
      * @author Erlantz
      */
     private void guardarCSV(Path baseDir, String[] datos) {
@@ -167,7 +284,7 @@ public class ControladorNuevoPersonaje {
      * Guarda personaje en formato XML (DOM Parser).
      *
      * @param baseDir Directorio base
-     * @param datos Array de datos del personaje
+     * @param datos   Array de datos del personaje
      * @author Erlantz
      */
     private void guardarXML(Path baseDir, String[] datos) {
@@ -228,7 +345,7 @@ public class ControladorNuevoPersonaje {
      * Guarda personaje en formato binario.
      *
      * @param baseDir Directorio base
-     * @param datos Array de datos del personaje
+     * @param datos   Array de datos del personaje
      * @author Erlantz
      */
     private void guardarBinario(Path baseDir, String[] datos) {
@@ -267,7 +384,8 @@ public class ControladorNuevoPersonaje {
      */
     private List<String[]> reconstruirDesdeCSV(Path csvPath) {
         List<String[]> lista = new ArrayList<>();
-        if (!Files.exists(csvPath)) return lista;
+        if (!Files.exists(csvPath))
+            return lista;
 
         try (var reader = Files.newBufferedReader(csvPath)) {
             String linea;

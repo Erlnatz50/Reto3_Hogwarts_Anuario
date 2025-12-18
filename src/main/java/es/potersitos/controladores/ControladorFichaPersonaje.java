@@ -9,8 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color; // <--- IMPORTANTE: Necesario para la transparencia
-import javafx.stage.Modality;    // <--- IMPORTANTE: Para bloquear la ventana de atrás
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.slf4j.Logger;
@@ -113,7 +111,7 @@ public class ControladorFichaPersonaje {
 
             if (nombre != null && !nombre.isBlank()) {
                 String base1 = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
-                encontrado = intentarCargarVariasExtensiones(base1);
+                 encontrado = intentarCargarVariasExtensiones(base1);
             }
 
             if (!encontrado && !nombreBonito.isEmpty()) {
@@ -271,11 +269,6 @@ public class ControladorFichaPersonaje {
             }
 
             Scene scene = new Scene(root);
-
-            // --- CORRECCIÓN CLAVE AQUÍ ---
-            // Hacemos el fondo de la escena transparente para que no pinte blanco detrás
-            scene.setFill(Color.TRANSPARENT);
-
             var css = getClass().getResource("/es/potersitos/css/estiloDatos.css");
             if (css != null){
                 scene.getStylesheets().add(css.toExternalForm());
@@ -283,13 +276,7 @@ public class ControladorFichaPersonaje {
 
             Stage stage = new Stage();
             stage.setScene(scene);
-
-            // Quitamos la decoración de ventana
             stage.initStyle(StageStyle.TRANSPARENT);
-
-            // Hacemos que sea modal (bloquea la ventana de atrás)
-            stage.initModality(Modality.APPLICATION_MODAL);
-
             stage.show();
 
         } catch (IOException e) {
