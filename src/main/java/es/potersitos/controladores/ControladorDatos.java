@@ -42,6 +42,9 @@ public class ControladorDatos {
     /** SLUG del personaje actual (necesario para la eliminación) */
     private String personajeSlug;
 
+    /** Datos del personaje actual */
+    private Map<String, String> personajeActual;
+
     /** Imagen del personaje */
     @FXML
     private ImageView imageView;
@@ -58,7 +61,8 @@ public class ControladorDatos {
     private Button actualizarButton, exportarButton, eliminarButton;
 
     /** Ruta local donde se buscan imágenes de personajes */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
+            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Metodo de inicialización del controlador.
@@ -76,7 +80,8 @@ public class ControladorDatos {
             }
         }
         configurarTextosBotones();
-        logger.info("ControladorDatos inicializado. Idioma: {}", resources != null ? resources.getLocale() : "Desconocido");
+        logger.info("ControladorDatos inicializado. Idioma: {}",
+                resources != null ? resources.getLocale() : "Desconocido");
     }
 
     /**
@@ -149,6 +154,7 @@ public class ControladorDatos {
      * @author Nizam
      */
     private void rellenarInterfaz(Map<String, String> p) {
+        this.personajeActual = p;
         String nombre = p.getOrDefault("name", "");
         String imagePathCSV = p.getOrDefault("image", "");
 
@@ -156,7 +162,8 @@ public class ControladorDatos {
 
         String nombreFormateado = formatearTexto(nombre);
         if (!nombreFormateado.isEmpty()) {
-            imagenCargada = intentarCargarVariasExtensiones(nombreFormateado) || intentarCargarVariasExtensiones(nombre.toLowerCase().replaceAll("\\s+", "-"));
+            imagenCargada = intentarCargarVariasExtensiones(nombreFormateado)
+                    || intentarCargarVariasExtensiones(nombre.toLowerCase().replaceAll("\\s+", "-"));
         }
 
         if (!imagenCargada && !imagePathCSV.isBlank()) {
@@ -176,7 +183,7 @@ public class ControladorDatos {
             cargarImagenPorDefecto();
         }
 
-        establecerTexto(nombreLabel, "nombre.label",nombre);
+        establecerTexto(nombreLabel, "nombre.label", nombre);
         establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
         establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
         establecerTexto(bloodStatusLabel, "bloodStatus.label", p.getOrDefault("blood_status", "N/A"));
@@ -208,23 +215,27 @@ public class ControladorDatos {
      * Intenta cargar una imagen probando varias extensiones comunes.
      *
      * @param base nombre base del archivo sin extensión
-     * @return {@code true} si la imagen se ha cargado correctamente, {@code false} en caso contrario
+     * @return {@code true} si la imagen se ha cargado correctamente, {@code false}
+     *         en caso contrario
      * @author Nizam
      */
     private boolean intentarCargarVariasExtensiones(String base) {
-        return cargarImagenLocal(base + ".png") || cargarImagenLocal(base + ".jpg") || cargarImagenLocal(base + ".jpeg");
+        return cargarImagenLocal(base + ".png") || cargarImagenLocal(base + ".jpg")
+                || cargarImagenLocal(base + ".jpeg");
     }
 
     /**
      * Carga una imagen local forzando su lectura desde disco.
      *
      * @param nombreArchivo nombre del archivo de imagen (incluida la extensión)
-     * @return {@code true} si la imagen existe y se ha cargado correctamente, {@code false} si no existe o ocurre un error
+     * @return {@code true} si la imagen existe y se ha cargado correctamente,
+     *         {@code false} si no existe o ocurre un error
      * @author Nizam
      */
     private boolean cargarImagenLocal(String nombreArchivo) {
         File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
-        if (!archivo.exists()) return false;
+        if (!archivo.exists())
+            return false;
 
         try (FileInputStream fis = new FileInputStream(archivo)) {
             imageView.setImage(new Image(fis));
@@ -258,7 +269,8 @@ public class ControladorDatos {
      * @author Nizam
      */
     private String formatearTexto(String texto) {
-        if (texto == null || texto.isBlank()) return "";
+        if (texto == null || texto.isBlank())
+            return "";
         StringBuilder sb = new StringBuilder();
         for (String p : texto.trim().split("\\s+")) {
             sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1).toLowerCase()).append(" ");
@@ -275,9 +287,12 @@ public class ControladorDatos {
      */
     private String limpiaNombreArchivo(String ruta) {
         String nombre = ruta;
-        if (nombre.contains("/")) nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        if (nombre.contains("?")) nombre = nombre.substring(0, nombre.indexOf("?"));
-        if (nombre.contains(".")) nombre = nombre.substring(0, nombre.lastIndexOf("."));
+        if (nombre.contains("/"))
+            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
+        if (nombre.contains("?"))
+            nombre = nombre.substring(0, nombre.indexOf("?"));
+        if (nombre.contains("."))
+            nombre = nombre.substring(0, nombre.lastIndexOf("."));
         return nombre.replace("%20", " ");
     }
 
@@ -285,7 +300,7 @@ public class ControladorDatos {
      * Establece texto traducido en una etiqueta.
      *
      * @param label etiqueta JavaFX a modificar
-     * @param key clave del {@link ResourceBundle} para el texto base
+     * @param key   clave del {@link ResourceBundle} para el texto base
      * @param valor valor a mostrar junto a la clave traducida
      * @author Marco
      */
@@ -303,7 +318,8 @@ public class ControladorDatos {
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null) return key;
+        if (resources == null)
+            return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -328,7 +344,8 @@ public class ControladorDatos {
      */
     @FXML
     public void handleActualizar() {
-        if (personajeSlug == null || personajeSlug.isBlank()) return;
+        if (personajeSlug == null || personajeSlug.isBlank())
+            return;
 
         try {
             Optional<Map<String, String>> personaje = PersonajeCSVManager.leerTodosLosPersonajes().stream()
@@ -340,8 +357,10 @@ public class ControladorDatos {
                 return;
             }
 
-            ResourceBundle bundle = resources != null ? resources : ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
+            ResourceBundle bundle = resources != null ? resources
+                    : ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"),
+                    bundle);
             Parent root = loader.load();
 
             ControladorNuevoPersonaje controller = loader.getController();
@@ -370,7 +389,8 @@ public class ControladorDatos {
 
         } catch (Exception e) {
             logger.error("Error al abrir ventana de edición", e);
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), getStringSafe("fallo.abrir.editor"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), getStringSafe("fallo.abrir.editor"),
+                    e.getMessage());
         }
     }
 
@@ -400,14 +420,7 @@ public class ControladorDatos {
             parameters.put("Piel", obtenerValor(colorPielLabel));
             parameters.put("Patronus", obtenerValor(patronusLabel));
 
-            if (imageView.getImage() != null) {
-                parameters.put("Imagen", imageView.getImage());
-            } else {
-                InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-                if (imagenStream != null) {
-                    parameters.put("Imagen", imagenStream);
-                }
-            }
+            parameters.put("Imagen", obtenerStreamImagen(personajeActual));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
             JasperViewer.viewReport(jasperPrint, false);
@@ -428,7 +441,8 @@ public class ControladorDatos {
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        if (personajeSlug == null || personajeSlug.isBlank()) return;
+        if (personajeSlug == null || personajeSlug.isBlank())
+            return;
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle(getStringSafe("eliminar.confirm.titulo"));
@@ -477,7 +491,8 @@ public class ControladorDatos {
      * Extrae el valor real de un {@link Label} con formato {@code "Clave: Valor"}.
      *
      * @param label label etiqueta de la cual se extraerá el valor
-     * @return valor textual sin la clave ni el separador, o cadena vacía si el label es nulo
+     * @return valor textual sin la clave ni el separador, o cadena vacía si el
+     *         label es nulo
      * @author Telmo
      */
     private String obtenerValor(Label label) {
@@ -488,5 +503,72 @@ public class ControladorDatos {
             return "";
         int separatorIndex = text.indexOf(": ");
         return (separatorIndex != -1) ? text.substring(separatorIndex + 2).trim() : text.trim();
+    }
+
+    /**
+     * Obtiene un {@link InputStream} de la imagen del personaje probando varias
+     * fuentes.
+     * Prioriza archivos locales, luego URLs y finalmente la imagen por defecto.
+     *
+     * @param p Mapa con los datos del personaje.
+     * @return {@link InputStream} de la imagen.
+     * @author Nizam
+     */
+    private InputStream obtenerStreamImagen(Map<String, String> p) {
+        if (p == null)
+            return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+
+        String nombre = p.getOrDefault("name", "");
+        String imagePathCSV = p.getOrDefault("image", "");
+        String nombreFormateado = formatearTexto(nombre);
+
+        // 1. Intentar por nombre formateado (Local)
+        if (!nombreFormateado.isEmpty()) {
+            InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
+            if (is != null)
+                return is;
+        }
+
+        // 2. Intentar por slug o nombre simple (Local)
+        String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
+        InputStream isNombre = obtenerStreamLocal(baseNombre);
+        if (isNombre != null)
+            return isNombre;
+
+        // 3. Intentar por ruta del CSV (Local o URL)
+        if (!imagePathCSV.isBlank()) {
+            String baseCSV = limpiaNombreArchivo(imagePathCSV);
+            InputStream isCSV = obtenerStreamLocal(baseCSV);
+            if (isCSV != null)
+                return isCSV;
+
+            if (imagePathCSV.startsWith("http")) {
+                try {
+                    return new java.net.URL(imagePathCSV).openStream();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        // 4. Por defecto
+        return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+    }
+
+    /**
+     * Intenta abrir un {@link FileInputStream} para un nombre de archivo base en la
+     * ruta local.
+     */
+    private InputStream obtenerStreamLocal(String base) {
+        String[] extensions = { ".png", ".jpg", ".jpeg" };
+        for (String ext : extensions) {
+            File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
+            if (f.exists()) {
+                try {
+                    return new FileInputStream(f);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return null;
     }
 }

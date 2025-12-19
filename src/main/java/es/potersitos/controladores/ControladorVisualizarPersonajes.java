@@ -110,6 +110,10 @@ public class ControladorVisualizarPersonajes {
     /** Conjunto de identificadores “slug” de los personajes seleccionados. */
     private final Set<String> selectedSlugs = new HashSet<>();
 
+    /** Ruta local donde se buscan imágenes de personajes */
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
+            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+
     /**
      * Metodo de inicialización automática FXML.
      *
@@ -160,7 +164,7 @@ public class ControladorVisualizarPersonajes {
             searchField.textProperty().addListener((o, ov, nv) -> filtrarPersonajes());
         }
     }
-    
+
     /**
      * Activa filtrado automático al seleccionar/des seleccionar cualquier opción.
      *
@@ -242,7 +246,8 @@ public class ControladorVisualizarPersonajes {
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                    resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
         }
     }
 
@@ -326,7 +331,8 @@ public class ControladorVisualizarPersonajes {
             tilePanePersonajes.getChildren().clear();
 
             mensaje.setText(resources.getString("no.se.encontraron.personajes"));
-            mensaje.setStyle("-fx-text-fill: black; -fx-text-alignment: center; -fx-font-size: 18px; -fx-padding: 40px;");
+            mensaje.setStyle(
+                    "-fx-text-fill: black; -fx-text-alignment: center; -fx-font-size: 18px; -fx-padding: 40px;");
             mensaje.setWrapText(true);
 
             VBox contenedor = new VBox(mensaje);
@@ -373,7 +379,8 @@ public class ControladorVisualizarPersonajes {
      * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
-        if (tilePanePersonajes == null) return;
+        if (tilePanePersonajes == null)
+            return;
 
         tilePanePersonajes.getChildren().clear();
         listaControladores = new ArrayList<>();
@@ -394,7 +401,8 @@ public class ControladorVisualizarPersonajes {
         int indiceFin = Math.min(indiceInicio + personajesPorPagina, totalPersonajesLista);
 
         List<Map<String, String>> personajesPagina = personajes.subList(indiceInicio, indiceFin);
-        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})", paginaActual, indiceInicio, indiceFin, personajesPagina.size());
+        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})", paginaActual, indiceInicio,
+                indiceFin, personajesPagina.size());
 
         for (Map<String, String> p : personajesPagina) {
             try {
@@ -482,7 +490,7 @@ public class ControladorVisualizarPersonajes {
      * Gestiona los cambios en la selección de personajes.
      *
      * @param controller Instancia del controlador {@link ControladorFichaPersonaje}
-     * cuyo estado de selección ha cambiado.
+     *                   cuyo estado de selección ha cambiado.
      * @author Telmo
      */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
@@ -503,20 +511,23 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private void exportarSeleccionados() {
         if (selectedSlugs.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.personaje.select"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    resources.getString("no.personaje.select"));
             return;
         }
 
         JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.encuentra.jrxml"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        resources.getString("no.encuentra.jrxml"));
                 return;
             }
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
             return;
         }
 
@@ -524,7 +535,8 @@ public class ControladorVisualizarPersonajes {
         int exportados = 0;
 
         for (String slug : selectedSlugs) {
-            Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream().filter(map -> slug.equals(map.get("slug"))).findFirst();
+            Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
+                    .filter(map -> slug.equals(map.get("slug"))).findFirst();
 
             if (datosOpt.isPresent()) {
                 Map<String, String> p = datosOpt.get();
@@ -540,12 +552,10 @@ public class ControladorVisualizarPersonajes {
                     parameters.put("Piel", p.getOrDefault("skin_color", ""));
                     parameters.put("Patronus", p.getOrDefault("patronus", ""));
 
-                    InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-                    if (imagenStream != null) {
-                        parameters.put("Imagen", imagenStream);
-                    }
+                    parameters.put("Imagen", obtenerStreamImagen(p));
 
-                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+                            new JREmptyDataSource(1));
 
                     jasperPrints.add(jasperPrint);
                     exportados++;
@@ -557,7 +567,8 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.generar.ningun.reporte"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    resources.getString("no.generar.ningun.reporte"));
             return;
         }
 
@@ -574,12 +585,15 @@ public class ControladorVisualizarPersonajes {
             JasperViewer.viewReport(mergedPrint, false);
 
             if (exportados > 0) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", resources.getString("se.han.exportado") + " " + exportados + " " + resources.getString("fichas.en.documento"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                        resources.getString("se.han.exportado") + " " + exportados + " "
+                                + resources.getString("fichas.en.documento"));
             }
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.mostrar.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    resources.getString("error.mostrar.reporte") + " " + e.getMessage());
         }
     }
 
@@ -597,13 +611,14 @@ public class ControladorVisualizarPersonajes {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resources.getString("eliminar.confirm.titulo"));
         alert.setHeaderText(null);
-        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " " + resources.getString("personajes.seleccionados"));
+        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " "
+                + resources.getString("personajes.seleccionados"));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             boolean algunError = false;
             int eliminados = 0;
-            
+
             Set<String> slugsParaBorrar = new HashSet<>(selectedSlugs);
 
             for (String slug : slugsParaBorrar) {
@@ -621,12 +636,14 @@ public class ControladorVisualizarPersonajes {
                 }
                 recargarListaCompleta();
 
-                String msg = resources.getString("se.han.eliminado") + " " + eliminados + " " + resources.getString("personaje.correctamente");
+                String msg = resources.getString("se.han.eliminado") + " " + eliminados + " "
+                        + resources.getString("personaje.correctamente");
                 if (algunError)
                     msg += "\n" + resources.getString("algunos.personajes.no.se.comprobaron");
                 mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", msg);
             } else {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.se.pudo.eliminar.ninguno"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        resources.getString("no.se.pudo.eliminar.ninguno"));
             }
         }
     }
@@ -716,7 +733,7 @@ public class ControladorVisualizarPersonajes {
      * específica.
      *
      * @param numeroPagina Número de página que representa este botón. Debe estar
-     * dentro del rango válido de paginación.
+     *                     dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
@@ -772,11 +789,12 @@ public class ControladorVisualizarPersonajes {
                 }
             }
         }
-        if (searchField != null) searchField.setText("");
+        if (searchField != null)
+            searchField.setText("");
         paginaActual = 1;
         cargarPersonajes(listaPersonajesMapeados);
     }
-    
+
     /**
      * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de múltiples
      * categorías.
@@ -785,7 +803,7 @@ public class ControladorVisualizarPersonajes {
      */
     private void filtrarPersonajes() {
         String searchText = (searchField != null) ? searchField.getText().toLowerCase() : "";
-        
+
         Set<Integer> selectedHousesIndices = new HashSet<>();
         Set<Integer> selectedNationalityIndices = new HashSet<>();
         Set<Integer> selectedSpeciesIndices = new HashSet<>();
@@ -819,24 +837,34 @@ public class ControladorVisualizarPersonajes {
                     if (!p.getOrDefault("name", "").toLowerCase().contains(searchText)) {
                         return false;
                     }
-                    
+
                     if (!selectedHousesIndices.isEmpty()) {
                         String house = p.getOrDefault("house", "").toLowerCase();
-                        boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"), house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
-                        if (!match) return false;
+                        boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"),
+                                house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
+                        if (!match)
+                            return false;
                     }
-                    
+
                     if (!selectedNationalityIndices.isEmpty()) {
                         String nac = p.getOrDefault("nationality", "").toLowerCase();
-                        boolean match = isMatch(selectedNationalityIndices, (nac.contains("brit") || nac.contains("kingdom")
-                                || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")), (nac.contains("irish") || nac.contains("ireland")), (nac.contains("french") || nac.contains("france")), (nac.contains("bulgar") || nac.contains("bulgaria")));
-                        if (!match) return false;
+                        boolean match = isMatch(selectedNationalityIndices,
+                                (nac.contains("brit") || nac.contains("kingdom")
+                                        || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")),
+                                (nac.contains("irish") || nac.contains("ireland")),
+                                (nac.contains("french") || nac.contains("france")),
+                                (nac.contains("bulgar") || nac.contains("bulgaria")));
+                        if (!match)
+                            return false;
                     }
-                    
+
                     if (!selectedSpeciesIndices.isEmpty()) {
                         String species = p.getOrDefault("species", "").toLowerCase();
-                        boolean match = isMatch(selectedSpeciesIndices, species.equals("human"), (species.contains("half") || species.contains("mixed")), (species.contains("elf")), (species.contains("giant")));
-                        if (!match) return false;
+                        boolean match = isMatch(selectedSpeciesIndices, species.equals("human"),
+                                (species.contains("half") || species.contains("mixed")), (species.contains("elf")),
+                                (species.contains("giant")));
+                        if (!match)
+                            return false;
                     }
 
                     if (!selectedGenderIndices.isEmpty()) {
@@ -860,7 +888,8 @@ public class ControladorVisualizarPersonajes {
         cargarPersonajes(filtrados);
     }
 
-    private static boolean isMatch(Set<Integer> selectedSpeciesIndices, boolean species, boolean species1, boolean species2, boolean species3) {
+    private static boolean isMatch(Set<Integer> selectedSpeciesIndices, boolean species, boolean species1,
+            boolean species2, boolean species3) {
         boolean match = selectedSpeciesIndices.contains(0) && species;
         if (selectedSpeciesIndices.contains(1) && species1) {
             match = true;
@@ -927,7 +956,8 @@ public class ControladorVisualizarPersonajes {
             stage.initStyle(StageStyle.TRANSPARENT);
 
             try {
-                stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+                stage.getIcons().add(new Image(
+                        Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
             } catch (Exception e) {
                 logger.warn("No se pudo cargar el icono de la ventana");
             }
@@ -937,7 +967,8 @@ public class ControladorVisualizarPersonajes {
 
         } catch (Exception e) {
             logger.error("Error al abrir el formulario de nuevo personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("fallo.abrir.ventana"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
+                    resources.getString("fallo.abrir.ventana"), e.getMessage());
         }
     }
 
@@ -961,7 +992,8 @@ public class ControladorVisualizarPersonajes {
             String exePath = "lib\\CrearArchivosPotter.exe";
             File exeFile = new File(exePath);
             if (!exeFile.exists()) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("exe.no.encontrado") + "\n" + exeFile.getAbsolutePath());
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        resources.getString("exe.no.encontrado") + "\n" + exeFile.getAbsolutePath());
                 return;
             }
 
@@ -985,13 +1017,15 @@ public class ControladorVisualizarPersonajes {
             boolean binOk = new File(binPath).exists();
 
             if (csvOk && xmlOk && binOk) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", resources.getString("tres.archivos.creados") + "\n" + proyectoPath);
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                        resources.getString("tres.archivos.creados") + "\n" + proyectoPath);
 
                 listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
                 calcularTotalPaginas();
                 cargarPersonajes(listaPersonajesMapeados);
             } else {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", String.format("ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", String.format(
+                        "ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
             }
         } catch (Exception e) {
             mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage());
@@ -1006,20 +1040,23 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void exportarPersonajes() {
         if (listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.hay.personajes.para.exportar"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    resources.getString("no.hay.personajes.para.exportar"));
             return;
         }
 
         JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.encuentra.jrxml"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                        resources.getString("no.encuentra.jrxml"));
                 return;
             }
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
             return;
         }
 
@@ -1039,12 +1076,10 @@ public class ControladorVisualizarPersonajes {
                 parameters.put("Piel", p.getOrDefault("skin_color", ""));
                 parameters.put("Patronus", p.getOrDefault("patronus", ""));
 
-                InputStream imagenStream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-                if (imagenStream != null) {
-                    parameters.put("Imagen", imagenStream);
-                }
+                parameters.put("Imagen", obtenerStreamImagen(p));
 
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+                        new JREmptyDataSource(1));
 
                 jasperPrints.add(jasperPrint);
                 exportados++;
@@ -1055,7 +1090,8 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.generar.ningun.reporte"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
+                    resources.getString("no.generar.ningun.reporte"));
             return;
         }
 
@@ -1069,13 +1105,16 @@ public class ControladorVisualizarPersonajes {
             }
 
             JasperViewer.viewReport(mergedPrint, false);
-            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", resources.getString("exportados") + " " +  exportados + " " + resources.getString("personajes.unico.pdf"));
+            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
+                    resources.getString("exportados") + " " + exportados + " "
+                            + resources.getString("personajes.unico.pdf"));
 
             logger.info("Exportados {} personajes completos", exportados);
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.mostrar.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                    resources.getString("error.mostrar.pdf") + " " + e.getMessage());
         }
     }
 
@@ -1090,14 +1129,16 @@ public class ControladorVisualizarPersonajes {
             Path manualPath = Paths.get("docs/Manual de usuario - Anuario Hogwarts.pdf");
 
             if (!Files.exists(manualPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
+                mandarAlertas(Alert.AlertType.ERROR, "Error", null,
+                        resources.getString("no.se.encontro.manual") + " " + manualPath);
                 return;
             }
 
             Desktop.getDesktop().open(manualPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, "Error", null,
+                    resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
         }
     }
 
@@ -1169,5 +1210,98 @@ public class ControladorVisualizarPersonajes {
         alerta.setContentText(mensaje);
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
+    }
+
+    /**
+     * Obtiene un {@link InputStream} de la imagen del personaje probando varias
+     * fuentes.
+     * Prioriza archivos locales, luego URLs y finalmente la imagen por defecto.
+     *
+     * @param p Mapa con los datos del personaje.
+     * @return {@link InputStream} de la imagen.
+     */
+    private InputStream obtenerStreamImagen(Map<String, String> p) {
+        if (p == null)
+            return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+
+        String nombre = p.getOrDefault("name", "");
+        String imagePathCSV = p.getOrDefault("image", "");
+        String nombreFormateado = formatearTexto(nombre);
+
+        // 1. Intentar por nombre formateado (Local)
+        if (!nombreFormateado.isEmpty()) {
+            InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
+            if (is != null)
+                return is;
+        }
+
+        // 2. Intentar por slug o nombre simple (Local)
+        String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
+        InputStream isNombre = obtenerStreamLocal(baseNombre);
+        if (isNombre != null)
+            return isNombre;
+
+        // 3. Intentar por ruta del CSV (Local o URL)
+        if (!imagePathCSV.isBlank()) {
+            String baseCSV = limpiaNombreArchivo(imagePathCSV);
+            InputStream isCSV = obtenerStreamLocal(baseCSV);
+            if (isCSV != null)
+                return isCSV;
+
+            if (imagePathCSV.startsWith("http")) {
+                try {
+                    return new java.net.URL(imagePathCSV).openStream();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        // 4. Por defecto
+        return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+    }
+
+    /**
+     * Intenta abrir un {@link FileInputStream} para un nombre de archivo base en la
+     * ruta local.
+     */
+    private InputStream obtenerStreamLocal(String base) {
+        String[] extensions = { ".png", ".jpg", ".jpeg" };
+        for (String ext : extensions) {
+            File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
+            if (f.exists()) {
+                try {
+                    return new FileInputStream(f);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Capitaliza palabras de un texto.
+     */
+    private String formatearTexto(String texto) {
+        if (texto == null || texto.isBlank())
+            return "";
+        StringBuilder sb = new StringBuilder();
+        for (String pal : texto.trim().split("\\s+")) {
+            sb.append(Character.toUpperCase(pal.charAt(0))).append(pal.substring(1).toLowerCase()).append(" ");
+        }
+        return sb.toString().trim();
+    }
+
+    /**
+     * Limpia una ruta o URL dejando solo el nombre base del archivo.
+     */
+    private String limpiaNombreArchivo(String ruta) {
+        String nombre = ruta;
+        if (nombre.contains("/"))
+            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
+        if (nombre.contains("?"))
+            nombre = nombre.substring(0, nombre.indexOf("?"));
+        if (nombre.contains("."))
+            nombre = nombre.substring(0, nombre.lastIndexOf("."));
+        return nombre.replace("%20", " ");
     }
 }
