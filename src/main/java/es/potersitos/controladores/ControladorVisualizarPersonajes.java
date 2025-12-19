@@ -273,6 +273,7 @@ public class ControladorVisualizarPersonajes {
         menuEuskera.setText(resources.getString("menu.idioma.euskera"));
         menuIngles.setText(resources.getString("menu.idioma.ingles"));
         menuEspaniol.setText(resources.getString("menu.idioma.espanol"));
+        menuVideoManual.setText(resources.getString("menu.video.tutorial"));
         botonImportar.setText(resources.getString("importar"));
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
