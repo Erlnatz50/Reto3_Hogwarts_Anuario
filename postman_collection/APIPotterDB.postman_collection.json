@@ -1,0 +1,243 @@
+{
+	"info": {
+		"_postman_id": "032248f3-0188-4a3b-ae6c-e1870acee82f",
+		"name": "APIPotterDB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41779493"
+	},
+	"item": [
+		{
+			"name": "Filtros",
+			"item": [
+				{
+					"name": "Filtrar por Gryffindor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?filter[house]=Gryffindor",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "filter[house]",
+									"value": "Gryffindor"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por especie",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?filter[species]=human",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "filter[species]",
+									"value": "human"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por genero",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?filter[gender]=male",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "filter[gender]",
+									"value": "male"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por nacionalidad",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?filter[nationality]=British",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "filter[nationality]",
+									"value": "British"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Datos personaje",
+			"item": [
+				{
+					"name": "Todos los Personajes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Personajes por Pagina",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?page[number]=1&page[size]=10",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "page[number]",
+									"value": "1"
+								},
+								{
+									"key": "page[size]",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get a la API de PotterDB"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Busquedas",
+			"item": [
+				{
+					"name": "Busqueda por nombre",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters/aberforth-dumbledore",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters",
+								"aberforth-dumbledore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Busqueda combinada",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.potterdb.com/v1/characters?filter[house]=Gryffindor&filter[species]=human&filter[gender]=male",
+							"protocol": "https",
+							"host": [
+								"api",
+								"potterdb",
+								"com"
+							],
+							"path": [
+								"v1",
+								"characters"
+							],
+							"query": [
+								{
+									"key": "filter[house]",
+									"value": "Gryffindor"
+								},
+								{
+									"key": "filter[species]",
+									"value": "human"
+								},
+								{
+									"key": "filter[gender]",
+									"value": "male"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
