@@ -60,7 +60,7 @@
             </Menu>
             <Menu text="%menu.ayuda">
                 <MenuItem fx:id="menuManual" onAction="#documentacion" text="%menu.ayuda.documentacion" />
-                <MenuItem fx:id="menuVideoManual" onAction="#videoManual" text="Video Manual" />
+                <MenuItem fx:id="menuVideoManual" onAction="#videoManual" text="%menu.video.tutorial" />
                 <MenuItem fx:id="menuAcercaDe" onAction="#acercaDe" text="%menu.ayuda.acercade" />
             </Menu>
         </MenuBar>
