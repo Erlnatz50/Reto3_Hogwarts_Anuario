@@ -999,7 +999,7 @@ public class ControladorVisualizarPersonajes {
             String xmlPath = proyectoPath + "\\todosPersonajes.xml";
             String binPath = proyectoPath + "\\todosPersonajes.bin";
 
-            String exePath = "lib\\CrearArchivosPotter.exe";
+            String exePath = "..\\lib\\CrearArchivosPotter.exe";
             File exeFile = new File(exePath);
             if (!exeFile.exists()) {
                 mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
@@ -1136,7 +1136,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void documentacion() {
         try {
-            Path manualPath = Paths.get("docs/Manual de usuario - Anuario Hogwarts.pdf");
+            Path manualPath = Paths.get("../docs/Manual de usuario - Anuario Hogwarts.pdf");
 
             if (!Files.exists(manualPath)) {
                 mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
@@ -1158,7 +1158,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void videoManual() {
         try{
-            Path videoPath = Paths.get("docs", "Video Tutorial - Anuario Hogwarts.mp4");
+            Path videoPath = Paths.get("../docs", "Video Tutorial - Anuario Hogwarts.mp4");
 
             if (!Files.exists(videoPath)) {
                 mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.encuentra.videoTutorial"));
