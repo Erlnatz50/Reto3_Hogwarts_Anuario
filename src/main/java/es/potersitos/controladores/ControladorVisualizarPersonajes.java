@@ -797,14 +797,17 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Ejecuta el algoritmo de filtrado combinado de texto + CheckBox de múltiples
+     * Ejecuta el algoritmo de filtrado combinado de texto (Nombre) + CheckBox de múltiples
      * categorías.
      *
      * @author Telmo
      */
     private void filtrarPersonajes() {
-        String searchText = (searchField != null) ? searchField.getText().toLowerCase() : "";
+        // 1. Obtener texto de búsqueda, pasarlo a minúsculas y quitar espacios sobrantes
+        String rawText = (searchField != null) ? searchField.getText() : "";
+        String searchText = rawText.toLowerCase().trim();
 
+        // 2. Recopilar índices de los checkboxes seleccionados
         Set<Integer> selectedHousesIndices = new HashSet<>();
         Set<Integer> selectedNationalityIndices = new HashSet<>();
         Set<Integer> selectedSpeciesIndices = new HashSet<>();
@@ -826,48 +829,53 @@ public class ControladorVisualizarPersonajes {
                                 case 3 -> selectedGenderIndices.add(checkBoxIndex);
                             }
                         }
-                        if (node instanceof CheckBox)
-                            checkBoxIndex++;
+                        if (node instanceof CheckBox) checkBoxIndex++;
                     }
                 }
             }
         }
 
+        // 3. Aplicar filtros usando Streams
         List<Map<String, String>> filtrados = listaPersonajesMapeados.stream()
                 .filter(p -> {
-                    if (!p.getOrDefault("name", "").toLowerCase().contains(searchText)) {
+                    // --- FILTRO POR NOMBRE (BÚSQUEDA) ---
+                    String nombrePersonaje = p.getOrDefault("name", "").toLowerCase();
+
+                    // Si hay texto escrito y el nombre NO lo contiene, descartamos el personaje
+                    if (!searchText.isEmpty() && !nombrePersonaje.contains(searchText)) {
                         return false;
                     }
+                    // ------------------------------------
 
+                    // Filtro de Casa
                     if (!selectedHousesIndices.isEmpty()) {
                         String house = p.getOrDefault("house", "").toLowerCase();
                         boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"),
                                 house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
-                        if (!match)
-                            return false;
+                        if (!match) return false;
                     }
 
+                    // Filtro de Nacionalidad
                     if (!selectedNationalityIndices.isEmpty()) {
                         String nac = p.getOrDefault("nationality", "").toLowerCase();
                         boolean match = isMatch(selectedNationalityIndices,
-                                (nac.contains("brit") || nac.contains("kingdom")
-                                        || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")),
+                                (nac.contains("brit") || nac.contains("kingdom") || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")),
                                 (nac.contains("irish") || nac.contains("ireland")),
                                 (nac.contains("french") || nac.contains("france")),
                                 (nac.contains("bulgar") || nac.contains("bulgaria")));
-                        if (!match)
-                            return false;
+                        if (!match) return false;
                     }
 
+                    // Filtro de Especie
                     if (!selectedSpeciesIndices.isEmpty()) {
                         String species = p.getOrDefault("species", "").toLowerCase();
                         boolean match = isMatch(selectedSpeciesIndices, species.equals("human"),
                                 (species.contains("half") || species.contains("mixed")), (species.contains("elf")),
                                 (species.contains("giant")));
-                        if (!match)
-                            return false;
+                        if (!match) return false;
                     }
 
+                    // Filtro de Género
                     if (!selectedGenderIndices.isEmpty()) {
                         String gender = p.getOrDefault("gender", "").toLowerCase();
                         boolean match = selectedGenderIndices.contains(0) && gender.equals("male");
@@ -876,12 +884,13 @@ public class ControladorVisualizarPersonajes {
                         return match;
                     }
 
-                    return true;
+                    return true; // Si pasa todos los filtros
                 })
                 .collect(Collectors.toList());
 
         logger.debug("Filtro aplicado. Coincidencias encontradas: {}", filtrados.size());
 
+        // 4. Actualizar paginación y vista
         int totalFiltrados = filtrados.size();
         totalPaginas = (int) Math.ceil((double) totalFiltrados / personajesPorPagina);
         paginaActual = 1;
@@ -974,8 +983,7 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Ejecuta el programa externo CrearArchivosPotter.exe para generar archivos
-     * CSV/XML/BIN.
+      * CSV/XML/BIN.
      *
      * @author Erlantz
      */
