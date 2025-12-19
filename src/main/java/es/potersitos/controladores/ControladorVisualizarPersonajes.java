@@ -58,7 +58,7 @@ public class ControladorVisualizarPersonajes {
 
     /** Elementos del menú superior. */
     @FXML
-    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol;
+    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol, menuVideoManual;
 
     /** Contenedor que aloja las fichas de los personajes. */
     @FXML
@@ -152,6 +152,7 @@ public class ControladorVisualizarPersonajes {
         menuSalir.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
         menuAcercaDe.setAccelerator(KeyCombination.keyCombination("Ctrl+D"));
         menuManual.setAccelerator(KeyCombination.keyCombination("Ctrl+M"));
+        menuVideoManual.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
     }
 
     /**
@@ -1129,16 +1130,41 @@ public class ControladorVisualizarPersonajes {
             Path manualPath = Paths.get("docs/Manual de usuario - Anuario Hogwarts.pdf");
 
             if (!Files.exists(manualPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, "Error", null,
-                        resources.getString("no.se.encontro.manual") + " " + manualPath);
+                mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
                 return;
             }
 
             Desktop.getDesktop().open(manualPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error", null,
-                    resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
+        }
+    }
+
+    /**
+     * Abre el videotutorial del manual usando el reproductor del sistema.
+     *
+     * @author Erlantz
+     */
+    @FXML
+    public void videoManual() {
+        try{
+            Path videoPath = Paths.get("docs", "Video Tutorial - Anuario Hogwarts.mp4");
+
+            if (!Files.exists(videoPath)) {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.encuentra.videoTutorial"));
+                return;
+            }
+
+            if (!Desktop.isDesktopSupported()) {
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.soporta.apertura.videoTutorial"));
+                return;
+            }
+
+            Desktop.getDesktop().open(videoPath.toFile());
+
+        } catch (Exception e) {
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.puede.abrir.videoTutorial") + " " + e.getMessage());
         }
     }
 
