@@ -45,9 +45,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            // Detectar el idioma del sistema
-            // Locale locale = Locale.getDefault();
-            Locale locale = Locale.of("es");
+            Locale locale = Locale.getDefault();
 
             resources = ResourceBundle.getBundle("es.potersitos.mensaje", locale);
 
@@ -57,7 +55,6 @@ public class App extends Application {
             Scene scene = new Scene(loaded.load());
             logger.info("FXML cargado correctamente");
 
-            // Comprobar que el archivo de CSS existe y si no mostrar una alerta
             var archivoCSS = getClass().getResource("/es/potersitos/css/estilo.css");
             if (archivoCSS != null) {
                 logger.info("CSS cargado correctamente: {}", archivoCSS.toExternalForm());
@@ -70,7 +67,6 @@ public class App extends Application {
             stage.setTitle("Anuario de Hogwarts");
             stage.setScene(scene);
             stage.setResizable(true);
-            // Icono de la aplicación:
             stage.getIcons().add(
                     new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
             );
@@ -113,6 +109,12 @@ public class App extends Application {
         alerta.setTitle(titulo);
         alerta.setHeaderText(mensajeTitulo);
         alerta.setContentText(mensaje);
+
+        Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
+
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
     }

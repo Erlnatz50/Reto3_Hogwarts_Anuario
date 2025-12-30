@@ -613,8 +613,12 @@ public class ControladorVisualizarPersonajes {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resources.getString("eliminar.confirm.titulo"));
         alert.setHeaderText(null);
-        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " "
-                + resources.getString("personajes.seleccionados"));
+        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " " + resources.getString("personajes.seleccionados"));
+
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -984,7 +988,7 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-      * CSV/XML/BIN.
+     * Crear los archivos CSV, XML y binario.
      *
      * @author Erlantz
      */
@@ -999,7 +1003,12 @@ public class ControladorVisualizarPersonajes {
             String xmlPath = proyectoPath + "\\todosPersonajes.xml";
             String binPath = proyectoPath + "\\todosPersonajes.bin";
 
-            String exePath = "..\\lib\\CrearArchivosPotter.exe";
+            String exePath;
+            if (new File("lib/CrearArchivosPersonajes.exe").exists()) {
+                exePath = "lib/CrearArchivosPersonajes.exe";
+            } else {
+                exePath = "../lib/CrearArchivosPersonajes.exe";
+            }
             File exeFile = new File(exePath);
             if (!exeFile.exists()) {
                 mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
@@ -1136,7 +1145,13 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void documentacion() {
         try {
-            Path manualPath = Paths.get("../docs/Manual de usuario - Anuario Hogwarts.pdf");
+            Path manualPath;
+            Path path = Paths.get("docs/Manual de usuario - Anuario Hogwarts.pdf");
+            if (Files.exists(path)) {
+                manualPath = path;
+            } else {
+                manualPath = Paths.get("../docs/Manual de usuario - Anuario Hogwarts.pdf");
+            }
 
             if (!Files.exists(manualPath)) {
                 mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
@@ -1158,7 +1173,13 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void videoManual() {
         try{
-            Path videoPath = Paths.get("../docs", "Video Tutorial - Anuario Hogwarts.mp4");
+            Path videoPath;
+            Path path = Paths.get("docs/Video Tutorial - Anuario Hogwarts.mp4");
+            if (Files.exists(path)) {
+                videoPath = path;
+            } else {
+                videoPath = Paths.get("../docs/Video Tutorial - Anuario Hogwarts.mp4");
+            }
 
             if (!Files.exists(videoPath)) {
                 mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.encuentra.videoTutorial"));
@@ -1215,11 +1236,16 @@ public class ControladorVisualizarPersonajes {
         alert.setContentText(resources.getString("deseas.salir.aplicacion"));
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
+
         if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
             if (menuBar != null && menuBar.getScene() != null) {
-                Stage stage = (Stage) menuBar.getScene().getWindow();
+                Stage mainStage = (Stage) menuBar.getScene().getWindow();
                 logger.info("Cerrando aplicación desde menú Archivo → Salir...");
-                stage.close();
+                mainStage.close();
             } else {
                 logger.error("No se pudo obtener el Stage para cerrar la ventana.");
             }
@@ -1243,6 +1269,12 @@ public class ControladorVisualizarPersonajes {
         alerta.setTitle(titulo);
         alerta.setHeaderText(mensajeTitulo);
         alerta.setContentText(mensaje);
+
+        Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
+
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
     }
@@ -1263,20 +1295,17 @@ public class ControladorVisualizarPersonajes {
         String imagePathCSV = p.getOrDefault("image", "");
         String nombreFormateado = formatearTexto(nombre);
 
-        // 1. Intentar por nombre formateado (Local)
         if (!nombreFormateado.isEmpty()) {
             InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
             if (is != null)
                 return is;
         }
 
-        // 2. Intentar por slug o nombre simple (Local)
         String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
         InputStream isNombre = obtenerStreamLocal(baseNombre);
         if (isNombre != null)
             return isNombre;
 
-        // 3. Intentar por ruta del CSV (Local o URL)
         if (!imagePathCSV.isBlank()) {
             String baseCSV = limpiaNombreArchivo(imagePathCSV);
             InputStream isCSV = obtenerStreamLocal(baseCSV);
@@ -1291,7 +1320,6 @@ public class ControladorVisualizarPersonajes {
             }
         }
 
-        // 4. Por defecto
         return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
     }
 

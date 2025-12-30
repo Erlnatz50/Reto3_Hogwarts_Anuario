@@ -449,6 +449,11 @@ public class ControladorDatos {
         confirmAlert.setHeaderText(getStringSafe("eliminar.confirm.header"));
         confirmAlert.setContentText(getStringSafe("eliminar.confirm.contenido"));
 
+        Stage stage = (Stage) confirmAlert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
+
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -461,8 +466,8 @@ public class ControladorDatos {
 
             if (exito) {
                 mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", getStringSafe("eliminar.exito"));
-                Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                stage.close();
+                Stage mainStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                mainStage.close();
             } else {
                 mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("eliminar.error"));
             }
@@ -484,6 +489,12 @@ public class ControladorDatos {
         alerta.setTitle(titulo);
         alerta.setHeaderText(mensajeTitulo);
         alerta.setContentText(mensaje);
+
+        Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
+
         alerta.showAndWait();
     }
 
