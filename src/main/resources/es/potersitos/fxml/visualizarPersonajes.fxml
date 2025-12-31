@@ -25,7 +25,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root"
+            xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="es.potersitos.controladores.ControladorVisualizarPersonajes">
 
     <top>
         <MenuBar fx:id="menuBar" prefHeight="28.0" prefWidth="900.0" styleClass="menu-bar">

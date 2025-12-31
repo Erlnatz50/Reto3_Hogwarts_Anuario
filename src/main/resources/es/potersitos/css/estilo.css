@@ -1,21 +1,23 @@
-/* ===== Fondo general ===== */
+/* ==============================
+   ROOT Y PANEL PRINCIPAL
+   ============================== */
 .root {
     -fx-font-family: "Times New Roman", "Georgia", serif;
     -fx-background-color: #9ca796;
-    /* gris verdoso suave */
 }
 
-/* El BorderPane de la ventana de datos */
 .border-pane {
     -fx-background-color: transparent;
 }
 
-/* ===== Panel izquierdo: imagen ===== */
 .left-panel,
 VBox[left] {
     -fx-background-color: transparent;
 }
 
+/* ==============================
+   IMAGEN PRINCIPAL
+   ============================== */
 #imageView {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 20, 0.2, 0, 4);
     -fx-border-color: #3b3b3b;
@@ -24,7 +26,9 @@ VBox[left] {
     -fx-background-color: #f5f5f5;
 }
 
-/* ===== Scroll y contenedor de datos ===== */
+/* ==============================
+   SCROLL PANES
+   ============================== */
 .scroll-pane {
     -fx-background: transparent;
     -fx-background-color: transparent;
@@ -35,17 +39,21 @@ VBox[left] {
     -fx-background-color: transparent;
 }
 
+/* ==============================
+   CONTENEDORES DE DATOS
+   ============================== */
 #datosVBox {
     -fx-background-color: transparent;
 }
 
-/* ===== Etiquetas de datos ===== */
+/* ==============================
+   LABELS
+   ============================== */
 .label {
     -fx-text-fill: #222222;
     -fx-font-size: 13px;
 }
 
-/* Título / nombre del personaje si lo usas como tal */
 #nombreLabel {
     -fx-font-size: 22px;
     -fx-font-weight: normal;
@@ -53,88 +61,67 @@ VBox[left] {
     -fx-letter-spacing: 2px;
 }
 
-/* Resto de campos: estilo “ficha antigua” */
-#aliasLabel,
-#animagusLabel,
-#bloodStatusLabel,
-#boggartLabel,
-#nacidoLabel,
-#fallecidoLabel,
-#colorOjosLabel,
-#familiaresLabel,
-#generoLabel,
-#colorPeloLabel,
-#alturaLabel,
-#casaLabel,
-#imagenLabel,
-#trabajosLabel,
-#estadoCivilLabel,
-#nacionalidadLabel,
-#patronusLabel,
-#romancesLabel,
-#colorPielLabel,
-#especieLabel,
-#titulosLabel,
-#varitasLabel,
-#pesoLabel {
+#aliasLabel, #animagusLabel, #bloodStatusLabel, #boggartLabel, #nacidoLabel, #fallecidoLabel,
+#colorOjosLabel, #familiaresLabel, #generoLabel, #colorPeloLabel, #alturaLabel, #casaLabel,
+#imagenLabel, #trabajosLabel, #estadoCivilLabel, #nacionalidadLabel, #patronusLabel, #romancesLabel,
+#colorPielLabel, #especieLabel, #titulosLabel, #varitasLabel, #pesoLabel {
     -fx-font-size: 14px;
     -fx-text-fill: #343434;
 }
 
-/* Opcional: ligera separación tipo línea */
 #datosVBox .label {
     -fx-padding: 2 0 2 0;
 }
 
-/* ===== Zona inferior: botones ===== */
+/* ==============================
+   CONTENEDORES HORIZONTAL / HBOX
+   ============================== */
 .hbox {
     -fx-background-color: transparent;
 }
 
-/* Estilo base “botón Hogwarts” */
+/* ==============================
+   BOTONES
+   ============================== */
 .button {
-    -fx-background-color: #2f2f2f;
-    -fx-text-fill: #f4f2ec;
+    -fx-background-color: linear-gradient(#6b5a45, #4a3f32);
+     -fx-text-fill: #f4f2ec;
     -fx-font-family: "Times New Roman", "Georgia", serif;
     -fx-font-size: 14px;
     -fx-padding: 6 18 6 18;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-border-color: #111111;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #2e261d;
     -fx-border-width: 1px;
     -fx-cursor: hand;
 }
 
-/* Botón principal (actualizar / seleccionar) un poco más claro */
 #actualizarButton {
-    -fx-background-color: #403f3e;
+    -fx-background-color: linear-gradient(#7b6952, #5a4c3d);
 }
 
-/* Exportar y eliminar pueden compartir estilo base;
-   si quieres que eliminar sea más “peligroso”: */
 #eliminarButton {
-    -fx-background-color: #5a2b2b;
-    -fx-border-color: #2a1111;
+    -fx-background-color: linear-gradient(#4a4743, #2f2d2a);
+    -fx-border-color: #1f1e1c;
 }
 
-/* Hover general */
 .button:hover {
-    -fx-background-color: #181818;
+    -fx-background-color: linear-gradient(#7b6952, #5a4c3d);
 }
 
-/* Pressed */
 .button:pressed {
     -fx-background-color: #000000;
 }
 
-/* ===== Scrollbar tipo varita (simple) ===== */
+/* ==============================
+   BARRAS DE SCROLL
+   ============================== */
 .scroll-bar:vertical {
     -fx-pref-width: 14;
     -fx-background-color: transparent;
 }
 
-.scroll-bar:vertical .increment-button,
-.scroll-bar:vertical .decrement-button {
+.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 4;
 }
@@ -148,7 +135,9 @@ VBox[left] {
     -fx-background-color: #f4f2ec;
 }
 
-/* ===== Paginación (si la añades en otra vista) ===== */
+/* ==============================
+   BOTONES DE PAGINACIÓN
+   ============================== */
 .page-button {
     -fx-background-color: #c3ced0;
     -fx-text-fill: #2b2b2b;
@@ -166,7 +155,9 @@ VBox[left] {
     -fx-text-fill: #f4f2ec;
 }
 
-/* Botón de cerrar filtro (X) */
+/* ==============================
+   BOTÓN DE CERRAR FILTROS
+   ============================== */
 .close-filter-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -182,7 +173,9 @@ VBox[left] {
     -fx-text-fill: #000000;
 }
 
-/* Panel de filtros */
+/* ==============================
+   PANEL DE FILTROS
+   ============================== */
 .filter-panel {
     -fx-background-color: #e8e8e8;
     -fx-padding: 15px;
@@ -191,7 +184,9 @@ VBox[left] {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, -2, 0);
 }
 
-/* Tarjeta de personaje */
+/* ==============================
+   TARJETAS DE PERSONAJES
+   ============================== */
 .character-card {
     -fx-background-color: white;
     -fx-background-radius: 10px;
@@ -209,117 +204,112 @@ VBox[left] {
     -fx-border-color: #3498db;
 }
 
-/* ======================================================= */
-/* NUEVOS ESTILOS PARA LA BÚSQUEDA MÁGICA                  */
-/* ======================================================= */
-
-/* Estilo para los iconos de rayo y gafas */
+/* ==============================
+   ICONOS MÁGICOS
+   ============================== */
 .magic-icon {
     -fx-text-fill: #2c3e50;
     -fx-font-family: "Segoe UI Symbol", "Apple Color Emoji", serif;
     -fx-padding: 0 5 5 0;
 }
 
-/* Estilo para el campo de búsqueda estilo Hogwarts (Transparente) */
+/* ==============================
+   CAMPO DE BÚSQUEDA ESTILO HOGWARTS
+   ============================== */
 .hogwarts-search-field {
     -fx-background-color: transparent;
-    /* Hace el fondo invisible */
     -fx-background-insets: 0;
     -fx-border-color: transparent;
-    /* Quita los bordes */
     -fx-border-width: 0;
-
-    /* Tipografía */
     -fx-text-fill: #1a1a1a;
-    /* Color del texto al escribir */
     -fx-prompt-text-fill: #555555;
-    /* Color de la palabra 'BUSCAR' */
     -fx-font-family: "Times New Roman", "Georgia", serif;
-    /* Fuente con serifa */
     -fx-font-style: italic;
-    /* Cursiva */
     -fx-font-size: 20px;
     -fx-padding: 0;
 }
 
-/* Eliminar el resaltado azul por defecto cuando haces clic */
 .hogwarts-search-field:focused {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-border-width: 0;
 }
 
-/* ===== MENÚ SUPERIOR OSCURO ===== */
+/* ==============================
+   MENU SUPERIOR
+   ============================== */
 .menu-bar {
-    -fx-background-color: linear-gradient(to right, #2c3e50, #34495e);
-    -fx-text-fill: white;
-    -fx-border-color: #1a252f;
+    -fx-background-color: linear-gradient(to right, #8b7a5e, #7b6b52);
+    -fx-border-color: rgba(50, 40, 30, 0.6);
     -fx-border-width: 0 0 2 0;
-}
-
-/* ===== Hover MENÚ PRINCIPAL ===== */
-.menu:hover,
-.menu-button:hover {
-    -fx-background-color: rgba(52, 152, 219, 0.15);
-    -fx-background-radius: 6;
-}
-
-.menu:hover .label,
-.menu-button:hover .label {
-    -fx-text-fill: #3498db;
-    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
 }
 
 .menu-bar .label {
-    -fx-text-fill: #ecf0f1;
+    -fx-text-fill: #f4f2ec;
     -fx-font-size: 14px;
-    -fx-font-weight: 500;
+    -fx-font-weight: bold;
+    -fx-font-family: "Times New Roman", "Georgia", serif;
 }
 
-/* ===== Hover MENÚ DESPLEGABLE ===== */
-.menu-item:hover {
-    -fx-background-color: rgba(52, 152, 219, 0.3);
+.menu, .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
 }
 
-/* ===== Menú desplegable ===== */
+.menu:hover, .menu-button:hover {
+    -fx-background-color: rgba(193, 155, 74, 0.2);
+}
+
+.menu:hover .label, .menu-button:hover .label {
+    -fx-text-fill: #c19b4a;
+}
+
+/* ==============================
+   SUBMENÚS
+   ============================== */
 .context-menu {
-    -fx-background-color: #272727;
-    -fx-border-color: #3b3b3b;
+    -fx-background-color: #7b6b52;
+    -fx-border-color: rgba(50, 40, 30, 0.6);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
 }
 
-.menu-item .label {
-    -fx-text-fill: white;
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f4f2ec;
 }
 
-.menu-item:focused {
-    -fx-background-color: #403f3e;
+.menu-item:hover {
+    -fx-background-color: rgba(193, 155, 74, 0.25);
+    -fx-text-fill: #fffdf8;
 }
 
-.menu-item:focused .label {
-    -fx-text-fill: white;
+.separator-menu-item {
+    -fx-background-color: #6b5a45;
 }
 
+.separator-menu-item .label {
+    -fx-text-fill: #d1c4a4;
+}
+
+/* ==============================
+   BOTONES DE NÚMEROS DE PÁGINA
+   ============================== */
 .page-number-button {
     -fx-font-size: 10.5px;
-    /* Un poco más pequeño */
     -fx-background-radius: 6px;
     -fx-padding: 5 8 5 8;
-    /* Padding más compacto */
     -fx-font-weight: bold;
     -fx-alignment: center;
-    /* Centrar el texto */
-
-    /* Anchos específicos por número de dígitos */
     -fx-min-width: 36px;
-    /* Para "1" */
 }
 
 .page-number-button:dos-digitos {
     -fx-pref-width: 44px;
-    /* Para "10-99" */
 }
 
 .page-number-button:tres-digitos {
     -fx-pref-width: 52px;
-    /* Para "100-525" */
 }

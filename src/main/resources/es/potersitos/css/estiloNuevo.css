@@ -1,8 +1,6 @@
-/* =======================================================
- * nuevoPersonaje.css - Estilo Hogwarts REFINADO (redondeles + botones oscuros)
- * ======================================================= */
-
-/* ===== Fondo principal de la ventana ===== */
+/* ==============================
+   ROOT Y FONDO PRINCIPAL
+   ============================== */
 .root {
     -fx-background-color: linear-gradient(to bottom, #9c8d72, #8b7a5e, #7b6b52);
     -fx-padding: 25;
@@ -14,11 +12,13 @@
     -fx-font-family: "Times New Roman", "Georgia", serif;
 }
 
-/* ===== ScrollPane ===== */
+/* ==============================
+   SCROLL PANES
+   ============================== */
 .scroll-pane {
     -fx-background-color: transparent;
-    -fx-background-radius: 25;     /* ← AÚN MÁS REDONDEADO (era 20) */
-    -fx-border-radius: 25;         /* ← AÚN MÁS REDONDEADO (era 20) */
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
     -fx-border-color: rgba(70, 55, 40, 0.4);
     -fx-border-width: 1.5;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 8, 0, 0, 3);
@@ -28,20 +28,24 @@
     -fx-background-color: rgba(252, 248, 242, 0.95);
 }
 
-/* ===== GridPane del formulario (PERGAMINO ULTRA REDONDEADO) ===== */
+/* ==============================
+   GRID PANE / CONTENEDOR DE DATOS
+   ============================== */
 .grid-pane {
     -fx-background-color: rgba(255, 255, 250, 0.92);
-    -fx-background-radius: 25;     /* ← AÚN MÁS REDONDEADO (era 20) */
-    -fx-border-radius: 25;         /* ← AÚN MÁS REDONDEADO (era 20) */
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
     -fx-border-color: #a49078;
-    -fx-border-width: 2.5;         /* ← Borde más grueso para resaltar */
-    -fx-padding: 35;               /* ← Más espacio interno */
+    -fx-border-width: 2.5;
+    -fx-padding: 35;
     -fx-hgap: 18;
     -fx-vgap: 18;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 15, 0.3, 3, 6);
 }
 
-/* ===== Etiquetas ===== */
+/* ==============================
+   LABELS
+   ============================== */
 .label {
     -fx-text-fill: #3b2f1b;
     -fx-font-size: 14px;
@@ -50,11 +54,13 @@
     -fx-padding: 8 0 4 0;
 }
 
-/* ===== Campos de texto ===== */
+/* ==============================
+   CAMPOS DE TEXTO
+   ============================== */
 .text-field {
     -fx-pref-height: 42;
     -fx-background-color: rgba(255, 255, 255, 0.97);
-    -fx-background-radius: 10;     /* ← Más redondeado */
+    -fx-background-radius: 10;
     -fx-border-radius: 10;
     -fx-border-color: #7b6a54;
     -fx-border-width: 0 0 2.5 0;
@@ -72,7 +78,9 @@
     -fx-background-color: #fffdf8;
 }
 
-/* ===== Tooltips ===== */
+/* ==============================
+   TOOLTIP
+   ============================== */
 .tooltip {
     -fx-font-family: "Georgia", serif;
     -fx-font-size: 12.5px;
@@ -83,60 +91,64 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 8, 0, 0, 3);
 }
 
-/* ===== Botones inferiores (MÁS OSCUROS) ===== */
+/* ==============================
+   CONTENEDORES HORIZONTAL
+   ============================== */
 .hbox {
     -fx-background-color: transparent;
     -fx-spacing: 16;
 }
 
+/* ==============================
+   BOTONES GENERALES
+   ============================== */
 .button {
     -fx-pref-width: 130;
     -fx-pref-height: 44;
     -fx-font-family: "Times New Roman", "Georgia", serif;
     -fx-font-size: 15px;
-    -fx-background-radius: 12;     /* ← Más redondeado */
-    -fx-border-radius: 12;
-    -fx-cursor: hand;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 3);
+    -fx-background-color: linear-gradient(#4a4743, #2f2d2a);
+    -fx-text-fill: #f4f2ec;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #1f1e1c;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.35), 8, 0, 0, 3);
     -fx-transition: all 0.25s ease-in-out;
 }
 
-/* Botón Cancelar – OSCURO rojizo */
-#cancelarButton {
-    -fx-background-color: linear-gradient(#6a2a23, #4f1f18);  /* ← MÁS OSCURO */
-    -fx-text-fill: #f8ede2;
-    -fx-border-color: #2e120e;
+.button:hover {
+    -fx-background-color: linear-gradient(#5a5752, #3a3733);
+}
+
+.button:pressed {
+    -fx-background-color: #1f1e1c;
+}
+
+/* ==============================
+   BOTONES ESPECIALES
+   ============================== */
+#agregarButton, #cancelarButton {
+    -fx-background-color: linear-gradient(#6b5a45, #4a3f32);
+    -fx-text-fill: #f4f2ec;
+    -fx-border-color: #2e261d;
     -fx-border-width: 1.5;
 }
 
-#cancelarButton:hover {
-    -fx-background-color: linear-gradient(#7d362b, #5a231d);
-    -fx-effect: dropshadow(three-pass-box, rgba(50,15,10,0.6), 12, 0, 0, 4);
+#agregarButton:hover, #cancelarButton:hover {
+    -fx-background-color: linear-gradient(#7b6952, #5a4c3d);
+    -fx-effect: dropshadow(three-pass-box, rgba(60,45,30,0.6), 12, 0, 0, 4);
 }
 
-#cancelarButton:pressed {
-    -fx-background-color: #3d150f;
+#agregarButton:pressed, #cancelarButton:pressed {
+    -fx-background-color: #3b3126;
 }
 
-/* Botón Agregar – OSCURO verde esmeralda */
-#agregarButton {
-    -fx-background-color: linear-gradient(#1f4330, #162d22);  /* ← MÁS OSCURO */
-    -fx-text-fill: #f2f0e9;
-    -fx-border-color: #112315;
-    -fx-border-width: 1.5;
-}
-
-#agregarButton:hover {
-    -fx-background-color: linear-gradient(#255037, #1a3627);
-    -fx-effect: dropshadow(three-pass-box, rgba(0,45,0,0.6), 12, 0, 0, 4);
-}
-
-#agregarButton:pressed {
-    -fx-background-color: #0f1d13;
-}
-
-/* ===== Scrollbar ===== */
+/* ==============================
+   BARRAS DE SCROLL VERTICALES
+   ============================== */
 .scroll-bar:vertical {
     -fx-pref-width: 16;
     -fx-background-color: rgba(0,0,0,0.12);

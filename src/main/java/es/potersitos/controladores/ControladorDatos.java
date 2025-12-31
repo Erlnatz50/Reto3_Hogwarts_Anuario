@@ -49,12 +49,20 @@ public class ControladorDatos {
     @FXML
     private ImageView imageView;
 
-    /** Etiquetas FXML que muestran los datos del personaje */
+    /** Etiquetas FXML que muestran los titulos de los datos del personaje */
     @FXML
     private Label nombreLabel, aliasLabel, animagusLabel, bloodStatusLabel, boggartLabel, nacidoLabel,
             fallecidoLabel, colorOjosLabel, familiaresLabel, generoLabel, colorPeloLabel, alturaLabel,
             casaLabel, imagenLabel, trabajosLabel, estadoCivilLabel, nacionalidadLabel, patronusLabel,
             romancesLabel, colorPielLabel, especieLabel, titulosLabel, varitasLabel, pesoLabel;
+
+    /** Etiquetas FXML que muestran los datos del personaje */
+    @FXML
+    private Label nombreDatoLabel, aliasDatoLabel, animagusDatoLabel, bloodStatusDatoLabel, boggartDatoLabel,
+            nacidoDatoLabel, fallecidoDatoLabel, colorOjosDatoLabel, familiaresDatoLabel, generoDatoLabel,
+            colorPeloDatoLabel, alturaDatoLabel, casaDatoLabel, imagenDatoLabel, trabajosDatoLabel,
+            estadoCivilDatoLabel, nacionalidadDatoLabel, patronusDatoLabel, romancesDatoLabel,
+            colorPielDatoLabel, especieDatoLabel, titulosDatoLabel, varitasDatoLabel, pesoDatoLabel;
 
     /** Botones principales de acción */
     @FXML
@@ -183,30 +191,30 @@ public class ControladorDatos {
             cargarImagenPorDefecto();
         }
 
-        establecerTexto(nombreLabel, "nombre.label", nombre);
-        establecerTexto(aliasLabel, "alias.label", p.getOrDefault("alias_names", "N/A"));
-        establecerTexto(animagusLabel, "animagus.label", p.getOrDefault("animagus", "N/A"));
-        establecerTexto(bloodStatusLabel, "bloodStatus.label", p.getOrDefault("blood_status", "N/A"));
-        establecerTexto(boggartLabel, "boggart.label", p.getOrDefault("boggart", "N/A"));
-        establecerTexto(nacidoLabel, "nacido.label", p.getOrDefault("born", "N/A"));
-        establecerTexto(fallecidoLabel, "fallecido.label", p.getOrDefault("died", "N/A"));
-        establecerTexto(colorOjosLabel, "colorOjos.label", p.getOrDefault("eye_color", "N/A"));
-        establecerTexto(familiaresLabel, "familiares.label", p.getOrDefault("family_members", "N/A"));
-        establecerTexto(generoLabel, "genero.label", p.getOrDefault("gender", "N/A"));
-        establecerTexto(colorPeloLabel, "colorPelo.label", p.getOrDefault("hair_color", "N/A"));
-        establecerTexto(alturaLabel, "altura.label", p.getOrDefault("height", "N/A"));
-        establecerTexto(casaLabel, "casa.label", p.getOrDefault("house", "N/A"));
-        establecerTexto(imagenLabel, "imagen.label", imagePathCSV.isEmpty() ? "N/A" : imagePathCSV);
-        establecerTexto(trabajosLabel, "trabajos.label", p.getOrDefault("jobs", "N/A"));
-        establecerTexto(estadoCivilLabel, "estadoCivil.label", p.getOrDefault("marital_status", "N/A"));
-        establecerTexto(nacionalidadLabel, "nacionalidad.label", p.getOrDefault("nationality", "N/A"));
-        establecerTexto(patronusLabel, "patronus.label", p.getOrDefault("patronus", "N/A"));
-        establecerTexto(romancesLabel, "romances.label", p.getOrDefault("romances", "N/A"));
-        establecerTexto(colorPielLabel, "colorPiel.label", p.getOrDefault("skin_color", "N/A"));
-        establecerTexto(especieLabel, "especie.label", p.getOrDefault("species", "N/A"));
-        establecerTexto(titulosLabel, "titulos.label", p.getOrDefault("titles", "N/A"));
-        establecerTexto(varitasLabel, "varitas.label", p.getOrDefault("wands", "N/A"));
-        establecerTexto(pesoLabel, "peso.label", p.getOrDefault("weight", "N/A"));
+        nombreDatoLabel.setText(nombre);
+        aliasDatoLabel.setText(p.get("alias_names"));
+        animagusDatoLabel.setText(p.get("animagus"));
+        bloodStatusDatoLabel.setText(p.get("blood_status"));
+        boggartDatoLabel.setText(p.get("boggart"));
+        nacidoDatoLabel.setText(p.get("born"));
+        fallecidoDatoLabel.setText(p.get("died"));
+        colorOjosDatoLabel.setText(p.get("eye_color"));
+        familiaresDatoLabel.setText(p.get("family_members"));
+        generoDatoLabel.setText(p.get("gender"));
+        colorPeloDatoLabel.setText(p.get("hair_color"));
+        alturaDatoLabel.setText(p.get("height"));
+        casaDatoLabel.setText(p.get("house"));
+        imagenDatoLabel.setText(imagePathCSV);
+        trabajosDatoLabel.setText(p.get("jobs"));
+        estadoCivilDatoLabel.setText(p.get("marital_status"));
+        nacionalidadDatoLabel.setText(p.get("nationality"));
+        patronusDatoLabel.setText(p.get("patronus"));
+        romancesDatoLabel.setText(p.get("romances"));
+        colorPielDatoLabel.setText(p.get("skin_color"));
+        especieDatoLabel.setText(p.get("species"));
+        titulosDatoLabel.setText(p.get("titles"));
+        varitasDatoLabel.setText(p.get("wands"));
+        pesoDatoLabel.setText(p.get("weight"));
 
         personajeSlug = p.get("slug");
     }
@@ -410,15 +418,15 @@ public class ControladorDatos {
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = new HashMap<>();
 
-            parameters.put("Nombre", obtenerValor(nombreLabel));
-            parameters.put("Alias", obtenerValor(aliasLabel));
-            parameters.put("Casa", obtenerValor(casaLabel));
-            parameters.put("Genero", obtenerValor(generoLabel));
-            parameters.put("Especie", obtenerValor(especieLabel));
-            parameters.put("Ojos", obtenerValor(colorOjosLabel));
-            parameters.put("Pelo", obtenerValor(colorPeloLabel));
-            parameters.put("Piel", obtenerValor(colorPielLabel));
-            parameters.put("Patronus", obtenerValor(patronusLabel));
+            parameters.put("Nombre", obtenerValor(nombreDatoLabel));
+            parameters.put("Alias", obtenerValor(aliasDatoLabel));
+            parameters.put("Casa", obtenerValor(casaDatoLabel));
+            parameters.put("Genero", obtenerValor(generoDatoLabel));
+            parameters.put("Especie", obtenerValor(especieDatoLabel));
+            parameters.put("Ojos", obtenerValor(colorOjosDatoLabel));
+            parameters.put("Pelo", obtenerValor(colorPeloDatoLabel));
+            parameters.put("Piel", obtenerValor(colorPielDatoLabel));
+            parameters.put("Patronus", obtenerValor(patronusDatoLabel));
 
             parameters.put("Imagen", obtenerStreamImagen(personajeActual));
 
@@ -501,19 +509,16 @@ public class ControladorDatos {
     /**
      * Extrae el valor real de un {@link Label} con formato {@code "Clave: Valor"}.
      *
-     * @param label label etiqueta de la cual se extraerá el valor
+     * @param datoLabel label etiqueta de la cual se extraerá el valor
      * @return valor textual sin la clave ni el separador, o cadena vacía si el
      *         label es nulo
      * @author Telmo
      */
-    private String obtenerValor(Label label) {
-        if (label == null)
+    private String obtenerValor(Label datoLabel) {
+        if (datoLabel == null)
             return "";
-        String text = label.getText();
-        if (text == null)
-            return "";
-        int separatorIndex = text.indexOf(": ");
-        return (separatorIndex != -1) ? text.substring(separatorIndex + 2).trim() : text.trim();
+        String text = datoLabel.getText();
+        return text == null ? "" : text.trim();
     }
 
     /**
