@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,6 +127,11 @@ public class ControladorNuevoPersonaje {
 
             Map<String, String> mapaDatos = construirMapaDatos();
 
+            String urlImagen = imageField.getText().trim();
+            if (!urlImagen.isEmpty()) {
+                descargarImagen(urlImagen, slugField.getText().trim());
+            }
+
             Path baseDir = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario");
             Files.createDirectories(baseDir);
 
@@ -187,6 +191,24 @@ public class ControladorNuevoPersonaje {
         }
         return slugs;
     }
+
+    private void descargarImagen(String urlImagen, String slug) {
+        if (urlImagen == null || urlImagen.isEmpty()) return;
+
+        String nombreArchivo = slug + ".jpg";
+        Path destino = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario", "imagenes", nombreArchivo);
+
+        try {
+            Files.createDirectories(destino.getParent());
+            try (InputStream in = new URL(urlImagen).openStream()) {
+                Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            logger.info("Imagen descargada/actualizada en: {}", destino);
+        } catch (Exception e) {
+            logger.error("No se pudo descargar/actualizar la imagen desde URL: {}", urlImagen, e);
+        }
+    }
+
 
     /**
      * Configura el formulario en modo edición y carga los datos del personaje.

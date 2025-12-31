@@ -1333,6 +1333,8 @@ public class ControladorVisualizarPersonajes {
     private InputStream obtenerStreamLocal(String base) {
         String[] extensions = { ".png", ".jpg", ".jpeg" };
         for (String ext : extensions) {
+            File dirImagenes = new File(RUTA_LOCAL_IMAGENES);
+            if (!dirImagenes.exists()) dirImagenes.mkdirs();
             File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
             if (f.exists()) {
                 try {
