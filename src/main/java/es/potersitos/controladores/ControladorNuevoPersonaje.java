@@ -112,6 +112,20 @@ public class ControladorNuevoPersonaje {
     @FXML
     public void onAgregar() {
         try {
+            if (!editMode) {
+                idField.setText(UUID.randomUUID().toString());
+
+                String nombre = nameField.getText().trim();
+                if (nombre.isEmpty()) {
+                    mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), resources.getString("alerta.titulo"), resources.getString("alerta.mensaje"));
+                    return;
+                } else {
+                    List<String> slugsExistentes = cargarSlugsExistentes();
+                    String slug = generarSlugUnico(nameField.getText().trim(), slugsExistentes);
+                    slugField.setText(slug);
+                }
+            }
+
             Map<String, String> mapaDatos = construirMapaDatos();
 
             Path baseDir = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario");
@@ -144,6 +158,36 @@ public class ControladorNuevoPersonaje {
         }
     }
 
+    private String generarSlugUnico(String nombre, List<String> slugsExistentes) {
+        String baseSlug = nombre.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
+        String slug = baseSlug;
+        int contador = 1;
+        while (slugsExistentes.contains(slug)) {
+            slug = baseSlug + "-" + contador;
+            contador++;
+        }
+        return slug;
+    }
+
+    private List<String> cargarSlugsExistentes() {
+        List<String> slugs = new ArrayList<>();
+        Path csvPath = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario", "todosPersonajes.csv");
+        if (Files.exists(csvPath)) {
+            try {
+                List<String> lineas = Files.readAllLines(csvPath);
+                for (String linea : lineas) {
+                    String[] campos = linea.split(",");
+                    if (campos.length > 2) {
+                        slugs.add(campos[2]);
+                    }
+                }
+            } catch (IOException e) {
+                logger.warn("No se pudieron cargar los slugs existentes", e);
+            }
+        }
+        return slugs;
+    }
+
     /**
      * Configura el formulario en modo edición y carga los datos del personaje.
      *
@@ -159,7 +203,6 @@ public class ControladorNuevoPersonaje {
         idField.setText(datos.getOrDefault("id", ""));
         typeField.setText(datos.getOrDefault("type", ""));
         slugField.setText(datos.getOrDefault("slug", ""));
-        slugField.setEditable(false);
 
         aliasNamesField.setText(datos.getOrDefault("alias_names", ""));
         animagusField.setText(datos.getOrDefault("animagus", ""));

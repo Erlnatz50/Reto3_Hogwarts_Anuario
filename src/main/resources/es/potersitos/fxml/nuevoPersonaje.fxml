@@ -57,7 +57,7 @@
                     </rowConstraints>
 
                     <Label text="%id.label" GridPane.rowIndex="0" />
-                    <TextField fx:id="idField" promptText="f5a1e23b-2519-406b-8ca3-593262654410" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <TextField fx:id="idField" editable="false" promptText="f5a1e23b-2519-406b-8ca3-593262654410" GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <tooltip>
                             <Tooltip text="%id.textfield.tooltip" />
                         </tooltip>
@@ -71,7 +71,7 @@
                     </TextField>
 
                     <Label text="%slug.label" GridPane.rowIndex="2" />
-                    <TextField fx:id="slugField" promptText="Aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <TextField fx:id="slugField" editable="false" promptText="Aamir-loonat" GridPane.columnIndex="1" GridPane.rowIndex="2">
                         <tooltip>
                             <Tooltip text="%slug.textfield.tooltip" />
                         </tooltip>

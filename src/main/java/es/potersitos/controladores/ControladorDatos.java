@@ -538,20 +538,17 @@ public class ControladorDatos {
         String imagePathCSV = p.getOrDefault("image", "");
         String nombreFormateado = formatearTexto(nombre);
 
-        // 1. Intentar por nombre formateado (Local)
         if (!nombreFormateado.isEmpty()) {
             InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
             if (is != null)
                 return is;
         }
 
-        // 2. Intentar por slug o nombre simple (Local)
         String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
         InputStream isNombre = obtenerStreamLocal(baseNombre);
         if (isNombre != null)
             return isNombre;
 
-        // 3. Intentar por ruta del CSV (Local o URL)
         if (!imagePathCSV.isBlank()) {
             String baseCSV = limpiaNombreArchivo(imagePathCSV);
             InputStream isCSV = obtenerStreamLocal(baseCSV);
@@ -566,7 +563,6 @@ public class ControladorDatos {
             }
         }
 
-        // 4. Por defecto
         return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
     }
 

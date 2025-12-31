@@ -455,6 +455,11 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     private void toggleSelectionMode() {
+        if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            return;
+        }
+
         selectionModeActive = !selectionModeActive;
 
         if (btnSeleccionar != null) {
@@ -808,11 +813,14 @@ public class ControladorVisualizarPersonajes {
      * @author Telmo
      */
     private void filtrarPersonajes() {
-        // 1. Obtener texto de búsqueda, pasarlo a minúsculas y quitar espacios sobrantes
+        if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            return;
+        }
+
         String rawText = (searchField != null) ? searchField.getText() : "";
         String searchText = rawText.toLowerCase().trim();
 
-        // 2. Recopilar índices de los checkboxes seleccionados
         Set<Integer> selectedHousesIndices = new HashSet<>();
         Set<Integer> selectedNationalityIndices = new HashSet<>();
         Set<Integer> selectedSpeciesIndices = new HashSet<>();
@@ -840,19 +848,14 @@ public class ControladorVisualizarPersonajes {
             }
         }
 
-        // 3. Aplicar filtros usando Streams
         List<Map<String, String>> filtrados = listaPersonajesMapeados.stream()
                 .filter(p -> {
-                    // --- FILTRO POR NOMBRE (BÚSQUEDA) ---
                     String nombrePersonaje = p.getOrDefault("name", "").toLowerCase();
 
-                    // Si hay texto escrito y el nombre NO lo contiene, descartamos el personaje
                     if (!searchText.isEmpty() && !nombrePersonaje.contains(searchText)) {
                         return false;
                     }
-                    // ------------------------------------
 
-                    // Filtro de Casa
                     if (!selectedHousesIndices.isEmpty()) {
                         String house = p.getOrDefault("house", "").toLowerCase();
                         boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"),
@@ -860,7 +863,6 @@ public class ControladorVisualizarPersonajes {
                         if (!match) return false;
                     }
 
-                    // Filtro de Nacionalidad
                     if (!selectedNationalityIndices.isEmpty()) {
                         String nac = p.getOrDefault("nationality", "").toLowerCase();
                         boolean match = isMatch(selectedNationalityIndices,
@@ -871,7 +873,6 @@ public class ControladorVisualizarPersonajes {
                         if (!match) return false;
                     }
 
-                    // Filtro de Especie
                     if (!selectedSpeciesIndices.isEmpty()) {
                         String species = p.getOrDefault("species", "").toLowerCase();
                         boolean match = isMatch(selectedSpeciesIndices, species.equals("human"),
@@ -880,7 +881,6 @@ public class ControladorVisualizarPersonajes {
                         if (!match) return false;
                     }
 
-                    // Filtro de Género
                     if (!selectedGenderIndices.isEmpty()) {
                         String gender = p.getOrDefault("gender", "").toLowerCase();
                         boolean match = selectedGenderIndices.contains(0) && gender.equals("male");
@@ -889,13 +889,12 @@ public class ControladorVisualizarPersonajes {
                         return match;
                     }
 
-                    return true; // Si pasa todos los filtros
+                    return true;
                 })
                 .collect(Collectors.toList());
 
         logger.debug("Filtro aplicado. Coincidencias encontradas: {}", filtrados.size());
 
-        // 4. Actualizar paginación y vista
         int totalFiltrados = filtrados.size();
         totalPaginas = (int) Math.ceil((double) totalFiltrados / personajesPorPagina);
         paginaActual = 1;
@@ -935,6 +934,11 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void onNuevo() {
+        if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            return;
+        }
+
         try {
             var fxmlResource = getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml");
             if (fxmlResource == null) {
@@ -1058,9 +1062,8 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void exportarPersonajes() {
-        if (listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    resources.getString("no.hay.personajes.para.exportar"));
+        if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
