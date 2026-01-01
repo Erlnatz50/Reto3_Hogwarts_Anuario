@@ -993,6 +993,7 @@ public class ControladorVisualizarPersonajes {
 
     /**
      * Crear los archivos CSV, XML y binario.
+     * Crear la carpeta imagenes con la imagen de cada personaje.
      *
      * @author Erlantz
      */

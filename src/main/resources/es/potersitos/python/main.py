@@ -1,8 +1,9 @@
 import sys
+import os
 import requests
 import csv
 import pickle
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as element_tree
 import json
 
 
@@ -27,7 +28,7 @@ class Personaje:
         hair_color (str | None): Color de cabello.
         height (str | None): Altura.
         house (str | None): Casa (Gryffindor, etc.).
-        image (str | None): URL o referencia a la imagen.
+        image (str | None): Nombre del archivo de imagen local.
         jobs (list[str]): Ocupaciones.
         marital_status (str | None): Estado civil.
         nationality (str | None): Nacionalidad.
@@ -39,7 +40,6 @@ class Personaje:
         wands (list[dict]): Varitas.
         weight (str | None): Peso.
         wiki (str | None): Enlace a la wikipedia.
-        image_blob (bytes | None): Datos binarios de la imagen.
     """
 
     def __init__(
@@ -72,7 +72,6 @@ class Personaje:
             wands: list[dict] | None = None,
             weight: str | None = None,
             wiki: str | None = None,
-            image_blob: bytes | None = None,
     ):
         """
         Inicializa una instancia de Personaje con los datos proporcionados.
@@ -94,7 +93,7 @@ class Personaje:
             hair_color (str | None): Color de cabello.
             height (str | None): Altura.
             house (str | None): Casa (Gryffindor, etc.).
-            image (str | None): URL o referencia a la imagen.
+            image (str | None): nombre del archivo de imagen local.
             jobs (list[str]): Ocupaciones.
             marital_status (str | None): Estado civil.
             nationality (str | None): Nacionalidad.
@@ -106,7 +105,6 @@ class Personaje:
             wands (list[dict]): Varitas.
             weight (str | None): Peso.
             wiki (str | None): Enlace a la wikipedia.
-            image_blob (bytes | None): Datos binarios de la imagen.
         """
 
         self.id = id
@@ -137,7 +135,6 @@ class Personaje:
         self.wands = wands
         self.weight = weight
         self.wiki = wiki
-        self.image_blob = image_blob
 
 
 class ServicioArchivos:
@@ -182,13 +179,13 @@ class ServicioArchivos:
         if not personajes:
             return
         try:
-            root = ET.Element("characters")
+            root = element_tree.Element("characters")
             for p in personajes:
-                char_elem = ET.SubElement(root, "character")
+                char_elem = element_tree.SubElement(root, "character")
                 for field, value in p.__dict__.items():
-                    elem = ET.SubElement(char_elem, field)
+                    elem = element_tree.SubElement(char_elem, field)
                     elem.text = json.dumps(value, ensure_ascii=False) if isinstance(value, list) and value else str(value or "")
-            tree = ET.ElementTree(root)
+            tree = element_tree.ElementTree(root)
             tree.write(ruta, encoding="utf-8", xml_declaration=True)
         except Exception:
             raise
@@ -207,6 +204,49 @@ class ServicioArchivos:
                 pickle.dump(personajes, f)
         except Exception:
             raise
+
+
+def descargar_imagen(image_url: str, slug: str) -> str:
+    """
+    Descarga la imagen de un personaje desde una URL y la guarda en una carpeta local.
+
+    La imagen se guarda en: Reto3_Hogwarts_Anuario/imagenes
+
+    Parámetros:
+        image_url (str): URL de la imagen del personaje.
+        slug (str): Slug del personaje, usado como nombre del archivo.
+
+    Retorna:
+        str: Nombre del archivo de imagen guardado localmente, o cadena vacía si no se pudo descargar.
+    """
+    if not image_url or not slug:
+        return ""
+
+    try:
+        base_dir = os.path.join(
+            os.path.expanduser("~"),
+            "Reto3_Hogwarts_Anuario",
+            "imagenes"
+        )
+        os.makedirs(base_dir, exist_ok=True)
+
+        ext = ".png" if image_url.lower().endswith(".png") else ".jpg"
+        nombre_archivo = f"{slug}{ext}"
+        ruta_final = os.path.join(base_dir, nombre_archivo)
+
+        if os.path.exists(ruta_final):
+            return nombre_archivo
+
+        resp = requests.get(image_url, timeout=10)
+        if resp.status_code == 200:
+            with open(ruta_final, "wb") as f:
+                f.write(resp.content)
+            return nombre_archivo
+
+    except Exception:
+        raise
+
+    return ""
 
 
 def fetch_personajes() -> list[Personaje]:
@@ -230,6 +270,10 @@ def fetch_personajes() -> list[Personaje]:
         data = resp.json()
         for item in data.get("data", []):
             attrs = item.get("attributes", {})
+
+            image_url = attrs.get("image")
+            imagen_local = descargar_imagen(image_url, attrs.get("slug", ""))
+
             p = Personaje(
                 id=item.get("id", ""),
                 type=item.get("type", ""),
@@ -247,7 +291,7 @@ def fetch_personajes() -> list[Personaje]:
                 hair_color=attrs.get("hair_color"),
                 height=attrs.get("height"),
                 house=attrs.get("house"),
-                image=attrs.get("image"),
+                image=imagen_local,
                 jobs=attrs.get("jobs", []),
                 marital_status=attrs.get("marital_status"),
                 nationality=attrs.get("nationality"),

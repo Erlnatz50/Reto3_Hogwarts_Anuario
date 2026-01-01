@@ -162,6 +162,14 @@ public class ControladorNuevoPersonaje {
         }
     }
 
+    /**
+     * Genera un slug único a partir del nombre del personaje.
+     *
+     * @param nombre Nombre del personaje
+     * @param slugsExistentes Lista de slugs ya existentes
+     * @return Slug único generado
+     * @author Erlantz
+     */
     private String generarSlugUnico(String nombre, List<String> slugsExistentes) {
         String baseSlug = nombre.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
         String slug = baseSlug;
@@ -173,6 +181,12 @@ public class ControladorNuevoPersonaje {
         return slug;
     }
 
+    /**
+     * Carga los slugs de los personajes ya existentes desde el archivo CSV.
+     *
+     * @return Lista de slugs existentes
+     * @author Erlantz
+     */
     private List<String> cargarSlugsExistentes() {
         List<String> slugs = new ArrayList<>();
         Path csvPath = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario", "todosPersonajes.csv");
@@ -192,6 +206,13 @@ public class ControladorNuevoPersonaje {
         return slugs;
     }
 
+    /**
+     * Descarga una imagen desde una URL y la guarda localmente asociada a un personaje.
+     *
+     * @param urlImagen URL de la imagen a descargar
+     * @param slug Slug del personaje, usado como nombre del archivo
+     * @author Erlantz
+     */
     private void descargarImagen(String urlImagen, String slug) {
         if (urlImagen == null || urlImagen.isEmpty()) return;
 
