@@ -1,6 +1,8 @@
 package es.potersitos.controladores;
 
 import es.potersitos.util.PersonajeCSVManager;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -103,6 +105,8 @@ public class ControladorVisualizarPersonajes {
 
     /** Mensaje de error si no hay personajes importados. */
     private Label mensaje;
+
+    private boolean importando = false;
 
     /** Indica si el modo selección está activo. */
     private boolean selectionModeActive = false;
@@ -381,30 +385,28 @@ public class ControladorVisualizarPersonajes {
      * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
-        if (tilePanePersonajes == null)
-            return;
+        if (tilePanePersonajes == null) return;
 
         tilePanePersonajes.getChildren().clear();
         listaControladores = new ArrayList<>();
 
-        int totalPersonajesLista = personajes.size();
-        if (totalPersonajesLista == 0) {
+        int totalPersonajes = personajes.size();
+        if (totalPersonajes == 0) {
             actualizarControlesPaginacion();
             return;
         }
 
         int indiceInicio = (paginaActual - 1) * personajesPorPagina;
-
-        if (indiceInicio >= totalPersonajesLista) {
+        if (indiceInicio >= totalPersonajes) {
             paginaActual = Math.max(1, totalPaginas);
             indiceInicio = (paginaActual - 1) * personajesPorPagina;
         }
 
-        int indiceFin = Math.min(indiceInicio + personajesPorPagina, totalPersonajesLista);
-
+        int indiceFin = Math.min(indiceInicio + personajesPorPagina, totalPersonajes);
         List<Map<String, String>> personajesPagina = personajes.subList(indiceInicio, indiceFin);
-        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})", paginaActual, indiceInicio,
-                indiceFin, personajesPagina.size());
+
+        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})",
+                paginaActual, indiceInicio, indiceFin, personajesPagina.size());
 
         for (Map<String, String> p : personajesPagina) {
             try {
@@ -414,15 +416,17 @@ public class ControladorVisualizarPersonajes {
 
                 ControladorFichaPersonaje controller = loader.getController();
 
+                String slug = p.getOrDefault("slug", "");
+                controller.setPersonajeSlug(slug);
+
                 String nombre = p.getOrDefault("name", "N/A");
                 String casa = p.getOrDefault("house", "Desconocida");
-                String imagePath = p.getOrDefault("image", "");
-                String slug = p.getOrDefault("slug", UUID.randomUUID().toString());
 
-                controller.setData(nombre, casa, imagePath);
-                controller.setPersonajeSlug(slug);
+                String imagenArchivo = p.getOrDefault("image", "");
+
+                controller.setData(nombre, casa, imagenArchivo);
+
                 controller.setOnRefreshListener(this::recargarListaCompleta);
-
                 controller.setOnSelectionChanged(() -> handleSelectionChange(controller));
 
                 if (selectionModeActive) {
@@ -434,6 +438,7 @@ public class ControladorVisualizarPersonajes {
 
                 listaControladores.add(controller);
                 tilePanePersonajes.getChildren().add(card);
+
             } catch (IOException e) {
                 logger.error("Error al cargar la ficha del personaje", e);
             }
@@ -442,9 +447,9 @@ public class ControladorVisualizarPersonajes {
         if (selectionModeActive) {
             actualizarEstadoBotonExportar();
         }
-
         actualizarControlesPaginacion();
     }
+
 
     /**
      * Alterna entre modo normal y modo selección de personajes para exportación.
@@ -999,61 +1004,70 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void crearArchivos() {
-        try {
-            String userHome = System.getProperty("user.home");
-            String proyectoPath = userHome + "\\Reto3_Hogwarts_Anuario";
-            new File(proyectoPath).mkdirs();
+        if (importando) return;
+        importando = true;
 
-            String csvPath = proyectoPath + "\\todosPersonajes.csv";
-            String xmlPath = proyectoPath + "\\todosPersonajes.xml";
-            String binPath = proyectoPath + "\\todosPersonajes.bin";
+        botonImportar.setDisable(true);
+        mensaje.setText(resources.getString("procesando.espera"));
+        mensaje.setVisible(true);
 
-            String exePath;
-            if (new File("lib/CrearArchivosPersonajes.exe").exists()) {
-                exePath = "lib/CrearArchivosPersonajes.exe";
-            } else {
-                exePath = "../lib/CrearArchivosPersonajes.exe";
-            }
-            File exeFile = new File(exePath);
-            if (!exeFile.exists()) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                        resources.getString("exe.no.encontrado") + "\n" + exeFile.getAbsolutePath());
-                return;
-            }
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
 
-            ProcessBuilder pb = new ProcessBuilder(exePath, csvPath, xmlPath, binPath);
-            pb.redirectErrorStream(true);
-            Process proceso = pb.start();
+                String userHome = System.getProperty("user.home");
+                String proyectoPath = userHome + File.separator + "Reto3_Hogwarts_Anuario";
+                new File(proyectoPath).mkdirs();
 
-            StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()))) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    output.append(linea).append("\n");
+                String csvPath = proyectoPath + File.separator + "todosPersonajes.csv";
+                String xmlPath = proyectoPath + File.separator + "todosPersonajes.xml";
+                String binPath = proyectoPath + File.separator + "todosPersonajes.bin";
+
+                String exePath = new File("lib/CrearArchivosPersonajes.exe").exists()
+                        ? "lib/CrearArchivosPersonajes.exe"
+                        : "../lib/CrearArchivosPersonajes.exe";
+
+                File exeFile = new File(exePath);
+                if (!exeFile.exists()) {
+                    Platform.runLater(() ->
+                            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("exe.no.encontrado")));
+                    return null;
                 }
+
+                try {
+                    ProcessBuilder pb = new ProcessBuilder(exePath, csvPath, xmlPath, binPath);
+                    pb.redirectErrorStream(true);
+                    Process proceso = pb.start();
+                    proceso.waitFor();
+                } catch (Exception e) {
+                    logger.error("Error ejecutando el EXE", e);
+                    Platform.runLater(() ->
+                            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage()));
+                }
+
+                return null;
             }
+        };
 
-            int exitCode = proceso.waitFor();
-            logger.info("PYTHON OUTPUT: {}", output);
+        task.setOnSucceeded(e -> finalizarImportacion());
+        task.setOnFailed(e -> finalizarImportacion());
 
-            boolean csvOk = new File(csvPath).exists();
-            boolean xmlOk = new File(xmlPath).exists();
-            boolean binOk = new File(binPath).exists();
+        new Thread(task).start();
+    }
 
-            if (csvOk && xmlOk && binOk) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
-                        resources.getString("tres.archivos.creados") + "\n" + proyectoPath);
+    /**
+     * Finaliza el proceso de importación de personajes.
+     *
+     * @author Erlantz
+     */
+    private void finalizarImportacion() {
+        importando = false;
+        botonImportar.setDisable(false);
+        mensaje.setVisible(false);
 
-                listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
-                calcularTotalPaginas();
-                cargarPersonajes(listaPersonajesMapeados);
-            } else {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", String.format(
-                        "ExitCode: %d\nCSV: %s\nXML: %s\nBIN: %s\n\n%s", exitCode, csvOk, xmlOk, binOk, output));
-            }
-        } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage());
-        }
+        listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
+        calcularTotalPaginas();
+        cargarPersonajes(listaPersonajesMapeados);
     }
 
     /**
@@ -1292,35 +1306,15 @@ public class ControladorVisualizarPersonajes {
      * @return {@link InputStream} de la imagen.
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
-        if (p == null)
+        if (p == null) {
             return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-
-        String nombre = p.getOrDefault("name", "");
-        String imagePathCSV = p.getOrDefault("image", "");
-        String nombreFormateado = formatearTexto(nombre);
-
-        if (!nombreFormateado.isEmpty()) {
-            InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
-            if (is != null)
-                return is;
         }
 
-        String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
-        InputStream isNombre = obtenerStreamLocal(baseNombre);
-        if (isNombre != null)
-            return isNombre;
-
-        if (!imagePathCSV.isBlank()) {
-            String baseCSV = limpiaNombreArchivo(imagePathCSV);
-            InputStream isCSV = obtenerStreamLocal(baseCSV);
-            if (isCSV != null)
-                return isCSV;
-
-            if (imagePathCSV.startsWith("http")) {
-                try {
-                    return new java.net.URL(imagePathCSV).openStream();
-                } catch (Exception ignored) {
-                }
+        String slug = p.getOrDefault("slug", "").trim().toLowerCase();
+        if (!slug.isEmpty()) {
+            InputStream isSlug = obtenerStreamLocal(slug);
+            if (isSlug != null) {
+                return isSlug;
             }
         }
 
@@ -1334,14 +1328,11 @@ public class ControladorVisualizarPersonajes {
     private InputStream obtenerStreamLocal(String base) {
         String[] extensions = { ".png", ".jpg", ".jpeg" };
         for (String ext : extensions) {
-            File dirImagenes = new File(RUTA_LOCAL_IMAGENES);
-            if (!dirImagenes.exists()) dirImagenes.mkdirs();
             File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
             if (f.exists()) {
                 try {
                     return new FileInputStream(f);
-                } catch (Exception ignored) {
-                }
+                } catch (FileNotFoundException ignored) {}
             }
         }
         return null;

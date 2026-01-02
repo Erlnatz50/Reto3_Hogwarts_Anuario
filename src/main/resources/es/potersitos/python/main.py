@@ -223,14 +223,19 @@ def descargar_imagen(image_url: str, slug: str) -> str:
         return ""
 
     try:
-        base_dir = os.path.join(
-            os.path.expanduser("~"),
-            "Reto3_Hogwarts_Anuario",
-            "imagenes"
-        )
+        base_dir = os.path.join(os.path.expanduser("~"),"Reto3_Hogwarts_Anuario","imagenes")
         os.makedirs(base_dir, exist_ok=True)
 
-        ext = ".png" if image_url.lower().endswith(".png") else ".jpg"
+        ext = ".jpg"
+        if image_url.lower().endswith(".png"):
+            ext = ".png"
+        elif image_url.lower().endswith(".jpeg"):
+            ext = ".jpeg"
+        elif image_url.lower().endswith(".gif"):
+            ext = ".gif"
+        elif image_url.lower().endswith(".webp"):
+            ext = ".webp"
+
         nombre_archivo = f"{slug}{ext}"
         ruta_final = os.path.join(base_dir, nombre_archivo)
 

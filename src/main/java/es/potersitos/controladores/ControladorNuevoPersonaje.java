@@ -116,7 +116,8 @@ public class ControladorNuevoPersonaje {
 
                 String nombre = nameField.getText().trim();
                 if (nombre.isEmpty()) {
-                    mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), resources.getString("alerta.titulo"), resources.getString("alerta.mensaje"));
+                    mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"),
+                            resources.getString("alerta.titulo"), resources.getString("alerta.mensaje"));
                     return;
                 } else {
                     List<String> slugsExistentes = cargarSlugsExistentes();
@@ -125,11 +126,21 @@ public class ControladorNuevoPersonaje {
                 }
             }
 
+            String urlImagen = imageField.getText().trim();
+            String nombreImagenLocal = "";
+
+            if (!urlImagen.isEmpty()) {
+                if (urlImagen.startsWith("http")) {
+                    nombreImagenLocal = descargarImagen(urlImagen, slugField.getText().trim());
+                } else {
+                    nombreImagenLocal = urlImagen;
+                }
+            }
+
             Map<String, String> mapaDatos = construirMapaDatos();
 
-            String urlImagen = imageField.getText().trim();
-            if (!urlImagen.isEmpty()) {
-                descargarImagen(urlImagen, slugField.getText().trim());
+            if (!nombreImagenLocal.isEmpty()) {
+                mapaDatos.put("image", nombreImagenLocal);
             }
 
             Path baseDir = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario");
@@ -140,14 +151,16 @@ public class ControladorNuevoPersonaje {
                 if (!exito) {
                     logger.warn("No se pudo actualizar el personaje en el CSV");
                 }
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
+                        resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
             } else {
                 String[] datos = construirArrayLegacy(mapaDatos);
                 guardarCSV(baseDir, datos);
                 guardarXML(baseDir, datos);
                 guardarBinario(baseDir, datos);
 
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
+                        resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
             }
 
             cancelarButton.getScene().getWindow().hide();
@@ -158,7 +171,8 @@ public class ControladorNuevoPersonaje {
 
         } catch (Exception e) {
             logger.error("Error al guardar el personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("falloAlGuardarPersonaje"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
+                    resources.getString("falloAlGuardarPersonaje"), e.getMessage());
         }
     }
 
@@ -213,11 +227,11 @@ public class ControladorNuevoPersonaje {
      * @param slug Slug del personaje, usado como nombre del archivo
      * @author Erlantz
      */
-    private void descargarImagen(String urlImagen, String slug) {
-        if (urlImagen == null || urlImagen.isEmpty()) return;
+    private String descargarImagen(String urlImagen, String slug) {
+        if (urlImagen == null || urlImagen.isEmpty()) return "";
 
         String nombreArchivo = slug + ".jpg";
-        Path destino = Paths.get(System.getProperty("user.home"), "Reto3_Hogwarts_Anuario", "imagenes", nombreArchivo);
+        Path destino = Paths.get(System.getProperty("user.home"),"Reto3_Hogwarts_Anuario", "imagenes", nombreArchivo);
 
         try {
             Files.createDirectories(destino.getParent());
@@ -225,11 +239,12 @@ public class ControladorNuevoPersonaje {
                 Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
             logger.info("Imagen descargada/actualizada en: {}", destino);
+            return nombreArchivo;
         } catch (Exception e) {
             logger.error("No se pudo descargar/actualizar la imagen desde URL: {}", urlImagen, e);
+            return "";
         }
     }
-
 
     /**
      * Configura el formulario en modo edición y carga los datos del personaje.

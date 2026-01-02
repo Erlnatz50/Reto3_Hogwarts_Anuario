@@ -97,40 +97,34 @@ public class ControladorFichaPersonaje {
      *
      * @param nombre    Nombre del personaje.
      * @param casa      Casa de Hogwarts a la que pertenece.
-     * @param imagePath Ruta o nombre del archivo de imagen.
+     * @param imagenArchivo Slug del personaje
      * @author Nizam
      */
-    public void setData(String nombre, String casa, String imagePath) {
-        String nombreFormateado = formatearTexto(nombre);
-        labelNombre.setText(nombreFormateado);
+    public void setData(String nombre, String casa, String imagenArchivo) {
+        labelNombre.setText(formatearTexto(nombre));
         labelCasa.setText(formatearTexto(casa));
         aplicarEstiloCasa(casa);
 
-        boolean imagenCargada = false;
+        cargarImagen(imagenArchivo);
+    }
 
-        try {
-            if (nombre != null && !nombre.isBlank()) {
-                String base = nombre.toLowerCase().trim().replaceAll("\\s+", "-");
-                imagenCargada = intentarCargarVariasExtensiones(base);
+    private void cargarImagen(String nombreArchivo) {
+        if (nombreArchivo != null && !nombreArchivo.isEmpty()) {
+            File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
+            logger.info("Intentando cargar imagen desde: {}", archivo.getAbsolutePath());
+
+            if (archivo.exists()) {
+                try {
+                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
+                    return;
+                } catch (Exception e) {
+                    logger.warn("No se pudo cargar la imagen {}", nombreArchivo, e);
+                }
+            } else {
+                logger.warn("Archivo de imagen no encontrado: {}", archivo.getAbsolutePath());
             }
-
-            if (!imagenCargada && !nombreFormateado.isBlank()) {
-                String base = nombreFormateado.replaceAll("\\s+", "-");
-                imagenCargada = intentarCargarVariasExtensiones(base) || intentarCargarVariasExtensiones(nombreFormateado);
-            }
-
-            if (!imagenCargada && imagePath != null && !imagePath.isBlank() && !"null".equalsIgnoreCase(imagePath)) {
-                String baseCSV = limpiaNombreArchivo(imagePath);
-                imagenCargada = intentarCargarVariasExtensiones(baseCSV);
-            }
-
-        } catch (Exception e) {
-            logger.error("Error al cargar la imagen del personaje", e);
         }
-
-        if (!imagenCargada) {
-            cargarImagenPorDefecto();
-        }
+        cargarImagenPorDefecto();
     }
 
     /**
