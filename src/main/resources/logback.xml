@@ -1,7 +1,7 @@
 <configuration>
 
     <!-- Nivel por defecto para el proyecto -->
-    <root level="debug">
+    <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
@@ -23,12 +23,12 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>logs/app.%i.log</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>1</maxIndex>
+            <maxIndex>3</maxIndex>
         </rollingPolicy>
 
         <!-- Tamaño máximo del archivo -->
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <maxFileSize>1MB</maxFileSize>
+            <maxFileSize>10MB</maxFileSize>
         </triggeringPolicy>
 
         <!-- Formato de los Logs del archivo -->
