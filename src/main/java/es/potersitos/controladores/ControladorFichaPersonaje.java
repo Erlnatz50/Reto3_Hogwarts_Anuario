@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -109,55 +110,19 @@ public class ControladorFichaPersonaje {
     }
 
     private void cargarImagen(String nombreArchivo) {
-        if (nombreArchivo != null && !nombreArchivo.isEmpty()) {
-            File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
-            logger.info("Intentando cargar imagen desde: {}", archivo.getAbsolutePath());
-
-            if (archivo.exists()) {
-                try {
-                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
-                    return;
-                } catch (Exception e) {
-                    logger.warn("No se pudo cargar la imagen {}", nombreArchivo, e);
-                }
-            } else {
-                logger.warn("Archivo de imagen no encontrado: {}", archivo.getAbsolutePath());
-            }
-        }
-        cargarImagenPorDefecto();
-    }
-
-    /**
-     * Ruta o nombre del archivo de imagen.
-     *
-     * @param nombreBase Nombre base del archivo de imagen.
-     * @return {@code true} si se encontró y cargó una imagen válida, {@code false}
-     *         en caso contrario.
-     * @author Nizam
-     */
-    private boolean intentarCargarVariasExtensiones(String nombreBase) {
-        return cargarImagenLocal(nombreBase + ".png") || cargarImagenLocal(nombreBase + ".jpg") || cargarImagenLocal(nombreBase + ".jpeg");
-    }
-
-    /**
-     * Carga una imagen local desde el sistema de archivos.
-     *
-     * @param nombreArchivo nombre del archivo de imagen
-     * @return {@code true} si la imagen se carga correctamente
-     * @author Nizam
-     */
-    private boolean cargarImagenLocal(String nombreArchivo) {
-        File archivo = new File(RUTA_LOCAL_IMAGENES + nombreArchivo);
-        if (!archivo.exists()) {
-            return false;
+        if (nombreArchivo == null || nombreArchivo.isBlank()) {
+            cargarImagenPorDefecto();
+            return;
         }
 
-        try (FileInputStream fis = new FileInputStream(archivo)) {
-            imagePersonaje.setImage(new Image(fis));
-            return true;
-        } catch (IOException e) {
-            logger.warn("No se ha podido cargar la imagen {}", nombreArchivo);
-            return false;
+        File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
+        logger.info("Cargando imagen: {}", archivo.getAbsolutePath());
+
+        if (archivo.exists()) {
+            imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
+        } else {
+            logger.warn("Imagen no encontrada: {}", archivo.getAbsolutePath());
+            cargarImagenPorDefecto();
         }
     }
 
@@ -196,37 +161,13 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Limpia el nombre del archivo extraído de una URL o ruta, eliminando
-     * extensiones y caracteres especiales.
-     *
-     * @param ruta Ruta o URL con el nombre del archivo.
-     * @return Nombre simple y limpio del archivo.
-     * @author Nizam
-     */
-    private String limpiaNombreArchivo(String ruta) {
-        String nombre = ruta;
-        if (nombre.contains("/")) {
-            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        }
-        if (nombre.contains("?")) {
-            nombre = nombre.substring(0, nombre.indexOf("?"));
-        }
-        if (nombre.contains(".")) {
-            nombre = nombre.substring(0, nombre.lastIndexOf("."));
-        }
-        return nombre.replace("%20", " ");
-    }
-
-    /**
      * Aplica un color distintivo a la etiqueta de casa según la casa del personaje.
      *
      * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y Hufflepuff).
      * @author Nizam
      */
     private void aplicarEstiloCasa(String casa) {
-        if (casa == null) {
-            return;
-        }
+        if (casa == null) return;
         String estiloBase = "-fx-font-weight: bold; -fx-text-fill: ";
         switch (casa.toLowerCase().trim()) {
             case "gryffindor" -> labelCasa.setStyle(estiloBase + "#740001;");
@@ -273,6 +214,7 @@ public class ControladorFichaPersonaje {
                 scene.getStylesheets().add(css.toExternalForm());
             }
             scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);

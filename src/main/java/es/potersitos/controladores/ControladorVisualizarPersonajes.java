@@ -1298,70 +1298,37 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Obtiene un {@link InputStream} de la imagen del personaje probando varias
-     * fuentes.
-     * Prioriza archivos locales, luego URLs y finalmente la imagen por defecto.
+     * Obtiene un InputStream de la imagen del personaje.
+     * Prioriza archivos locales y usa una imagen por defecto si no existe.
      *
      * @param p Mapa con los datos del personaje.
      * @return {@link InputStream} de la imagen.
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
-        if (p == null) {
-            return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-        }
+        if (p == null) return imagenPorDefecto();
 
-        String slug = p.getOrDefault("slug", "").trim().toLowerCase();
-        if (!slug.isEmpty()) {
-            InputStream isSlug = obtenerStreamLocal(slug);
-            if (isSlug != null) {
-                return isSlug;
-            }
-        }
-
-        return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-    }
-
-    /**
-     * Intenta abrir un {@link FileInputStream} para un nombre de archivo base en la
-     * ruta local.
-     */
-    private InputStream obtenerStreamLocal(String base) {
-        String[] extensions = { ".png", ".jpg", ".jpeg" };
-        for (String ext : extensions) {
-            File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
-            if (f.exists()) {
+        String nombreImagen = p.getOrDefault("image", "").trim();
+        if (!nombreImagen.isEmpty()) {
+            Path ruta = Paths.get(RUTA_LOCAL_IMAGENES, nombreImagen);
+            if (Files.exists(ruta)) {
+                logger.info("Cargando imagen desde: {}", ruta.toAbsolutePath());
                 try {
-                    return new FileInputStream(f);
-                } catch (FileNotFoundException ignored) {}
+                    return Files.newInputStream(ruta);
+                } catch (IOException e) {
+                    logger.error("Error abriendo imagen: {}", ruta, e);
+                }
+            } else {
+                logger.warn("Imagen no encontrada: {}", ruta.toAbsolutePath());
             }
         }
-        return null;
+
+        logger.info("Usando imagen por defecto para {}", p.getOrDefault("name", "N/A"));
+        return imagenPorDefecto();
     }
 
-    /**
-     * Capitaliza palabras de un texto.
-     */
-    private String formatearTexto(String texto) {
-        if (texto == null || texto.isBlank())
-            return "";
-        StringBuilder sb = new StringBuilder();
-        for (String pal : texto.trim().split("\\s+")) {
-            sb.append(Character.toUpperCase(pal.charAt(0))).append(pal.substring(1).toLowerCase()).append(" ");
-        }
-        return sb.toString().trim();
-    }
-
-    /**
-     * Limpia una ruta o URL dejando solo el nombre base del archivo.
-     */
-    private String limpiaNombreArchivo(String ruta) {
-        String nombre = ruta;
-        if (nombre.contains("/"))
-            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        if (nombre.contains("?"))
-            nombre = nombre.substring(0, nombre.indexOf("?"));
-        if (nombre.contains("."))
-            nombre = nombre.substring(0, nombre.lastIndexOf("."));
-        return nombre.replace("%20", " ");
+    private InputStream imagenPorDefecto() {
+        return getClass().getResourceAsStream(
+                "/es/potersitos/img/persona_predeterminado.png"
+        );
     }
 }

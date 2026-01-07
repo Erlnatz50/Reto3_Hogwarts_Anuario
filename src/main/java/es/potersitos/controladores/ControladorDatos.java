@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javafx.fxml.FXMLLoader;
@@ -32,31 +33,45 @@ import net.sf.jasperreports.view.JasperViewer;
  */
 public class ControladorDatos {
 
-    /** Logger para esta clase */
+    /**
+     * Logger para esta clase
+     */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
-    /** Bundle del sistema de internacionalización. */
+    /**
+     * Bundle del sistema de internacionalización.
+     */
     @FXML
     private ResourceBundle resources;
 
-    /** SLUG del personaje actual (necesario para la eliminación) */
+    /**
+     * SLUG del personaje actual (necesario para la eliminación)
+     */
     private String personajeSlug;
 
-    /** Datos del personaje actual */
+    /**
+     * Datos del personaje actual
+     */
     private Map<String, String> personajeActual;
 
-    /** Imagen del personaje */
+    /**
+     * Imagen del personaje
+     */
     @FXML
     private ImageView imageView;
 
-    /** Etiquetas FXML que muestran los titulos de los datos del personaje */
+    /**
+     * Etiquetas FXML que muestran los titulos de los datos del personaje
+     */
     @FXML
     private Label nombreLabel, aliasLabel, animagusLabel, bloodStatusLabel, boggartLabel, nacidoLabel,
             fallecidoLabel, colorOjosLabel, familiaresLabel, generoLabel, colorPeloLabel, alturaLabel,
             casaLabel, imagenLabel, trabajosLabel, estadoCivilLabel, nacionalidadLabel, patronusLabel,
             romancesLabel, colorPielLabel, especieLabel, titulosLabel, varitasLabel, pesoLabel;
 
-    /** Etiquetas FXML que muestran los datos del personaje */
+    /**
+     * Etiquetas FXML que muestran los datos del personaje
+     */
     @FXML
     private Label nombreDatoLabel, aliasDatoLabel, animagusDatoLabel, bloodStatusDatoLabel, boggartDatoLabel,
             nacidoDatoLabel, fallecidoDatoLabel, colorOjosDatoLabel, familiaresDatoLabel, generoDatoLabel,
@@ -64,11 +79,15 @@ public class ControladorDatos {
             estadoCivilDatoLabel, nacionalidadDatoLabel, patronusDatoLabel, romancesDatoLabel,
             colorPielDatoLabel, especieDatoLabel, titulosDatoLabel, varitasDatoLabel, pesoDatoLabel;
 
-    /** Botones principales de acción */
+    /**
+     * Botones principales de acción
+     */
     @FXML
     private Button actualizarButton, exportarButton, eliminarButton;
 
-    /** Ruta local donde se buscan imágenes de personajes */
+    /**
+     * Ruta local donde se buscan imágenes de personajes
+     */
     private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
             + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
@@ -162,57 +181,47 @@ public class ControladorDatos {
      * @author Nizam
      */
     private void rellenarInterfaz(Map<String, String> p) {
-        this.personajeActual = p;
+        personajeActual = p;
         String nombre = p.getOrDefault("name", "");
-        String imagePathCSV = p.getOrDefault("image", "");
+        String imageName = p.getOrDefault("image", "").trim();
 
-        boolean imagenCargada = false;
-
-        String nombreFormateado = formatearTexto(nombre);
-        if (!nombreFormateado.isEmpty()) {
-            imagenCargada = intentarCargarVariasExtensiones(nombreFormateado)
-                    || intentarCargarVariasExtensiones(nombre.toLowerCase().replaceAll("\\s+", "-"));
-        }
-
-        if (!imagenCargada && !imagePathCSV.isBlank()) {
-            String base = limpiaNombreArchivo(imagePathCSV);
-            imagenCargada = intentarCargarVariasExtensiones(base);
-
-            if (!imagenCargada && imagePathCSV.startsWith("http")) {
-                try {
-                    imageView.setImage(new Image(imagePathCSV, true));
-                    imagenCargada = true;
-                } catch (Exception ignored) {
+        if (!imageName.isEmpty()) {
+            File imgFile = Paths.get(RUTA_LOCAL_IMAGENES, imageName).toFile();
+            if (imgFile.exists()) {
+                try (FileInputStream fis = new FileInputStream(imgFile)) {
+                    imageView.setImage(new Image(fis));
+                } catch (Exception e) {
+                    cargarImagenPorDefecto();
                 }
+            } else {
+                cargarImagenPorDefecto();
             }
-        }
-
-        if (!imagenCargada) {
+        } else {
             cargarImagenPorDefecto();
         }
 
         nombreDatoLabel.setText(nombre);
-        aliasDatoLabel.setText(p.get("alias_names"));
+        aliasDatoLabel.setText(formatearListaJSON(p.get("alias_names")));
         animagusDatoLabel.setText(p.get("animagus"));
         bloodStatusDatoLabel.setText(p.get("blood_status"));
         boggartDatoLabel.setText(p.get("boggart"));
         nacidoDatoLabel.setText(p.get("born"));
         fallecidoDatoLabel.setText(p.get("died"));
         colorOjosDatoLabel.setText(p.get("eye_color"));
-        familiaresDatoLabel.setText(p.get("family_members"));
+        familiaresDatoLabel.setText(formatearListaJSON(p.get("family_members")));
         generoDatoLabel.setText(p.get("gender"));
         colorPeloDatoLabel.setText(p.get("hair_color"));
         alturaDatoLabel.setText(p.get("height"));
         casaDatoLabel.setText(p.get("house"));
-        imagenDatoLabel.setText(imagePathCSV);
-        trabajosDatoLabel.setText(p.get("jobs"));
+        imagenDatoLabel.setText(imageName);
+        trabajosDatoLabel.setText(formatearListaJSON(p.get("jobs")));
         estadoCivilDatoLabel.setText(p.get("marital_status"));
         nacionalidadDatoLabel.setText(p.get("nationality"));
         patronusDatoLabel.setText(p.get("patronus"));
-        romancesDatoLabel.setText(p.get("romances"));
+        romancesDatoLabel.setText(formatearListaJSON(p.get("romances")));
         colorPielDatoLabel.setText(p.get("skin_color"));
         especieDatoLabel.setText(p.get("species"));
-        titulosDatoLabel.setText(p.get("titles"));
+        titulosDatoLabel.setText(formatearListaJSON(p.get("titles")));
         varitasDatoLabel.setText(p.get("wands"));
         pesoDatoLabel.setText(p.get("weight"));
 
@@ -220,24 +229,11 @@ public class ControladorDatos {
     }
 
     /**
-     * Intenta cargar una imagen probando varias extensiones comunes.
-     *
-     * @param base nombre base del archivo sin extensión
-     * @return {@code true} si la imagen se ha cargado correctamente, {@code false}
-     *         en caso contrario
-     * @author Nizam
-     */
-    private boolean intentarCargarVariasExtensiones(String base) {
-        return cargarImagenLocal(base + ".png") || cargarImagenLocal(base + ".jpg")
-                || cargarImagenLocal(base + ".jpeg");
-    }
-
-    /**
      * Carga una imagen local forzando su lectura desde disco.
      *
      * @param nombreArchivo nombre del archivo de imagen (incluida la extensión)
      * @return {@code true} si la imagen existe y se ha cargado correctamente,
-     *         {@code false} si no existe o ocurre un error
+     * {@code false} si no existe o ocurre un error
      * @author Nizam
      */
     private boolean cargarImagenLocal(String nombreArchivo) {
@@ -249,7 +245,7 @@ public class ControladorDatos {
             imageView.setImage(new Image(fis));
             return true;
         } catch (Exception e) {
-            logger.warn("No se ha podido cargar la imagen {}", nombreArchivo);
+            logger.warn("No se ha podido cargar la imagen {}", nombreArchivo, e);
             return false;
         }
     }
@@ -267,41 +263,6 @@ public class ControladorDatos {
         } catch (Exception e) {
             logger.error("No se ha podido cargar la imagen por defecto.", e);
         }
-    }
-
-    /**
-     * Capitaliza palabras de un texto.
-     *
-     * @param texto texto original a formatear
-     * @return texto con cada palabra capitalizada, o cadena vacía si es nulo
-     * @author Nizam
-     */
-    private String formatearTexto(String texto) {
-        if (texto == null || texto.isBlank())
-            return "";
-        StringBuilder sb = new StringBuilder();
-        for (String p : texto.trim().split("\\s+")) {
-            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1).toLowerCase()).append(" ");
-        }
-        return sb.toString().trim();
-    }
-
-    /**
-     * Limpia una ruta o URL dejando solo el nombre base del archivo.
-     *
-     * @param ruta ruta completa o URL de una imagen
-     * @return nombre base del archivo sin extensión ni parámetros
-     * @author Nizam
-     */
-    private String limpiaNombreArchivo(String ruta) {
-        String nombre = ruta;
-        if (nombre.contains("/"))
-            nombre = nombre.substring(nombre.lastIndexOf("/") + 1);
-        if (nombre.contains("?"))
-            nombre = nombre.substring(0, nombre.indexOf("?"));
-        if (nombre.contains("."))
-            nombre = nombre.substring(0, nombre.lastIndexOf("."));
-        return nombre.replace("%20", " ");
     }
 
     /**
@@ -352,8 +313,10 @@ public class ControladorDatos {
      */
     @FXML
     public void handleActualizar() {
-        if (personajeSlug == null || personajeSlug.isBlank())
+        if (personajeSlug == null || personajeSlug.isBlank()) {
+            logger.warn("handleActualizar llamado sin personajeSlug válido");
             return;
+        }
 
         try {
             Optional<Map<String, String>> personaje = PersonajeCSVManager.leerTodosLosPersonajes().stream()
@@ -385,7 +348,7 @@ public class ControladorDatos {
                     scene.getStylesheets().add(archivoCSS.toExternalForm());
                 }
             } catch (Exception e) {
-                logger.warn("Error al aplicar CSS: {}", e.getMessage());
+                logger.warn("Error al aplicar CSS", e);
             }
 
             stage.setScene(scene);
@@ -449,8 +412,10 @@ public class ControladorDatos {
      */
     @FXML
     public void handleEliminar(ActionEvent event) {
-        if (personajeSlug == null || personajeSlug.isBlank())
+        if (personajeSlug == null || personajeSlug.isBlank()) {
+            logger.warn("handleEliminar llamado sin personajeSlug válido");
             return;
+        }
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle(getStringSafe("eliminar.confirm.titulo"));
@@ -489,7 +454,6 @@ public class ControladorDatos {
      * @param titulo        Título de la alerta
      * @param mensajeTitulo Encabezado del mensaje
      * @param mensaje       Contenido del mensaje
-     *
      * @author Erlantz
      */
     private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
@@ -511,7 +475,7 @@ public class ControladorDatos {
      *
      * @param datoLabel label etiqueta de la cual se extraerá el valor
      * @return valor textual sin la clave ni el separador, o cadena vacía si el
-     *         label es nulo
+     * label es nulo
      * @author Telmo
      */
     private String obtenerValor(Label datoLabel) {
@@ -531,56 +495,33 @@ public class ControladorDatos {
      * @author Nizam
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
-        if (p == null)
-            return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+        try {
+            if (p == null) {
+                return imagenPorDefecto();
+            }
 
-        String nombre = p.getOrDefault("name", "");
-        String imagePathCSV = p.getOrDefault("image", "");
-        String nombreFormateado = formatearTexto(nombre);
-
-        if (!nombreFormateado.isEmpty()) {
-            InputStream is = obtenerStreamLocal(formatearTexto(nombreFormateado).replace(" ", "-").toLowerCase());
-            if (is != null)
-                return is;
-        }
-
-        String baseNombre = nombre.toLowerCase().replaceAll("\\s+", "-");
-        InputStream isNombre = obtenerStreamLocal(baseNombre);
-        if (isNombre != null)
-            return isNombre;
-
-        if (!imagePathCSV.isBlank()) {
-            String baseCSV = limpiaNombreArchivo(imagePathCSV);
-            InputStream isCSV = obtenerStreamLocal(baseCSV);
-            if (isCSV != null)
-                return isCSV;
-
-            if (imagePathCSV.startsWith("http")) {
-                try {
-                    return new java.net.URL(imagePathCSV).openStream();
-                } catch (Exception ignored) {
+            String imageName = p.getOrDefault("image", "").trim();
+            if (!imageName.isEmpty()) {
+                File imgFile = Paths.get(RUTA_LOCAL_IMAGENES, imageName).toFile();
+                if (imgFile.exists()) {
+                    return new FileInputStream(imgFile);
                 }
             }
+        } catch (Exception e) {
+            logger.warn("Error cargando imagen para Jasper", e);
         }
 
-        return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
+        return imagenPorDefecto();
     }
 
-    /**
-     * Intenta abrir un {@link FileInputStream} para un nombre de archivo base en la
-     * ruta local.
-     */
-    private InputStream obtenerStreamLocal(String base) {
-        String[] extensions = { ".png", ".jpg", ".jpeg" };
-        for (String ext : extensions) {
-            File f = new File(RUTA_LOCAL_IMAGENES + base + ext);
-            if (f.exists()) {
-                try {
-                    return new FileInputStream(f);
-                } catch (Exception ignored) {
-                }
-            }
-        }
-        return null;
+    private InputStream imagenPorDefecto() {
+        return getClass().getResourceAsStream(
+                "/es/potersitos/img/persona_predeterminado.png"
+        );
+    }
+
+    private String formatearListaJSON(String jsonLista) {
+        if (jsonLista == null || jsonLista.isEmpty()) return "";
+        return jsonLista.replaceAll("[\\[\\]\"]", "").trim();
     }
 }
