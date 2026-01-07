@@ -7,150 +7,40 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane styleClass="root" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorDatos">
+<StackPane styleClass="root" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.potersitos.controladores.ControladorDatos">
 
     <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
 
         <left>
             <VBox alignment="CENTER" spacing="10">
                 <padding>
-                    <Insets bottom="10" left="10" right="10" top="10" />
+                    <Insets bottom="10" left="10" right="15" top="10" />
                 </padding>
                 <ImageView id="imageView" fx:id="imageView" fitHeight="250" fitWidth="200" preserveRatio="true" />
             </VBox>
         </left>
-
+ 
         <center>
-            <VBox BorderPane.alignment="CENTER">
-                <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-                    <VBox fx:id="datosVBox" spacing="8" styleClass="datos-container">
-                        <padding>
-                            <Insets bottom="10" left="10" right="10" top="10" />
-                        </padding>
-
-                        <HBox prefHeight="17.0" prefWidth="119.0" spacing="5">
-                            <Label fx:id="nombreLabel" styleClass="label-titulo" text="%nombre.label" />
-                            <Label fx:id="nombreDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="aliasLabel" styleClass="label-titulo" text="%alias.label" />
-                            <Label fx:id="aliasDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="animagusLabel" styleClass="label-titulo" text="%animagus.label" />
-                            <Label fx:id="animagusDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="bloodStatusLabel" styleClass="label-titulo" text="%bloodStatus.label" />
-                            <Label fx:id="bloodStatusDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="boggartLabel" styleClass="label-titulo" text="%boggart.label" />
-                            <Label fx:id="boggartDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="nacidoLabel" styleClass="label-titulo" text="%nacido.label" />
-                            <Label fx:id="nacidoDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="fallecidoLabel" styleClass="label-titulo" text="%fallecido.label" />
-                            <Label fx:id="fallecidoDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="colorOjosLabel" styleClass="label-titulo" text="%colorOjos.label" />
-                            <Label fx:id="colorOjosDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="familiaresLabel" styleClass="label-titulo" text="%familiares.label" />
-                            <Label fx:id="familiaresDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="generoLabel" styleClass="label-titulo" text="%genero.label" />
-                            <Label fx:id="generoDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="colorPeloLabel" styleClass="label-titulo" text="%colorPelo.label" />
-                            <Label fx:id="colorPeloDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="alturaLabel" styleClass="label-titulo" text="%altura.label" />
-                            <Label fx:id="alturaDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="casaLabel" styleClass="label-titulo" text="%casa.label" />
-                            <Label fx:id="casaDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="imagenLabel" styleClass="label-titulo" text="%imagen.label" />
-                            <Label fx:id="imagenDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="trabajosLabel" styleClass="label-titulo" text="%trabajos.label" />
-                            <Label fx:id="trabajosDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="estadoCivilLabel" styleClass="label-titulo" text="%estadoCivil.label" />
-                            <Label fx:id="estadoCivilDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="nacionalidadLabel" styleClass="label-titulo" text="%nacionalidad.label" />
-                            <Label fx:id="nacionalidadDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="patronusLabel" styleClass="label-titulo" text="%patronus.label" />
-                            <Label fx:id="patronusDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="romancesLabel" styleClass="label-titulo" text="%romances.label" />
-                            <Label fx:id="romancesDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="colorPielLabel" styleClass="label-titulo" text="%colorPiel.label" />
-                            <Label fx:id="colorPielDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="especieLabel" styleClass="label-titulo" text="%especie.label" />
-                            <Label fx:id="especieDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="titulosLabel" styleClass="label-titulo" text="%titulos.label" />
-                            <Label fx:id="titulosDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="varitasLabel" styleClass="label-titulo" text="%varitas.label" />
-                            <Label fx:id="varitasDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
-
-                        <HBox spacing="5">
-                            <Label fx:id="pesoLabel" styleClass="label-titulo" text="%peso.label" />
-                            <Label fx:id="pesoDatoLabel" styleClass="label-dato" text="" />
-                        </HBox>
+            <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane">
+                    <VBox alignment="CENTER_LEFT">
+                        <GridPane fx:id="datosGrid" hgap="6" vgap="8" styleClass="datos-container">
+                            <padding>
+                                <Insets bottom="10" left="10" right="10" top="10" />
+                            </padding>
+                            <columnConstraints>
+                                <!-- Columna para títulos: alineada a la izquierda junto a la foto -->
+                                <ColumnConstraints halignment="LEFT" minWidth="120" prefWidth="120" maxWidth="120" />
+                                <!-- Columna para datos: crece para ocupar el resto -->
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" />
+                            </columnConstraints>
+                        </GridPane>
                     </VBox>
                 </ScrollPane>
             </VBox>

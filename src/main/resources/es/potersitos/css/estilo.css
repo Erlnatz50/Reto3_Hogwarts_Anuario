@@ -61,16 +61,55 @@ VBox[left] {
     -fx-letter-spacing: 2px;
 }
 
-#aliasLabel, #animagusLabel, #bloodStatusLabel, #boggartLabel, #nacidoLabel, #fallecidoLabel,
-#colorOjosLabel, #familiaresLabel, #generoLabel, #colorPeloLabel, #alturaLabel, #casaLabel,
-#imagenLabel, #trabajosLabel, #estadoCivilLabel, #nacionalidadLabel, #patronusLabel, #romancesLabel,
-#colorPielLabel, #especieLabel, #titulosLabel, #varitasLabel, #pesoLabel {
+#aliasLabel,
+#animagusLabel,
+#bloodStatusLabel,
+#boggartLabel,
+#nacidoLabel,
+#fallecidoLabel,
+#colorOjosLabel,
+#familiaresLabel,
+#generoLabel,
+#colorPeloLabel,
+#alturaLabel,
+#casaLabel,
+#imagenLabel,
+#trabajosLabel,
+#estadoCivilLabel,
+#nacionalidadLabel,
+#patronusLabel,
+#romancesLabel,
+#colorPielLabel,
+#especieLabel,
+#titulosLabel,
+#varitasLabel,
+#pesoLabel {
     -fx-font-size: 14px;
     -fx-text-fill: #343434;
 }
 
 #datosVBox .label {
     -fx-padding: 2 0 2 0;
+}
+
+.label-titulo {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1a1a1a;
+    -fx-min-width: 120px;
+    -fx-pref-width: 120px;
+    -fx-max-width: 120px;
+    -fx-alignment: top-left;
+    -fx-padding: 0 0 0 0;
+}
+
+.label-dato {
+    -fx-font-weight: normal;
+    -fx-font-size: 14px;
+    -fx-text-fill: #4b4b4b;
+    -fx-wrap-text: false;
+    -fx-alignment: top-left;
+    -fx-overrun-style: ellipsis-word;
 }
 
 /* ==============================
@@ -85,7 +124,7 @@ VBox[left] {
    ============================== */
 .button {
     -fx-background-color: linear-gradient(#6b5a45, #4a3f32);
-     -fx-text-fill: #f4f2ec;
+    -fx-text-fill: #f4f2ec;
     -fx-font-family: "Times New Roman", "Georgia", serif;
     -fx-font-size: 14px;
     -fx-padding: 6 18 6 18;
@@ -121,7 +160,8 @@ VBox[left] {
     -fx-background-color: transparent;
 }
 
-.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button {
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 4;
 }
@@ -244,7 +284,7 @@ VBox[left] {
     -fx-border-width: 0 0 2 0;
     -fx-background-radius: 12;
     -fx-border-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
 }
 
 .menu-bar .label {
@@ -254,16 +294,19 @@ VBox[left] {
     -fx-font-family: "Times New Roman", "Georgia", serif;
 }
 
-.menu, .menu-button {
+.menu,
+.menu-button {
     -fx-background-color: transparent;
     -fx-background-radius: 8;
 }
 
-.menu:hover, .menu-button:hover {
+.menu:hover,
+.menu-button:hover {
     -fx-background-color: rgba(193, 155, 74, 0.2);
 }
 
-.menu:hover .label, .menu-button:hover .label {
+.menu:hover .label,
+.menu-button:hover .label {
     -fx-text-fill: #c19b4a;
 }
 
@@ -273,7 +316,7 @@ VBox[left] {
 .context-menu {
     -fx-background-color: #7b6b52;
     -fx-border-color: rgba(50, 40, 30, 0.6);
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
 }
 
 .menu-item {

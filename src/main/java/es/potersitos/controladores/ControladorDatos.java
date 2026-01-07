@@ -20,6 +20,8 @@ import java.util.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -49,20 +51,12 @@ public class ControladorDatos {
     @FXML
     private ImageView imageView;
 
-    /** Etiquetas FXML que muestran los titulos de los datos del personaje */
+    /** Contenedor Grid para los datos */
     @FXML
-    private Label nombreLabel, aliasLabel, animagusLabel, bloodStatusLabel, boggartLabel, nacidoLabel,
-            fallecidoLabel, colorOjosLabel, familiaresLabel, generoLabel, colorPeloLabel, alturaLabel,
-            casaLabel, imagenLabel, trabajosLabel, estadoCivilLabel, nacionalidadLabel, patronusLabel,
-            romancesLabel, colorPielLabel, especieLabel, titulosLabel, varitasLabel, pesoLabel;
+    private GridPane datosGrid;
 
-    /** Etiquetas FXML que muestran los datos del personaje */
-    @FXML
-    private Label nombreDatoLabel, aliasDatoLabel, animagusDatoLabel, bloodStatusDatoLabel, boggartDatoLabel,
-            nacidoDatoLabel, fallecidoDatoLabel, colorOjosDatoLabel, familiaresDatoLabel, generoDatoLabel,
-            colorPeloDatoLabel, alturaDatoLabel, casaDatoLabel, imagenDatoLabel, trabajosDatoLabel,
-            estadoCivilDatoLabel, nacionalidadDatoLabel, patronusDatoLabel, romancesDatoLabel,
-            colorPielDatoLabel, especieDatoLabel, titulosDatoLabel, varitasDatoLabel, pesoDatoLabel;
+    /** Contador de filas para el GridPane */
+    private int filaActual = 0;
 
     /** Botones principales de acción */
     @FXML
@@ -151,12 +145,15 @@ public class ControladorDatos {
             rellenarInterfaz(personajeEncontrado.get());
         } else {
             logger.error("Personaje con SLUG '{}' no encontrado.", slug);
-            establecerTexto(nombreLabel, "nombre.label", getStringSafe("error.nodatos"));
+            // Mostrar mensaje de error en el grid si no hay datos
+            datosGrid.getChildren().clear();
+            datosGrid.add(new Label(getStringSafe("error.nodatos")), 0, 0);
         }
     }
 
     /**
      * Rellena las etiquetas FXML con los valores del mapa del personaje.
+     * Solo se muestran los campos que tienen información.
      *
      * @param p mapa con los datos del personaje
      * @author Nizam
@@ -187,36 +184,79 @@ public class ControladorDatos {
             }
         }
 
-        if (!imagenCargada) {
+        if (imagenCargada) {
+            // Log logic if needed
+        } else {
             cargarImagenPorDefecto();
         }
 
-        nombreDatoLabel.setText(nombre);
-        aliasDatoLabel.setText(p.get("alias_names"));
-        animagusDatoLabel.setText(p.get("animagus"));
-        bloodStatusDatoLabel.setText(p.get("blood_status"));
-        boggartDatoLabel.setText(p.get("boggart"));
-        nacidoDatoLabel.setText(p.get("born"));
-        fallecidoDatoLabel.setText(p.get("died"));
-        colorOjosDatoLabel.setText(p.get("eye_color"));
-        familiaresDatoLabel.setText(p.get("family_members"));
-        generoDatoLabel.setText(p.get("gender"));
-        colorPeloDatoLabel.setText(p.get("hair_color"));
-        alturaDatoLabel.setText(p.get("height"));
-        casaDatoLabel.setText(p.get("house"));
-        imagenDatoLabel.setText(imagePathCSV);
-        trabajosDatoLabel.setText(p.get("jobs"));
-        estadoCivilDatoLabel.setText(p.get("marital_status"));
-        nacionalidadDatoLabel.setText(p.get("nationality"));
-        patronusDatoLabel.setText(p.get("patronus"));
-        romancesDatoLabel.setText(p.get("romances"));
-        colorPielDatoLabel.setText(p.get("skin_color"));
-        especieDatoLabel.setText(p.get("species"));
-        titulosDatoLabel.setText(p.get("titles"));
-        varitasDatoLabel.setText(p.get("wands"));
-        pesoDatoLabel.setText(p.get("weight"));
+        // Limpiar el grid antes de rellenar
+        datosGrid.getChildren().clear();
+        filaActual = 0;
+
+        // Rellenar campos dinámicamente en el grid
+        actualizarCampo("nombre.label", nombre);
+        actualizarCampo("alias.label", p.get("alias_names"));
+        actualizarCampo("animagus.label", p.get("animagus"));
+        actualizarCampo("bloodStatus.label", p.get("blood_status"));
+        actualizarCampo("boggart.label", p.get("boggart"));
+        actualizarCampo("nacido.label", p.get("born"));
+        actualizarCampo("fallecido.label", p.get("died"));
+        actualizarCampo("colorOjos.label", p.get("eye_color"));
+        actualizarCampo("familiares.label", p.get("family_members"));
+        actualizarCampo("genero.label", p.get("gender"));
+        actualizarCampo("colorPelo.label", p.get("hair_color"));
+        actualizarCampo("altura.label", p.get("height"));
+        actualizarCampo("casa.label", p.get("house"));
+        actualizarCampo("imagen.label", imagePathCSV);
+        actualizarCampo("trabajos.label", p.get("jobs"));
+        actualizarCampo("estadoCivil.label", p.get("marital_status"));
+        actualizarCampo("nacionalidad.label", p.get("nationality"));
+        actualizarCampo("patronus.label", p.get("patronus"));
+        actualizarCampo("romances.label", p.get("romances"));
+        actualizarCampo("colorPiel.label", p.get("skin_color"));
+        actualizarCampo("especie.label", p.get("species"));
+        actualizarCampo("titulos.label", p.get("titles"));
+        actualizarCampo("varitas.label", p.get("wands"));
+        actualizarCampo("peso.label", p.get("weight"));
 
         personajeSlug = p.get("slug");
+    }
+
+    /**
+     * Crea dinámicamente un par de etiquetas (Título y Dato) y las añade al
+     * GridPane
+     * si el valor es válido.
+     *
+     * @param keyClave clave del ResourceBundle para el título
+     * @param valor    valor textual del dato
+     * @author Nizam
+     */
+    private void actualizarCampo(String keyClave, String valor) {
+        boolean tieneValor = valor != null && !valor.isBlank() && !valor.equalsIgnoreCase("unknown");
+
+        if (tieneValor) {
+            // Crear el Label para el título (el bundle ya incluye el :)
+            Label tituloLabel = new Label(getStringSafe(keyClave));
+            tituloLabel.getStyleClass().add("label-titulo");
+
+            // Crear el Label para el dato
+            Label datoLabel = new Label(valor);
+            datoLabel.getStyleClass().add("label-dato");
+            datoLabel.setWrapText(false);
+            datoLabel.setMinWidth(0);
+            datoLabel.setTooltip(new Tooltip(valor));
+
+            // Asegurar que el dato crezca en el grid
+            GridPane.setHgrow(datoLabel, Priority.ALWAYS);
+            datoLabel.setMaxWidth(Double.MAX_VALUE);
+
+            // Añadir al grid
+            datosGrid.add(tituloLabel, 0, filaActual);
+            datosGrid.add(datoLabel, 1, filaActual);
+
+            filaActual++;
+        }
     }
 
     /**
@@ -302,20 +342,6 @@ public class ControladorDatos {
         if (nombre.contains("."))
             nombre = nombre.substring(0, nombre.lastIndexOf("."));
         return nombre.replace("%20", " ");
-    }
-
-    /**
-     * Establece texto traducido en una etiqueta.
-     *
-     * @param label etiqueta JavaFX a modificar
-     * @param key   clave del {@link ResourceBundle} para el texto base
-     * @param valor valor a mostrar junto a la clave traducida
-     * @author Marco
-     */
-    private void establecerTexto(Label label, String key, String valor) {
-        if (label != null) {
-            label.setText(getStringSafe(key) + ": " + valor);
-        }
     }
 
     /**
@@ -418,15 +444,15 @@ public class ControladorDatos {
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = new HashMap<>();
 
-            parameters.put("Nombre", obtenerValor(nombreDatoLabel));
-            parameters.put("Alias", obtenerValor(aliasDatoLabel));
-            parameters.put("Casa", obtenerValor(casaDatoLabel));
-            parameters.put("Genero", obtenerValor(generoDatoLabel));
-            parameters.put("Especie", obtenerValor(especieDatoLabel));
-            parameters.put("Ojos", obtenerValor(colorOjosDatoLabel));
-            parameters.put("Pelo", obtenerValor(colorPeloDatoLabel));
-            parameters.put("Piel", obtenerValor(colorPielDatoLabel));
-            parameters.put("Patronus", obtenerValor(patronusDatoLabel));
+            parameters.put("Nombre", personajeActual.getOrDefault("name", ""));
+            parameters.put("Alias", personajeActual.getOrDefault("alias_names", ""));
+            parameters.put("Casa", personajeActual.getOrDefault("house", ""));
+            parameters.put("Genero", personajeActual.getOrDefault("gender", ""));
+            parameters.put("Especie", personajeActual.getOrDefault("species", ""));
+            parameters.put("Ojos", personajeActual.getOrDefault("eye_color", ""));
+            parameters.put("Pelo", personajeActual.getOrDefault("hair_color", ""));
+            parameters.put("Piel", personajeActual.getOrDefault("skin_color", ""));
+            parameters.put("Patronus", personajeActual.getOrDefault("patronus", ""));
 
             parameters.put("Imagen", obtenerStreamImagen(personajeActual));
 
@@ -459,8 +485,7 @@ public class ControladorDatos {
 
         Stage stage = (Stage) confirmAlert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
@@ -500,25 +525,9 @@ public class ControladorDatos {
 
         Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         alerta.showAndWait();
-    }
-
-    /**
-     * Extrae el valor real de un {@link Label} con formato {@code "Clave: Valor"}.
-     *
-     * @param datoLabel label etiqueta de la cual se extraerá el valor
-     * @return valor textual sin la clave ni el separador, o cadena vacía si el
-     *         label es nulo
-     * @author Telmo
-     */
-    private String obtenerValor(Label datoLabel) {
-        if (datoLabel == null)
-            return "";
-        String text = datoLabel.getText();
-        return text == null ? "" : text.trim();
     }
 
     /**
