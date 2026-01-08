@@ -5,6 +5,15 @@ import csv
 import pickle
 import xml.etree.ElementTree as element_tree
 import json
+import logging
+
+
+logging.basicConfig(
+    filename="hogwartsEXE.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    encoding="utf-8"
+)
 
 
 class Personaje:
@@ -152,8 +161,10 @@ class ServicioArchivos:
             ruta (str): Ruta del archivo CSV de salida.
         """
         if not personajes:
+            logging.warning("No hay personajes para guardar en CSV")
             return
         try:
+            logging.info(f"Guardando CSV en {ruta}")
             with open(ruta, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 headers = list(personajes[0].__dict__.keys())
@@ -164,7 +175,9 @@ class ServicioArchivos:
                         for v in p.__dict__.values()
                     ]
                     writer.writerow(row)
+            logging.info("CSV generado correctamente")
         except Exception:
+            logging.exception("Error al guardar CSV")
             raise
 
     @staticmethod
@@ -177,8 +190,10 @@ class ServicioArchivos:
             ruta (str): Ruta del archivo XML de salida.
         """
         if not personajes:
+            logging.warning("No hay personajes para guardar en XML")
             return
         try:
+            logging.info(f"Guardando XML en {ruta}")
             root = element_tree.Element("characters")
             for p in personajes:
                 char_elem = element_tree.SubElement(root, "character")
@@ -187,7 +202,9 @@ class ServicioArchivos:
                     elem.text = json.dumps(value, ensure_ascii=False) if isinstance(value, list) and value else str(value or "")
             tree = element_tree.ElementTree(root)
             tree.write(ruta, encoding="utf-8", xml_declaration=True)
+            logging.info("XML generado correctamente")
         except Exception:
+            logging.exception("Error al guardar XML")
             raise
 
     @staticmethod
@@ -200,9 +217,12 @@ class ServicioArchivos:
             ruta (str): Ruta del archivo binario de salida.
         """
         try:
+            logging.info(f"Guardando binario en {ruta}")
             with open(ruta, "wb") as f:
                 pickle.dump(personajes, f)
+            logging.info("Binario guardado correctamente")
         except Exception:
+            logging.exception("Error al guardar binario")
             raise
 
 
@@ -246,10 +266,13 @@ def descargar_imagen(image_url: str, slug: str) -> str:
         if resp.status_code == 200:
             with open(ruta_final, "wb") as f:
                 f.write(resp.content)
+            logging.info(f"Imagen descargada: {nombre_archivo}")
             return nombre_archivo
+        else:
+            logging.warning(f"No se pudo descargar la imagen {image_url} (HTTP {resp.status_code})")
 
     except Exception:
-        raise
+        logging.exception(f"Error descargando imagen {image_url}")
 
     return ""
 
@@ -267,17 +290,20 @@ def fetch_personajes() -> list[Personaje]:
     personajes = []
     page = 1
 
+    logging.info("Inicio de descarga de personajes")
+
     while True:
+        logging.info(f"Solicitando página {page}")
         resp = requests.get(url, params={"page[number]": page, "page[size]": 100})
+
         if resp.status_code != 200:
+            logging.error(f"Error HTTP {resp.status_code} en página {page}")
             break
 
         data = resp.json()
         for item in data.get("data", []):
             attrs = item.get("attributes", {})
-
-            image_url = attrs.get("image")
-            imagen_local = descargar_imagen(image_url, attrs.get("slug", ""))
+            imagen_local = descargar_imagen(attrs.get("image"), attrs.get("slug", ""))
 
             p = Personaje(
                 id=item.get("id", ""),
@@ -311,11 +337,11 @@ def fetch_personajes() -> list[Personaje]:
             )
             personajes.append(p)
 
-        links = data.get("links", {})
-        if not links.get("next"):
+        if not data.get("links", {}).get("next"):
             break
         page += 1
 
+    logging.info(f"Descarga completada. Total de personajes: {len(personajes)}")
     return personajes
 
 
@@ -326,7 +352,10 @@ def main():
     Lee las rutas de salida desde la línea de comandos, obtiene los personajes desde la API
     y los guarda en formatos CSV, XML y binario.
     """
+    logging.info("Programa iniciado")
+
     if len(sys.argv) != 4:
+        logging.error("Número incorrecto de argumentos")
         sys.exit(1)
 
     csv_path, xml_path, bin_path = sys.argv[1:4]
@@ -337,6 +366,8 @@ def main():
     servicio.guardar_csv(personajes, csv_path)
     servicio.guardar_xml(personajes, xml_path)
     servicio.guardar_bin(personajes, bin_path)
+
+    logging.info("Programa finalizado correctamente")
 
 
 if __name__ == "__main__":
