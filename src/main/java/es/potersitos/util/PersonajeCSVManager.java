@@ -62,7 +62,8 @@ public class PersonajeCSVManager {
     /**
      * Lee todos los personajes desde el CSV.
      *
-     * @return Lista de mapas, donde cada mapa representa un personaje con claves de CLAVES_PERSONAJE.
+     * @return Lista de mapas, donde cada mapa representa un personaje con claves de
+     *         CLAVES_PERSONAJE.
      * @author Nizam
      */
     public static List<Map<String, String>> leerTodosLosPersonajes() {
@@ -97,12 +98,12 @@ public class PersonajeCSVManager {
     /**
      * Procesa una línea del CSV y la añade a la lista de personajes.
      *
-     * @param linea Línea del CSV.
+     * @param linea      Línea del CSV.
      * @param personajes Lista donde se almacenarán los mapas de personajes.
      * @author Nizam
      */
     private static void procesarLineaCSV(String linea, List<Map<String, String>> personajes) {
-        if (linea == null || linea.trim().isEmpty()){
+        if (linea == null || linea.trim().isEmpty()) {
             return;
         }
 
@@ -146,13 +147,24 @@ public class PersonajeCSVManager {
     /**
      * Actualiza un personaje con nuevos datos, identificado por su slug.
      *
-     * @param nuevosDatos Mapa con los datos actualizados del personaje. Debe contener la clave "slug".
+     * @param nuevosDatos Mapa con los datos actualizados del personaje. Debe
+     *                    contener la clave "slug".
+     * @return true si se actualizó correctamente, false en caso contrario.
+     * @author Telmo
+     */
+    /**
+     * Actualiza un personaje con nuevos datos.
+     * Intenta identificar al personaje primero por su "id" y luego por su "slug".
+     *
+     * @param nuevosDatos Mapa con los datos actualizados del personaje.
      * @return true si se actualizó correctamente, false en caso contrario.
      * @author Telmo
      */
     public static boolean actualizarPersonaje(Map<String, String> nuevosDatos) {
+        String id = nuevosDatos.get("id");
         String slug = nuevosDatos.get("slug");
-        if (slug == null || slug.isEmpty()){
+
+        if ((id == null || id.isEmpty()) && (slug == null || slug.isEmpty())) {
             return false;
         }
 
@@ -162,7 +174,16 @@ public class PersonajeCSVManager {
 
         for (int i = 0; i < personajes.size(); i++) {
             Map<String, String> p = personajes.get(i);
-            if (slug.equalsIgnoreCase(p.get("slug"))) {
+
+            // Prioridad 1: Buscar por ID (es único y no cambia)
+            if (id != null && !id.isEmpty() && id.equalsIgnoreCase(p.get("id"))) {
+                personajes.set(i, nuevosDatos);
+                encontrado = true;
+                break;
+            }
+
+            // Prioridad 2: Buscar por Slug (como fallback)
+            if (!encontrado && slug != null && !slug.isEmpty() && slug.equalsIgnoreCase(p.get("slug"))) {
                 personajes.set(i, nuevosDatos);
                 encontrado = true;
                 break;
@@ -179,7 +200,7 @@ public class PersonajeCSVManager {
      * Reescribe el CSV a partir de la lista de personajes.
      *
      * @param lista Lista de personajes (maps).
-     * @param ruta Ruta completa del CSV.
+     * @param ruta  Ruta completa del CSV.
      * @return true si se escribió correctamente, false en caso contrario.
      * @author Nizam
      */

@@ -12,6 +12,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.ImageView?>
 
 <StackPane fx:id="rootPane" styleClass="root"
            xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1"

@@ -65,6 +65,9 @@ public class ControladorNuevoPersonaje {
     /** Campo para el callback */
     private Runnable onPersonajeGuardado;
 
+    /** Slug del personaje después de ser guardado (útil si cambió) */
+    private String slugActualizado;
+
     @FXML
     private ImageView imageView;
 
@@ -228,11 +231,17 @@ public class ControladorNuevoPersonaje {
 
             if (editMode) {
                 boolean exito = PersonajeCSVManager.actualizarPersonaje(mapaDatos);
-                if (!exito) {
+                if (exito) {
+                    slugActualizado = mapaDatos.get("slug");
+                    mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
+                            resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
+                } else {
                     logger.warn("No se pudo actualizar el personaje en el CSV");
+                    mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
+                            resources.getString("falloAlGuardarPersonaje"),
+                            "No se pudo encontrar el personaje para actualizar.");
+                    return; // No cerrar la ventana si falló
                 }
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
-                        resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
             } else {
                 String[] datos = construirArrayLegacy(mapaDatos);
                 guardarCSV(baseDir, datos);
@@ -575,5 +584,13 @@ public class ControladorNuevoPersonaje {
 
         alerta.showAndWait();
         logger.debug("Alerta mostrada: {}", titulo);
+    }
+
+    /**
+     * @return El slug del personaje después de la operación (ej. tras
+     *         actualizarse).
+     */
+    public String getSlugActualizado() {
+        return slugActualizado;
     }
 }

@@ -378,6 +378,11 @@ public class ControladorDatos {
             stage.initStyle(StageStyle.TRANSPARENT);
             stage.showAndWait();
 
+            // Refrescar con el slug (por si cambió durante la edición)
+            String slugGuardado = controller.getSlugActualizado();
+            if (slugGuardado != null) {
+                personajeSlug = slugGuardado;
+            }
             cargarDatosPersonaje(personajeSlug);
 
         } catch (Exception e) {
