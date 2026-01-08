@@ -18,6 +18,12 @@
            fx:controller="es.potersitos.controladores.ControladorNuevoPersonaje">
 
     <BorderPane style="-fx-background-color: transparent;">
+        <right>
+            <VBox alignment="TOP_CENTER" spacing="10" style="-fx-padding: 20;">
+                <Label text="Previsualización" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                <ImageView fx:id="imageView" fitHeight="250" fitWidth="200" preserveRatio="true" />
+            </VBox>
+        </right>
         <center>
             <ScrollPane fitToWidth="true">
                 <GridPane hgap="15" prefHeight="380.0" prefWidth="740.0" vgap="10">

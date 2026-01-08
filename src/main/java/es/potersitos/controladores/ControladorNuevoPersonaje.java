@@ -14,6 +14,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,13 @@ public class ControladorNuevoPersonaje {
     /** Campo para el callback */
     private Runnable onPersonajeGuardado;
 
+    @FXML
+    private ImageView imageView;
+
+    /** Ruta local donde se buscan imágenes de personajes */
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
+            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+
     /**
      * Inicializa el controlador.
      * JavaFX inyecta automáticamente el ResourceBundle si se pasó al FXMLLoader.
@@ -77,14 +85,86 @@ public class ControladorNuevoPersonaje {
                 logger.error("No se ha podido cargar el ResourceBundle por defecto", e);
             }
         }
-        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}", resources != null ? resources.getLocale() : "Desconocido");
+
+        // Listener para previsualizar la imagen cuando el usuario escribe la URL
+        imageField.textProperty()
+                .addListener((observable, oldValue, newValue) -> actualizarPrevisualizacionImagen(newValue));
+
+        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}",
+                resources != null ? resources.getLocale() : "Desconocido");
+    }
+
+    /**
+     * Actualiza la previsualización de la imagen basada en el texto del campo
+     * imageField.
+     * 
+     * @param urlImagen URL o ruta de la imagen
+     */
+    private void actualizarPrevisualizacionImagen(String urlImagen) {
+        if (imageView == null)
+            return;
+
+        if (urlImagen == null || urlImagen.isBlank()) {
+            cargarImagenPorDefecto();
+            return;
+        }
+
+        try {
+            // 1. Intenta cargar como URL remota
+            if (urlImagen.startsWith("http")) {
+                imageView.setImage(new Image(urlImagen, true));
+                return;
+            }
+
+            // 2. Intenta cargar como ruta absoluta local
+            File archivo = new File(urlImagen);
+            if (archivo.isAbsolute() && archivo.exists()) {
+                imageView.setImage(new Image(archivo.toURI().toString()));
+                return;
+            }
+
+            // 3. Intenta buscar en la carpeta de imagenes local
+            File pathLocal = new File(RUTA_LOCAL_IMAGENES, urlImagen);
+            if (pathLocal.exists()) {
+                imageView.setImage(new Image(pathLocal.toURI().toString()));
+                return;
+            }
+
+            // 4. Si no se encuentra, intentar con el slug (si está disponible)
+            String slug = slugField.getText().trim();
+            if (!slug.isEmpty()) {
+                String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+                for (String ext : extensiones) {
+                    File pathSlug = new File(RUTA_LOCAL_IMAGENES, slug + ext);
+                    if (pathSlug.exists()) {
+                        imageView.setImage(new Image(pathSlug.toURI().toString()));
+                        return;
+                    }
+                }
+            }
+
+            cargarImagenPorDefecto();
+        } catch (Exception e) {
+            logger.warn("Error en previsualización de imagen: {}", urlImagen);
+            cargarImagenPorDefecto();
+        }
+    }
+
+    private void cargarImagenPorDefecto() {
+        try {
+            imageView.setImage(new Image(Objects
+                    .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
+        } catch (Exception e) {
+            logger.warn("No se pudo cargar la imagen por defecto");
+        }
     }
 
     /**
      * Establece un callback que se ejecutará cuando un personaje
      * haya sido guardado correctamente (ya sea creado o actualizado).
      *
-     * @param callback callback un objeto {@link Runnable} que se ejecutará tras guardar el personaje.
+     * @param callback callback un objeto {@link Runnable} que se ejecutará tras
+     *                 guardar el personaje.
      *                 Puede ser {@code null} si no se desea ninguna acción.
      * @author Erlantz
      */
@@ -179,7 +259,7 @@ public class ControladorNuevoPersonaje {
     /**
      * Genera un slug único a partir del nombre del personaje.
      *
-     * @param nombre Nombre del personaje
+     * @param nombre          Nombre del personaje
      * @param slugsExistentes Lista de slugs ya existentes
      * @return Slug único generado
      * @author Erlantz
@@ -221,24 +301,28 @@ public class ControladorNuevoPersonaje {
     }
 
     /**
-     * Descarga una imagen desde una URL y la guarda localmente asociada a un personaje.
+     * Descarga una imagen desde una URL y la guarda localmente asociada a un
+     * personaje.
      *
      * @param urlImagen URL de la imagen a descargar
-     * @param slug Slug del personaje, usado como nombre del archivo
+     * @param slug      Slug del personaje, usado como nombre del archivo
      * @author Erlantz
      */
     private String descargarImagen(String urlImagen, String slug) {
-        if (urlImagen == null || urlImagen.isEmpty()) return "";
+        if (urlImagen == null || urlImagen.isEmpty())
+            return "";
 
         String nombreArchivo = slug + ".jpg";
-        Path destino = Paths.get(System.getProperty("user.home"),"Reto3_Hogwarts_Anuario", "imagenes", nombreArchivo);
+        File destino = new File(RUTA_LOCAL_IMAGENES, nombreArchivo);
 
         try {
-            Files.createDirectories(destino.getParent());
-            try (InputStream in = new URL(urlImagen).openStream()) {
-                Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            if (!destino.getParentFile().exists()) {
+                destino.getParentFile().mkdirs();
             }
-            logger.info("Imagen descargada/actualizada en: {}", destino);
+            try (InputStream in = new URL(urlImagen).openStream()) {
+                Files.copy(in, destino.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            logger.info("Imagen descargada/actualizada en: {}", destino.getAbsolutePath());
             return nombreArchivo;
         } catch (Exception e) {
             logger.error("No se pudo descargar/actualizar la imagen desde URL: {}", urlImagen, e);
@@ -278,6 +362,7 @@ public class ControladorNuevoPersonaje {
         heightField.setText(datos.getOrDefault("height", ""));
         houseField.setText(datos.getOrDefault("house", ""));
         imageField.setText(datos.getOrDefault("image", ""));
+        actualizarPrevisualizacionImagen(imageField.getText());
         maritalStatusField.setText(datos.getOrDefault("marital_status", ""));
         nameField.setText(datos.getOrDefault("name", ""));
         nationalityField.setText(datos.getOrDefault("nationality", ""));
@@ -336,7 +421,7 @@ public class ControladorNuevoPersonaje {
      * @author Erlantz
      */
     private String[] construirArrayLegacy(Map<String, String> mapaDatos) {
-        return new String[]{
+        return new String[] {
                 mapaDatos.get("id"),
                 mapaDatos.get("type"),
                 mapaDatos.get("slug"),
@@ -459,7 +544,8 @@ public class ControladorNuevoPersonaje {
 
             personajes.add(datos);
 
-            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(binPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(
+                    Files.newOutputStream(binPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
                 oos.writeObject(personajes);
             }
 
@@ -485,8 +571,7 @@ public class ControladorNuevoPersonaje {
 
         Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         alerta.showAndWait();
         logger.debug("Alerta mostrada: {}", titulo);

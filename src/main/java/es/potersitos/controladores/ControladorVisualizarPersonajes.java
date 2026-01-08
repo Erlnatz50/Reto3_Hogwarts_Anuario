@@ -60,7 +60,8 @@ public class ControladorVisualizarPersonajes {
 
     /** Elementos del menú superior. */
     @FXML
-    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol, menuVideoManual;
+    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol,
+            menuVideoManual;
 
     /** Contenedor que aloja las fichas de los personajes. */
     @FXML
@@ -282,7 +283,7 @@ public class ControladorVisualizarPersonajes {
         searchField.setPromptText(resources.getString("visualizar.search.prompt"));
         btnFiltrar.setText(resources.getString("visualizar.filtro.titulo"));
         btnExportar.setText(resources.getString("visualizar.btn.exportar"));
-        btnExportar.setText(resources.getString("visualizar.btn.exportar"));
+        btnEliminarSeleccionados.setText(resources.getString("eliminar.button").toUpperCase());
         btnLimpiarFiltro.setText(resources.getString("visualizar.filtro.limpiar"));
 
         if (selectionModeActive) {
@@ -385,7 +386,8 @@ public class ControladorVisualizarPersonajes {
      * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
-        if (tilePanePersonajes == null) return;
+        if (tilePanePersonajes == null)
+            return;
 
         tilePanePersonajes.getChildren().clear();
         listaControladores = new ArrayList<>();
@@ -422,6 +424,7 @@ public class ControladorVisualizarPersonajes {
                 String nombre = p.getOrDefault("name", "N/A");
                 String casa = p.getOrDefault("house", "Desconocida");
 
+                // Usar el campo 'image' del CSV que contiene el nombre del archivo
                 String imagenArchivo = p.getOrDefault("image", "");
 
                 controller.setData(nombre, casa, imagenArchivo);
@@ -450,7 +453,6 @@ public class ControladorVisualizarPersonajes {
         actualizarControlesPaginacion();
     }
 
-
     /**
      * Alterna entre modo normal y modo selección de personajes para exportación.
      * Muestra/oculta botón Exportar y actualiza texto del botón Seleccionar.
@@ -461,7 +463,8 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private void toggleSelectionMode() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
+                    resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -623,12 +626,12 @@ public class ControladorVisualizarPersonajes {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resources.getString("eliminar.confirm.titulo"));
         alert.setHeaderText(null);
-        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " " + resources.getString("personajes.seleccionados"));
+        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " "
+                + resources.getString("personajes.seleccionados"));
 
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -812,14 +815,16 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Ejecuta el algoritmo de filtrado combinado de texto (Nombre) + CheckBox de múltiples
+     * Ejecuta el algoritmo de filtrado combinado de texto (Nombre) + CheckBox de
+     * múltiples
      * categorías.
      *
      * @author Telmo
      */
     private void filtrarPersonajes() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
+                    resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -847,7 +852,8 @@ public class ControladorVisualizarPersonajes {
                                 case 3 -> selectedGenderIndices.add(checkBoxIndex);
                             }
                         }
-                        if (node instanceof CheckBox) checkBoxIndex++;
+                        if (node instanceof CheckBox)
+                            checkBoxIndex++;
                     }
                 }
             }
@@ -865,17 +871,20 @@ public class ControladorVisualizarPersonajes {
                         String house = p.getOrDefault("house", "").toLowerCase();
                         boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"),
                                 house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
-                        if (!match) return false;
+                        if (!match)
+                            return false;
                     }
 
                     if (!selectedNationalityIndices.isEmpty()) {
                         String nac = p.getOrDefault("nationality", "").toLowerCase();
                         boolean match = isMatch(selectedNationalityIndices,
-                                (nac.contains("brit") || nac.contains("kingdom") || nac.contains("uk") || nac.contains("scot") || nac.contains("eng")),
+                                (nac.contains("brit") || nac.contains("kingdom") || nac.contains("uk")
+                                        || nac.contains("scot") || nac.contains("eng")),
                                 (nac.contains("irish") || nac.contains("ireland")),
                                 (nac.contains("french") || nac.contains("france")),
                                 (nac.contains("bulgar") || nac.contains("bulgaria")));
-                        if (!match) return false;
+                        if (!match)
+                            return false;
                     }
 
                     if (!selectedSpeciesIndices.isEmpty()) {
@@ -883,7 +892,8 @@ public class ControladorVisualizarPersonajes {
                         boolean match = isMatch(selectedSpeciesIndices, species.equals("human"),
                                 (species.contains("half") || species.contains("mixed")), (species.contains("elf")),
                                 (species.contains("giant")));
-                        if (!match) return false;
+                        if (!match)
+                            return false;
                     }
 
                     if (!selectedGenderIndices.isEmpty()) {
@@ -940,7 +950,8 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void onNuevo() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
+                    resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -1004,7 +1015,8 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void crearArchivos() {
-        if (importando) return;
+        if (importando)
+            return;
         importando = true;
 
         botonImportar.setDisable(true);
@@ -1029,8 +1041,8 @@ public class ControladorVisualizarPersonajes {
 
                 File exeFile = new File(exePath);
                 if (!exeFile.exists()) {
-                    Platform.runLater(() ->
-                            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("exe.no.encontrado")));
+                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                            resources.getString("exe.no.encontrado")));
                     return null;
                 }
 
@@ -1041,8 +1053,8 @@ public class ControladorVisualizarPersonajes {
                     proceso.waitFor();
                 } catch (Exception e) {
                     logger.error("Error ejecutando el EXE", e);
-                    Platform.runLater(() ->
-                            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage()));
+                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
+                            e.getMessage()));
                 }
 
                 return null;
@@ -1078,7 +1090,8 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void exportarPersonajes() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
+                    resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -1172,14 +1185,16 @@ public class ControladorVisualizarPersonajes {
             }
 
             if (!Files.exists(manualPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
+                mandarAlertas(Alert.AlertType.ERROR, "Error", null,
+                        resources.getString("no.se.encontro.manual") + " " + manualPath);
                 return;
             }
 
             Desktop.getDesktop().open(manualPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, "Error", null,
+                    resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
         }
     }
 
@@ -1190,7 +1205,7 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void videoManual() {
-        try{
+        try {
             Path videoPath;
             Path path = Paths.get("docs/Video Tutorial - Anuario Hogwarts.mp4");
             if (Files.exists(path)) {
@@ -1200,19 +1215,22 @@ public class ControladorVisualizarPersonajes {
             }
 
             if (!Files.exists(videoPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.encuentra.videoTutorial"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                        resources.getString("no.se.encuentra.videoTutorial"));
                 return;
             }
 
             if (!Desktop.isDesktopSupported()) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.soporta.apertura.videoTutorial"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                        resources.getString("no.soporta.apertura.videoTutorial"));
                 return;
             }
 
             Desktop.getDesktop().open(videoPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.puede.abrir.videoTutorial") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
+                    resources.getString("no.se.puede.abrir.videoTutorial") + " " + e.getMessage());
         }
     }
 
@@ -1256,8 +1274,7 @@ public class ControladorVisualizarPersonajes {
 
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
             if (menuBar != null && menuBar.getScene() != null) {
@@ -1290,8 +1307,7 @@ public class ControladorVisualizarPersonajes {
 
         Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
 
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
@@ -1305,20 +1321,39 @@ public class ControladorVisualizarPersonajes {
      * @return {@link InputStream} de la imagen.
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
-        if (p == null) return imagenPorDefecto();
+        if (p == null)
+            return imagenPorDefecto();
 
+        String slug = p.getOrDefault("slug", "").trim();
+        // Usar el campo 'image' del CSV que contiene el nombre del archivo
         String nombreImagen = p.getOrDefault("image", "").trim();
+
+        // Primero intentar con el campo 'image' si no está vacío
         if (!nombreImagen.isEmpty()) {
             Path ruta = Paths.get(RUTA_LOCAL_IMAGENES, nombreImagen);
             if (Files.exists(ruta)) {
-                logger.info("Cargando imagen desde: {}", ruta.toAbsolutePath());
+                logger.info("Cargando imagen desde campo 'image': {}", ruta.toAbsolutePath());
                 try {
                     return Files.newInputStream(ruta);
                 } catch (IOException e) {
                     logger.error("Error abriendo imagen: {}", ruta, e);
                 }
-            } else {
-                logger.warn("Imagen no encontrada: {}", ruta.toAbsolutePath());
+            }
+        }
+
+        // Si no se encontró, intentar con el slug y diferentes extensiones
+        if (!slug.isEmpty()) {
+            String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+            for (String ext : extensiones) {
+                Path ruta = Paths.get(RUTA_LOCAL_IMAGENES, slug + ext);
+                if (Files.exists(ruta)) {
+                    logger.info("Cargando imagen usando slug: {}", ruta.toAbsolutePath());
+                    try {
+                        return Files.newInputStream(ruta);
+                    } catch (IOException e) {
+                        logger.error("Error abriendo imagen: {}", ruta, e);
+                    }
+                }
             }
         }
 
@@ -1328,7 +1363,6 @@ public class ControladorVisualizarPersonajes {
 
     private InputStream imagenPorDefecto() {
         return getClass().getResourceAsStream(
-                "/es/potersitos/img/persona_predeterminado.png"
-        );
+                "/es/potersitos/img/persona_predeterminado.png");
     }
 }

@@ -64,7 +64,8 @@ public class ControladorFichaPersonaje {
     private Runnable onRefresh;
 
     /** Ruta local donde se buscan imágenes de personajes */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
+            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Inicializa el controlador y asigna el {@link ResourceBundle} de idioma.
@@ -96,8 +97,8 @@ public class ControladorFichaPersonaje {
     /**
      * Carga los datos visuales del personaje en la tarjeta: nombre, casa e imagen.
      *
-     * @param nombre    Nombre del personaje.
-     * @param casa      Casa de Hogwarts a la que pertenece.
+     * @param nombre        Nombre del personaje.
+     * @param casa          Casa de Hogwarts a la que pertenece.
      * @param imagenArchivo Slug del personaje
      * @author Nizam
      */
@@ -110,20 +111,81 @@ public class ControladorFichaPersonaje {
     }
 
     private void cargarImagen(String nombreArchivo) {
-        if (nombreArchivo == null || nombreArchivo.isBlank()) {
-            cargarImagenPorDefecto();
+        // Intentar cargar la imagen en orden de prioridad
+
+        // 1. Si es una URL remota
+        if (nombreArchivo != null && nombreArchivo.startsWith("http")) {
+            try {
+                imagePersonaje.setImage(new Image(nombreArchivo, true));
+                return;
+            } catch (Exception e) {
+                logger.warn("Error cargando imagen desde URL: {}", nombreArchivo);
+            }
+        }
+
+        // 2. Si es una ruta absoluta local
+        if (nombreArchivo != null && !nombreArchivo.isBlank()) {
+            File fileAbs = new File(nombreArchivo);
+            if (fileAbs.isAbsolute() && fileAbs.exists()) {
+                try {
+                    imagePersonaje.setImage(new Image(fileAbs.toURI().toString(), true));
+                    return;
+                } catch (Exception e) {
+                    logger.warn("Error cargando imagen desde ruta absoluta: {}", nombreArchivo);
+                }
+            }
+        }
+
+        // 3. Si es un nombre de archivo en la carpeta local
+        if (nombreArchivo != null && !nombreArchivo.isBlank()) {
+            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
+            if (archivo.exists()) {
+                try {
+                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
+                    logger.info("Imagen cargada exitosamente: {}", nombreArchivo);
+                    return;
+                } catch (Exception e) {
+                    logger.warn("Error cargando imagen local: {}", archivo.getAbsolutePath());
+                }
+            }
+        }
+
+        // 4. Intentar con el slug si no se pudo con el nombre del archivo
+        if (intentarCargarPorSlug()) {
             return;
         }
 
-        File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-        logger.info("Cargando imagen: {}", archivo.getAbsolutePath());
+        // 5. Imagen por defecto
+        cargarImagenPorDefecto();
+    }
 
-        if (archivo.exists()) {
-            imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
-        } else {
-            logger.warn("Imagen no encontrada: {}", archivo.getAbsolutePath());
-            cargarImagenPorDefecto();
+    /**
+     * Intenta cargar la imagen usando el slug con diferentes extensiones en la
+     * carpeta local.
+     * 
+     * @return true si se cargó exitosamente, false en caso contrario
+     */
+    private boolean intentarCargarPorSlug() {
+        if (personajeSlug == null || personajeSlug.isBlank()) {
+            return false;
         }
+
+        String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+        for (String ext : extensiones) {
+            String nombreArchivo = personajeSlug + ext;
+            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
+            if (archivo.exists()) {
+                try {
+                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
+                    logger.info("Imagen cargada exitosamente usando slug: {}", nombreArchivo);
+                    return true;
+                } catch (Exception e) {
+                    logger.warn("Error cargando imagen por slug {}: {}", nombreArchivo, e.getMessage());
+                }
+            }
+        }
+        logger.warn("No se encontró imagen local para el slug: {}", personajeSlug);
+        return false;
     }
 
     /**
@@ -163,11 +225,13 @@ public class ControladorFichaPersonaje {
     /**
      * Aplica un color distintivo a la etiqueta de casa según la casa del personaje.
      *
-     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y Hufflepuff).
+     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y
+     *             Hufflepuff).
      * @author Nizam
      */
     private void aplicarEstiloCasa(String casa) {
-        if (casa == null) return;
+        if (casa == null)
+            return;
         String estiloBase = "-fx-font-weight: bold; -fx-text-fill: ";
         switch (casa.toLowerCase().trim()) {
             case "gryffindor" -> labelCasa.setStyle(estiloBase + "#740001;");
@@ -233,7 +297,8 @@ public class ControladorFichaPersonaje {
     /**
      * Activa o desactiva el modo selección de la tarjeta.
      *
-     * @param active {@code true} para mostrar el checkbox, {@code false} para ocultarlo.
+     * @param active {@code true} para mostrar el checkbox, {@code false} para
+     *               ocultarlo.
      * @author Telmo
      */
     public void setSelectionMode(boolean active) {
@@ -245,7 +310,8 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Establece una acción (callback) a ejecutar cuando cambia la selección del checkbox.
+     * Establece una acción (callback) a ejecutar cuando cambia la selección del
+     * checkbox.
      *
      * @param listener Acción a ejecutar al cambiar el estado del checkbox.
      * @author Telmo
