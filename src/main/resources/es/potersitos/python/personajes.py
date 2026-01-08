@@ -247,19 +247,21 @@ def descargar_imagen(image_url: str, slug: str) -> str:
         os.makedirs(base_dir, exist_ok=True)
 
         ext = ".jpg"
-        if image_url.lower().endswith(".png"):
+        url_lower = image_url.lower()
+        if url_lower.endswith(".png"):
             ext = ".png"
-        elif image_url.lower().endswith(".jpeg"):
+        elif url_lower.endswith(".jpeg"):
             ext = ".jpeg"
-        elif image_url.lower().endswith(".gif"):
+        elif url_lower.endswith(".gif"):
             ext = ".gif"
-        elif image_url.lower().endswith(".webp"):
+        elif url_lower.endswith(".webp"):
             ext = ".webp"
 
         nombre_archivo = f"{slug}{ext}"
         ruta_final = os.path.join(base_dir, nombre_archivo)
 
         if os.path.exists(ruta_final):
+            logging.info(f"Imagen ya existe: {nombre_archivo}")
             return nombre_archivo
 
         resp = requests.get(image_url, timeout=10)
@@ -270,11 +272,11 @@ def descargar_imagen(image_url: str, slug: str) -> str:
             return nombre_archivo
         else:
             logging.warning(f"No se pudo descargar la imagen {image_url} (HTTP {resp.status_code})")
+            return ""
 
-    except Exception:
-        logging.exception(f"Error descargando imagen {image_url}")
-
-    return ""
+    except Exception as e:
+        logging.exception(f"Error descargando imagen {image_url}: {str(e)}")
+        return ""
 
 
 def fetch_personajes() -> list[Personaje]:

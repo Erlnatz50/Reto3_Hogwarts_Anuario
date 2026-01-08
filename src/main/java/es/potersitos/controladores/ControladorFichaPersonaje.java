@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -111,81 +110,61 @@ public class ControladorFichaPersonaje {
     }
 
     private void cargarImagen(String nombreArchivo) {
-        // Intentar cargar la imagen en orden de prioridad
+        logger.info("=== DEBUG CARGA IMAGEN ===");
 
-        // 1. Si es una URL remota
-        if (nombreArchivo != null && nombreArchivo.startsWith("http")) {
-            try {
-                imagePersonaje.setImage(new Image(nombreArchivo, true));
-                return;
-            } catch (Exception e) {
-                logger.warn("Error cargando imagen desde URL: {}", nombreArchivo);
-            }
-        }
-
-        // 2. Si es una ruta absoluta local
         if (nombreArchivo != null && !nombreArchivo.isBlank()) {
-            File fileAbs = new File(nombreArchivo);
-            if (fileAbs.isAbsolute() && fileAbs.exists()) {
+            File archivoCSV = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
+            logger.info("Intentando cargar: {}", archivoCSV.getAbsolutePath());
+            logger.info("Archivo existe: {}", archivoCSV.exists());
+
+            if (archivoCSV.exists()) {
                 try {
-                    imagePersonaje.setImage(new Image(fileAbs.toURI().toString(), true));
-                    return;
+                    String uri = archivoCSV.toURI().toString();
+                    logger.info("URI generada: {}", uri);
+
+                    Image imagen = new Image(uri, 120, 120, true, true);
+
+                    // NUEVO: Esperar y capturar el error específico
+                    if (imagen.isError()) {
+                        Exception ex = imagen.getException();
+                        logger.error("❌ ERROR CARGANDO IMAGEN: {}", ex != null ? ex.getMessage() : "Desconocido");
+                        if (ex != null) {
+                            logger.error("Causa:", ex);
+                        }
+                    } else {
+                        imagePersonaje.setImage(imagen);
+                        logger.info("✓ Imagen OK: {}", nombreArchivo);
+                        return;
+                    }
                 } catch (Exception e) {
-                    logger.warn("Error cargando imagen desde ruta absoluta: {}", nombreArchivo);
+                    logger.error("Excepción al cargar imagen: ", e);
                 }
             }
         }
 
-        // 3. Si es un nombre de archivo en la carpeta local
-        if (nombreArchivo != null && !nombreArchivo.isBlank()) {
-            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-            if (archivo.exists()) {
-                try {
-                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
-                    logger.info("Imagen cargada exitosamente: {}", nombreArchivo);
-                    return;
-                } catch (Exception e) {
-                    logger.warn("Error cargando imagen local: {}", archivo.getAbsolutePath());
+        // Intentar con slug
+        if (personajeSlug != null && !personajeSlug.isBlank()) {
+            String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+            for (String ext : extensiones) {
+                File archivoSlug = Paths.get(RUTA_LOCAL_IMAGENES, personajeSlug + ext).toFile();
+                logger.info("Probando con slug: {}", archivoSlug.getAbsolutePath());
+
+                if (archivoSlug.exists()) {
+                    try {
+                        String uri = archivoSlug.toURI().toString();
+                        Image imagen = new Image(uri, 120, 120, true, true);
+                        imagePersonaje.setImage(imagen);
+                        logger.info("✓ Imagen cargada con slug: {}", archivoSlug.getName());
+                        return;
+                    } catch (Exception e) {
+                        logger.warn("Error con extensión {}: {}", ext, e.getMessage());
+                    }
                 }
             }
         }
 
-        // 4. Intentar con el slug si no se pudo con el nombre del archivo
-        if (intentarCargarPorSlug()) {
-            return;
-        }
-
-        // 5. Imagen por defecto
+        logger.warn("Cargando imagen por defecto");
         cargarImagenPorDefecto();
-    }
-
-    /**
-     * Intenta cargar la imagen usando el slug con diferentes extensiones en la
-     * carpeta local.
-     * 
-     * @return true si se cargó exitosamente, false en caso contrario
-     */
-    private boolean intentarCargarPorSlug() {
-        if (personajeSlug == null || personajeSlug.isBlank()) {
-            return false;
-        }
-
-        String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
-        for (String ext : extensiones) {
-            String nombreArchivo = personajeSlug + ext;
-            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-            if (archivo.exists()) {
-                try {
-                    imagePersonaje.setImage(new Image(archivo.toURI().toString(), true));
-                    logger.info("Imagen cargada exitosamente usando slug: {}", nombreArchivo);
-                    return true;
-                } catch (Exception e) {
-                    logger.warn("Error cargando imagen por slug {}: {}", nombreArchivo, e.getMessage());
-                }
-            }
-        }
-        logger.warn("No se encontró imagen local para el slug: {}", personajeSlug);
-        return false;
     }
 
     /**

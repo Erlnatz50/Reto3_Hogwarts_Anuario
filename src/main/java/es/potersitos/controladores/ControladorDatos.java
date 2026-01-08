@@ -4,17 +4,13 @@ import es.potersitos.util.PersonajeCSVManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -23,6 +19,8 @@ import net.sf.jasperreports.view.JasperViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -179,63 +177,32 @@ public class ControladorDatos {
         String slug = p.getOrDefault("slug", "").trim();
         String imageName = p.getOrDefault("image", "").trim();
 
-        // 1. Intentar cargar desde URL
-        boolean imagenCargada = false;
-        if (imageName.startsWith("http")) {
-            try {
-                imageView.setImage(new Image(imageName, true));
-                imagenCargada = true;
-                logger.info("Imagen cargada desde URL: {}", imageName);
-            } catch (Exception e) {
-                logger.warn("Error cargando imagen desde URL: {}", imageName);
-            }
-        }
+        File imagen = obtenerImagenLocal(imageName, slug);
 
-        // 2. Intentar como ruta absoluta
-        if (!imagenCargada && !imageName.isEmpty()) {
-            File imgFileAbs = new File(imageName);
-            if (imgFileAbs.isAbsolute() && imgFileAbs.exists()) {
-                try {
-                    imageView.setImage(new Image(imgFileAbs.toURI().toString()));
-                    imagenCargada = true;
-                    logger.info("Imagen cargada desde ruta absoluta: {}", imageName);
-                } catch (Exception e) {
-                    logger.warn("Error cargando imagen desde ruta absoluta: {}", imageName);
+        if (imagen != null) {
+            Image img = new Image(imagen.toURI().toString());
+
+            img.progressProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal.doubleValue() >= 1.0 && !img.isError()) {
+                    imageView.setImage(img);
+                    imageView.setVisible(true);
+                    logger.info("Imagen renderizada: {}", imagen.getName());
                 }
-            }
-        }
+            });
 
-        // 3. Intentar en carpeta local (campo image o slug)
-        if (!imagenCargada) {
-            String[] candidatos = { imageName, slug + ".jpg", slug + ".png", slug + ".jpeg", slug + ".JPG",
-                    slug + ".PNG", slug + ".JPEG" };
-            for (String cand : candidatos) {
-                if (cand == null || cand.isBlank())
-                    continue;
-                File imgFile = Paths.get(RUTA_LOCAL_IMAGENES, cand).toFile();
-                if (imgFile.exists()) {
-                    try {
-                        imageView.setImage(new Image(imgFile.toURI().toString()));
-                        imagenCargada = true;
-                        logger.info("Imagen cargada localmente: {}", cand);
-                        break;
-                    } catch (Exception e) {
-                        logger.warn("Error cargando imagen local: {}", cand);
-                    }
-                }
+            if (img.getProgress() >= 1.0 && !img.isError()) {
+                imageView.setImage(img);
+                imageView.setVisible(true);
+                logger.info("Imagen cargada localmente: {}", imagen.getName());
             }
-        }
-
-        // 4. Imagen por defecto
-        if (!imagenCargada) {
+        } else {
             cargarImagenPorDefecto();
+            logger.warn("Imagen no encontrada para slug {}", slug);
         }
 
-        // Limpiar contenedor dinámico
         datosGrid.getChildren().clear();
         filaActual = 0;
 
-        // Rellenar campos solo si tienen valor
         actualizarCampo("nombre.label", nombre);
         actualizarCampo("alias.label", formatearListaJSON(p.get("alias_names")));
         actualizarCampo("animagus.label", p.get("animagus"));
@@ -278,14 +245,12 @@ public class ControladorDatos {
         Label datoLabel = new Label(valor);
         datoLabel.getStyleClass().add("label-dato");
 
-        // Truncamiento y Tooltip para textos largos
         datoLabel.setWrapText(false);
         datoLabel.setMinWidth(0);
         datoLabel.setTooltip(new Tooltip(valor));
         GridPane.setHgrow(datoLabel, Priority.ALWAYS);
         datoLabel.setMaxWidth(Double.MAX_VALUE);
 
-        // Añadir al grid en las columnas 0 (título) y 1 (dato)
         datosGrid.add(tituloLabel, 0, filaActual);
         datosGrid.add(datoLabel, 1, filaActual);
 
@@ -298,7 +263,7 @@ public class ControladorDatos {
      * @author Nizam
      */
     private void cargarImagenPorDefecto() {
-        imageView.setImage(new Image(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png")));
+        imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
     }
 
     /**
@@ -309,8 +274,7 @@ public class ControladorDatos {
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null)
-            return key;
+        if (resources == null) return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -378,7 +342,6 @@ public class ControladorDatos {
             stage.initStyle(StageStyle.TRANSPARENT);
             stage.showAndWait();
 
-            // Refrescar con el slug (por si cambió durante la edición)
             String slugGuardado = controller.getSlugActualizado();
             if (slugGuardado != null) {
                 personajeSlug = slugGuardado;
@@ -407,7 +370,6 @@ public class ControladorDatos {
 
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = new HashMap<>();
-
             parameters.put("Nombre", personajeActual.getOrDefault("name", ""));
             parameters.put("Alias", formatearListaJSON(personajeActual.getOrDefault("alias_names", "")));
             parameters.put("Casa", personajeActual.getOrDefault("house", ""));
@@ -417,12 +379,10 @@ public class ControladorDatos {
             parameters.put("Pelo", personajeActual.getOrDefault("hair_color", ""));
             parameters.put("Piel", personajeActual.getOrDefault("skin_color", ""));
             parameters.put("Patronus", personajeActual.getOrDefault("patronus", ""));
-
             parameters.put("Imagen", obtenerStreamImagen(personajeActual));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
             JasperViewer.viewReport(jasperPrint, false);
-
             logger.info("Reporte PDF generado exitosamente");
 
         } catch (Exception e) {
@@ -430,6 +390,27 @@ public class ControladorDatos {
             mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
         }
     }
+
+    private File obtenerImagenLocal(String imageName, String slug) {
+        String[] candidatos = {imageName, slug + ".png", slug + ".jpg", slug + ".jpeg"};
+        for (String nombre : candidatos) {
+            if (nombre == null || nombre.isBlank()) continue;
+            File f = Paths.get(RUTA_LOCAL_IMAGENES, nombre).toFile();
+            if (f.exists()) {
+                // Validar que la imagen se puede leer
+                try {
+                    BufferedImage test = ImageIO.read(f);
+                    if (test != null) {
+                        return f;
+                    }
+                } catch (Exception e) {
+                    logger.warn("Imagen corrupta o ilegible: {}", f.getName());
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Elimina el personaje actual tras confirmación del usuario.
@@ -512,43 +493,19 @@ public class ControladorDatos {
         String slug = p.getOrDefault("slug", "").trim();
         String imageName = p.getOrDefault("image", "").trim();
 
+        File img = obtenerImagenLocal(imageName, slug);
+
         try {
-            // 1. Intentar como URL
-            if (imageName.startsWith("http")) {
-                try {
-                    return new java.net.URL(imageName).openStream();
-                } catch (Exception e) {
-                    logger.warn("No se pudo abrir stream desde URL: {}", imageName);
-                }
+            if (img != null) {
+                return new FileInputStream(img);
             }
-
-            // 2. Intentar como ruta absoluta
-            if (!imageName.isEmpty()) {
-                File fileAbs = new File(imageName);
-                if (fileAbs.isAbsolute() && fileAbs.exists()) {
-                    return new FileInputStream(fileAbs);
-                }
-            }
-
-            // 3. Intentar en carpeta local (campo image o slug)
-            String[] candidatos = { imageName, slug + ".jpg", slug + ".png", slug + ".jpeg", slug + ".JPG",
-                    slug + ".PNG", slug + ".JPEG" };
-            for (String cand : candidatos) {
-                if (cand == null || cand.isBlank())
-                    continue;
-                File imgFile = Paths.get(RUTA_LOCAL_IMAGENES, cand).toFile();
-                if (imgFile.exists()) {
-                    return new FileInputStream(imgFile);
-                }
-            }
-
-            logger.warn("No se encontró imagen para: {}", p.getOrDefault("name", "N/A"));
         } catch (Exception e) {
-            logger.warn("Error obteniendo stream de imagen para Jasper", e);
+            logger.warn("Error abriendo imagen para Jasper", e);
         }
 
         return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
     }
+
 
     private String formatearListaJSON(String jsonLista) {
         if (jsonLista == null || jsonLista.isEmpty())

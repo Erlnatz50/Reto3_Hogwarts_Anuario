@@ -424,7 +424,6 @@ public class ControladorVisualizarPersonajes {
                 String nombre = p.getOrDefault("name", "N/A");
                 String casa = p.getOrDefault("house", "Desconocida");
 
-                // Usar el campo 'image' del CSV que contiene el nombre del archivo
                 String imagenArchivo = p.getOrDefault("image", "");
 
                 controller.setData(nombre, casa, imagenArchivo);
@@ -1325,39 +1324,33 @@ public class ControladorVisualizarPersonajes {
             return imagenPorDefecto();
 
         String slug = p.getOrDefault("slug", "").trim();
-        // Usar el campo 'image' del CSV que contiene el nombre del archivo
         String nombreImagen = p.getOrDefault("image", "").trim();
 
-        // Primero intentar con el campo 'image' si no está vacío
         if (!nombreImagen.isEmpty()) {
             Path ruta = Paths.get(RUTA_LOCAL_IMAGENES, nombreImagen);
             if (Files.exists(ruta)) {
-                logger.info("Cargando imagen desde campo 'image': {}", ruta.toAbsolutePath());
                 try {
                     return Files.newInputStream(ruta);
                 } catch (IOException e) {
-                    logger.error("Error abriendo imagen: {}", ruta, e);
+                    throw new RuntimeException(e);
                 }
             }
         }
 
-        // Si no se encontró, intentar con el slug y diferentes extensiones
         if (!slug.isEmpty()) {
             String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
             for (String ext : extensiones) {
                 Path ruta = Paths.get(RUTA_LOCAL_IMAGENES, slug + ext);
                 if (Files.exists(ruta)) {
-                    logger.info("Cargando imagen usando slug: {}", ruta.toAbsolutePath());
                     try {
                         return Files.newInputStream(ruta);
                     } catch (IOException e) {
-                        logger.error("Error abriendo imagen: {}", ruta, e);
+                        throw new RuntimeException(e);
                     }
                 }
             }
         }
 
-        logger.info("Usando imagen por defecto para {}", p.getOrDefault("name", "N/A"));
         return imagenPorDefecto();
     }
 

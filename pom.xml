@@ -33,6 +33,11 @@
             <artifactId>javafx-graphics</artifactId>
             <version>24</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>24</version>
+        </dependency>
 
         <!-- Dependencias para los archivos log -->
         <dependency>
