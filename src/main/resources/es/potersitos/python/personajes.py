@@ -243,39 +243,36 @@ def descargar_imagen(image_url: str, slug: str) -> str:
         return ""
 
     try:
-        base_dir = os.path.join(os.path.expanduser("~"),"Reto3_Hogwarts_Anuario","imagenes")
+        base_dir = os.path.join(os.path.expanduser("~"), "Reto3_Hogwarts_Anuario", "imagenes")
         os.makedirs(base_dir, exist_ok=True)
 
-        ext = ".jpg"
-        url_lower = image_url.lower()
-        if url_lower.endswith(".png"):
-            ext = ".png"
-        elif url_lower.endswith(".jpeg"):
-            ext = ".jpeg"
-        elif url_lower.endswith(".gif"):
-            ext = ".gif"
-        elif url_lower.endswith(".webp"):
-            ext = ".webp"
+        resp = requests.get(image_url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+        if resp.status_code != 200:
+            logging.warning(f"HTTP {resp.status_code}: {image_url}")
+            return ""
 
-        nombre_archivo = f"{slug}{ext}"
+        nombre_archivo = f"{slug}.jpg"
         ruta_final = os.path.join(base_dir, nombre_archivo)
 
-        if os.path.exists(ruta_final):
-            logging.info(f"Imagen ya existe: {nombre_archivo}")
-            return nombre_archivo
+        # 🎯 ESCRIBE IMAGEN JAVA FX READY
+        with open(ruta_final, 'wb') as f:
+            f.write(resp.content)
 
-        resp = requests.get(image_url, timeout=10)
-        if resp.status_code == 200:
-            with open(ruta_final, "wb") as f:
-                f.write(resp.content)
-            logging.info(f"Imagen descargada: {nombre_archivo}")
+        # ✅ VERIFICACIÓN JAVA FX
+        file_size = os.path.getsize(ruta_final)
+        if file_size > 500 and file_size < 10_000_000:  # 0.5KB - 10MB
+            logging.info(f"✅ JavaFX OK: {nombre_archivo} ({file_size:,} bytes)")
             return nombre_archivo
         else:
-            logging.warning(f"No se pudo descargar la imagen {image_url} (HTTP {resp.status_code})")
+            logging.warning(f"❌ Tamaño inválido {nombre_archivo}: {file_size} bytes")
+            try:
+                os.remove(ruta_final)
+            except:
+                pass
             return ""
 
     except Exception as e:
-        logging.exception(f"Error descargando imagen {image_url}: {str(e)}")
+        logging.error(f"❌ Error {image_url}: {str(e)[:100]}")
         return ""
 
 

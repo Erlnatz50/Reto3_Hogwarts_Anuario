@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -110,61 +111,49 @@ public class ControladorFichaPersonaje {
     }
 
     private void cargarImagen(String nombreArchivo) {
-        logger.info("=== DEBUG CARGA IMAGEN ===");
+        logger.info("=== DEBUG CARGA IMAGEN: {} ===", nombreArchivo);
 
         if (nombreArchivo != null && !nombreArchivo.isBlank()) {
-            File archivoCSV = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-            logger.info("Intentando cargar: {}", archivoCSV.getAbsolutePath());
-            logger.info("Archivo existe: {}", archivoCSV.exists());
-
-            if (archivoCSV.exists()) {
-                try {
-                    String uri = archivoCSV.toURI().toString();
-                    logger.info("URI generada: {}", uri);
-
-                    Image imagen = new Image(uri, 120, 120, true, true);
-
-                    // NUEVO: Esperar y capturar el error específico
-                    if (imagen.isError()) {
-                        Exception ex = imagen.getException();
-                        logger.error("❌ ERROR CARGANDO IMAGEN: {}", ex != null ? ex.getMessage() : "Desconocido");
-                        if (ex != null) {
-                            logger.error("Causa:", ex);
-                        }
-                    } else {
-                        imagePersonaje.setImage(imagen);
-                        logger.info("✓ Imagen OK: {}", nombreArchivo);
-                        return;
-                    }
-                } catch (Exception e) {
-                    logger.error("Excepción al cargar imagen: ", e);
-                }
-            }
+            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
+            if (cargarArchivoImagen(archivo, nombreArchivo)) return;
         }
 
-        // Intentar con slug
         if (personajeSlug != null && !personajeSlug.isBlank()) {
-            String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+            String[] extensiones = {".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG"};
             for (String ext : extensiones) {
-                File archivoSlug = Paths.get(RUTA_LOCAL_IMAGENES, personajeSlug + ext).toFile();
-                logger.info("Probando con slug: {}", archivoSlug.getAbsolutePath());
-
-                if (archivoSlug.exists()) {
-                    try {
-                        String uri = archivoSlug.toURI().toString();
-                        Image imagen = new Image(uri, 120, 120, true, true);
-                        imagePersonaje.setImage(imagen);
-                        logger.info("✓ Imagen cargada con slug: {}", archivoSlug.getName());
-                        return;
-                    } catch (Exception e) {
-                        logger.warn("Error con extensión {}: {}", ext, e.getMessage());
-                    }
-                }
+                File archivo = Paths.get(RUTA_LOCAL_IMAGENES, personajeSlug + ext).toFile();
+                if (cargarArchivoImagen(archivo, personajeSlug + ext)) return;
             }
         }
 
         logger.warn("Cargando imagen por defecto");
         cargarImagenPorDefecto();
+    }
+
+    private boolean cargarArchivoImagen(File archivo, String nombreDebug) {
+        logger.info("Probando: {} ({} bytes)", archivo.getAbsolutePath(), archivo.length());
+
+        if (!archivo.exists() || archivo.length() < 500) {
+            logger.warn("Archivo inválido: {}", nombreDebug);
+            return false;
+        }
+
+        try {
+            try (FileInputStream fis = new FileInputStream(archivo)) {
+                Image imagen = new Image(fis, 120, 120, true, true);
+                if (!imagen.isError()) {
+                    imagePersonaje.setImage(imagen);
+                    logger.info("IMAGEN CARGADA: {}", nombreDebug);
+                    return true;
+                } else {
+                    logger.error("Image.error(): {}", imagen.getException());
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            logger.error("Error cargando {}: {}", nombreDebug, e.getMessage());
+            return false;
+        }
     }
 
     /**

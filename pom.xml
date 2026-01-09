@@ -68,6 +68,18 @@
             <version>6.20.6</version>
         </dependency>
 
+        <!-- WEBp support -->
+        <dependency>
+            <groupId>com.github.gotson</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>
