@@ -75,12 +75,12 @@ public class ControladorNuevoPersonaje {
     private ImageView imageView;
 
     /** Ruta local donde se buscan imágenes de personajes */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
-            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
-     * Inicializa el controlador.
-     * JavaFX inyecta automáticamente el ResourceBundle si se pasó al FXMLLoader.
+     * Inicializa el controlador y configura listener de previsualización de imagen.
+     *
+     * @author Erlantz
      */
     @FXML
     private void initialize() {
@@ -92,61 +92,39 @@ public class ControladorNuevoPersonaje {
             }
         }
 
-        // Listener para previsualizar la imagen cuando el usuario escribe la URL
-        imageField.textProperty()
-                .addListener((observable, oldValue, newValue) -> actualizarPrevisualizacionImagen(newValue));
+        imageField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (imageView != null) actualizarPrevisualizacionImagen(newValue);
+        });
 
-        logger.info("ControladorNuevoPersonaje inicializado. Idioma detectado: {}",
-                resources != null ? resources.getLocale() : "Desconocido");
+        logger.info("ControladorNuevoPersonaje inicializado");
     }
 
     /**
-     * Actualiza la previsualización de la imagen basada en el texto del campo
-     * imageField.
+     * Actualiza la previsualización de la imagen basada en el texto del campo imageField.
      * 
      * @param urlImagen URL o ruta de la imagen
+     * @author Telmo
      */
     private void actualizarPrevisualizacionImagen(String urlImagen) {
-        if (imageView == null)
-            return;
-
-        if (urlImagen == null || urlImagen.isBlank()) {
+        if (imageView == null || urlImagen == null || urlImagen.isBlank()) {
             cargarImagenPorDefecto();
             return;
         }
 
         try {
-            // 1. Intenta cargar como URL remota
             if (urlImagen.startsWith("http")) {
                 imageView.setImage(new Image(urlImagen, true));
                 return;
             }
 
-            // 2. Intenta cargar como ruta absoluta local
-            File archivo = new File(urlImagen);
-            if (archivo.isAbsolute() && archivo.exists()) {
-                cargarImagenConSoporteWebP(archivo);
-                return;
-            }
+            File[] candidatos = {
+                    new File(urlImagen),
+                    new File(RUTA_LOCAL_IMAGENES, urlImagen),
+                    buscarPorSlug()
+            };
 
-            // 3. Intenta buscar en la carpeta de imagenes local
-            File pathLocal = new File(RUTA_LOCAL_IMAGENES, urlImagen);
-            if (pathLocal.exists()) {
-                cargarImagenConSoporteWebP(pathLocal);
-                return;
-            }
-
-            // 4. Si no se encuentra, intentar con el slug (si está disponible)
-            String slug = slugField.getText().trim();
-            if (!slug.isEmpty()) {
-                String[] extensiones = { ".jpg", ".png", ".jpeg", ".webp", ".JPG", ".PNG", ".JPEG", ".WEBP" };
-                for (String ext : extensiones) {
-                    File pathSlug = new File(RUTA_LOCAL_IMAGENES, slug + ext);
-                    if (pathSlug.exists()) {
-                        cargarImagenConSoporteWebP(pathSlug);
-                        return;
-                    }
-                }
+            for (File archivo : candidatos) {
+                if (archivo.exists() && cargarImagenLocal(archivo)) return;
             }
 
             cargarImagenPorDefecto();
@@ -156,7 +134,31 @@ public class ControladorNuevoPersonaje {
         }
     }
 
-    private void cargarImagenConSoporteWebP(File archivo) {
+    /**
+     * Busca imagen por slug con múltiples extensiones.
+     *
+     * @return archivo encontrado o archivo vacío si no existe
+     * @author Erlantz
+     */
+    private File buscarPorSlug() {
+        if (slugField.getText().trim().isEmpty()) return new File("");
+
+        String[] extensiones = {".jpg", ".png", ".jpeg", ".webp", ".JPG", ".PNG", ".JPEG", ".WEBP"};
+        for (String ext : extensiones) {
+            File f = new File(RUTA_LOCAL_IMAGENES, slugField.getText().trim() + ext);
+            if (f.exists()) return f;
+        }
+        return new File("");
+    }
+
+    /**
+     * Carga imagen desde archivo local con soporte especial para formato WebP.
+     *
+     * @param archivo imagen local a cargar
+     * @return true si se cargó exitosamente, false en caso de error
+     * @author Telmo
+     */
+    private boolean cargarImagenLocal(File archivo) {
         try {
             Image img = null;
             if (archivo.getName().toLowerCase().endsWith(".webp")) {
@@ -166,35 +168,37 @@ public class ControladorNuevoPersonaje {
                         img = SwingFXUtils.toFXImage(bi, null);
                     }
                 } catch (Exception e) {
-                    logger.warn("Fallo carga WebP: " + e.getMessage());
+                    logger.warn("Fallo carga WebP: {}", e.getMessage());
                 }
             }
             if (img == null) {
                 img = new Image(archivo.toURI().toString());
             }
             imageView.setImage(img);
+            return true;
         } catch (Exception e) {
-            logger.warn("Error cargando imagen: " + archivo.getAbsolutePath());
-            cargarImagenPorDefecto();
+            logger.warn("Error cargando imagen: {}", archivo.getAbsolutePath());
+            return false;
         }
     }
 
+    /**
+     * Carga imagen por defecto en el ImageView.
+     *
+     * @author Telmo
+     */
     private void cargarImagenPorDefecto() {
         try {
-            imageView.setImage(new Image(Objects
-                    .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
+            imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
         } catch (Exception e) {
             logger.warn("No se pudo cargar la imagen por defecto");
         }
     }
 
     /**
-     * Establece un callback que se ejecutará cuando un personaje
-     * haya sido guardado correctamente (ya sea creado o actualizado).
+     * Establece callback a ejecutar tras guardar personaje.
      *
-     * @param callback callback un objeto {@link Runnable} que se ejecutará tras
-     *                 guardar el personaje.
-     *                 Puede ser {@code null} si no se desea ninguna acción.
+     * @param callback acción a ejecutar
      * @author Erlantz
      */
     public void setOnPersonajeGuardado(Runnable callback) {
@@ -222,11 +226,8 @@ public class ControladorNuevoPersonaje {
         try {
             if (!editMode) {
                 idField.setText(UUID.randomUUID().toString());
-
-                String nombre = nameField.getText().trim();
-                if (nombre.isEmpty()) {
-                    mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"),
-                            resources.getString("alerta.titulo"), resources.getString("alerta.mensaje"));
+                if (nameField.getText().trim().isEmpty()) {
+                    mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), resources.getString("alerta.titulo"), resources.getString("alerta.mensaje"));
                     return;
                 } else {
                     List<String> slugsExistentes = cargarSlugsExistentes();
@@ -237,7 +238,6 @@ public class ControladorNuevoPersonaje {
 
             String urlImagen = imageField.getText().trim();
             String nombreImagenLocal = "";
-
             if (!urlImagen.isEmpty()) {
                 if (urlImagen.startsWith("http")) {
                     nombreImagenLocal = descargarImagen(urlImagen, slugField.getText().trim());
@@ -259,14 +259,11 @@ public class ControladorNuevoPersonaje {
                 boolean exito = PersonajeCSVManager.actualizarPersonaje(mapaDatos);
                 if (exito) {
                     slugActualizado = mapaDatos.get("slug");
-                    mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
-                            resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
+                    mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("menu.archivo.guardar"), resources.getString("personajeActualizado"));
                 } else {
                     logger.warn("No se pudo actualizar el personaje en el CSV");
-                    mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
-                            resources.getString("falloAlGuardarPersonaje"),
-                            "No se pudo encontrar el personaje para actualizar.");
-                    return; // No cerrar la ventana si falló
+                    mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("falloAlGuardarPersonaje"), "No se pudo encontrar el personaje para actualizar.");
+                    return;
                 }
             } else {
                 String[] datos = construirArrayLegacy(mapaDatos);
@@ -274,8 +271,7 @@ public class ControladorNuevoPersonaje {
                 guardarXML(baseDir, datos);
                 guardarBinario(baseDir, datos);
 
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"),
-                        resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), resources.getString("personajeGuardado"), resources.getString("personajeGuardadoMensaje"));
             }
 
             cancelarButton.getScene().getWindow().hide();
@@ -286,15 +282,14 @@ public class ControladorNuevoPersonaje {
 
         } catch (Exception e) {
             logger.error("Error al guardar el personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
-                    resources.getString("falloAlGuardarPersonaje"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("falloAlGuardarPersonaje"), e.getMessage());
         }
     }
 
     /**
      * Genera un slug único a partir del nombre del personaje.
      *
-     * @param nombre          Nombre del personaje
+     * @param nombre Nombre del personaje
      * @param slugsExistentes Lista de slugs ya existentes
      * @return Slug único generado
      * @author Erlantz
@@ -344,8 +339,7 @@ public class ControladorNuevoPersonaje {
      * @author Erlantz
      */
     private String descargarImagen(String urlImagen, String slug) {
-        if (urlImagen == null || urlImagen.isEmpty())
-            return "";
+        if (urlImagen == null || urlImagen.isEmpty()) return "";
 
         String nombreArchivo = slug + ".jpg";
         File destino = new File(RUTA_LOCAL_IMAGENES, nombreArchivo);
@@ -369,7 +363,7 @@ public class ControladorNuevoPersonaje {
      * Configura el formulario en modo edición y carga los datos del personaje.
      *
      * @param datos mapa con los datos del personaje
-     * @author Erlantz
+     * @author Telmo
      */
     public void setDatosPersonaje(Map<String, String> datos) {
         this.editMode = true;
@@ -498,8 +492,7 @@ public class ControladorNuevoPersonaje {
     private void guardarCSV(Path baseDir, String[] datos) {
         try {
             Path csvPath = baseDir.resolve("todosPersonajes.csv");
-            Files.write(csvPath, (String.join(",", datos) + "\n").getBytes(),
-                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.write(csvPath, (String.join(",", datos) + "\n").getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             logger.error("Error al guardar CSV", e);
         }
@@ -579,8 +572,7 @@ public class ControladorNuevoPersonaje {
 
             personajes.add(datos);
 
-            try (ObjectOutputStream oos = new ObjectOutputStream(
-                    Files.newOutputStream(binPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(binPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
                 oos.writeObject(personajes);
             }
 
@@ -613,8 +605,10 @@ public class ControladorNuevoPersonaje {
     }
 
     /**
-     * @return El slug del personaje después de la operación (ej. tras
-     *         actualizarse).
+     * Devuelve el slug actualizado tras edición (útil para refrescar listas).
+     *
+     * @return slug del personaje editado o null si no se editó
+     * @author Telmo
      */
     public String getSlugActualizado() {
         return slugActualizado;

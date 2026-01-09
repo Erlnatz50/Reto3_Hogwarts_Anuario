@@ -37,49 +37,33 @@ import javafx.embed.swing.SwingFXUtils;
  */
 public class ControladorDatos {
 
-    /**
-     * Logger para esta clase
-     */
+    /** Logger para esta clase */
     private static final Logger logger = LoggerFactory.getLogger(ControladorDatos.class);
 
-    /**
-     * Bundle del sistema de internacionalización.
-     */
+    /** Bundle del sistema de internacionalización. */
     @FXML
     private ResourceBundle resources;
 
-    /**
-     * SLUG del personaje actual (necesario para la eliminación)
-     */
+    /** SLUG del personaje actual (necesario para la eliminación) */
     private String personajeSlug;
 
-    /**
-     * Datos del personaje actual
-     */
+    /** Datos del personaje actual */
     private Map<String, String> personajeActual;
 
+    /** Vista de imagen del personaje */
     @FXML
     private ImageView imageView;
 
-    /**
-     * Botones principales de acción
-     */
+    /** Botones principales de acción */
     @FXML
-    private Button actualizarButton, exportarButton, eliminarButton, closeButton;
+    private Button actualizarButton, exportarButton, eliminarButton;
 
+    /** Grid donde se muestran los datos del personaje */
     @FXML
     private GridPane datosGrid;
 
-    /**
-     * Fila actual en la que se añadirán los datos al grid dynamicamente.
-     */
-    private int filaActual = 0;
-
-    /**
-     * Ruta local donde se buscan imágenes de personajes
-     */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
-            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    /** Ruta local donde se buscan imágenes de personajes */
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Metodo de inicialización del controlador.
@@ -97,8 +81,7 @@ public class ControladorDatos {
             }
         }
         configurarTextosBotones();
-        logger.info("ControladorDatos inicializado. Idioma: {}",
-                resources != null ? resources.getLocale() : "Desconocido");
+        logger.info("ControladorDatos inicializado. Idioma: {}", resources != null ? resources.getLocale() : "Desconocido");
     }
 
     /**
@@ -107,23 +90,25 @@ public class ControladorDatos {
      * @author Marco
      */
     private void configurarTextosBotones() {
-        if (resources == null) {
-            return;
-        }
+        if (resources == null) return;
 
-        if (actualizarButton != null) {
-            actualizarButton.setText(getStringSafe("actualizar.button"));
-            actualizarButton.setTooltip(new Tooltip(getStringSafe("actualizar.tooltip")));
-        }
+        configurarBoton(actualizarButton, "actualizar.button", "actualizar.tooltip");
+        configurarBoton(exportarButton, "exportar.button", "exportar.tooltip");
+        configurarBoton(eliminarButton, "eliminar.button", "eliminar.tooltip");
+    }
 
-        if (exportarButton != null) {
-            exportarButton.setText(getStringSafe("exportar.button"));
-            exportarButton.setTooltip(new Tooltip(getStringSafe("exportar.tooltip")));
-        }
-
-        if (eliminarButton != null) {
-            eliminarButton.setText(getStringSafe("eliminar.button"));
-            eliminarButton.setTooltip(new Tooltip(getStringSafe("eliminar.tooltip")));
+    /**
+     * Configura texto y tooltip de un botón específico.
+     *
+     * @param boton botón a configurar
+     * @param claveTexto clave del texto del botón
+     * @param claveTooltip clave del tooltip del botón
+     * @author Erlantz
+     */
+    private void configurarBoton(Button boton, String claveTexto, String claveTooltip) {
+        if (boton != null) {
+            boton.setText(getStringSafe(claveTexto));
+            boton.setTooltip(new Tooltip(getStringSafe(claveTooltip)));
         }
     }
 
@@ -131,7 +116,7 @@ public class ControladorDatos {
      * Asigna el slug del personaje y carga sus datos.
      *
      * @param slug identificador único del personaje
-     * @author Marco
+     * @author Erlantz
      */
     public void setPersonajeSlug(String slug) {
         personajeSlug = slug;
@@ -151,7 +136,6 @@ public class ControladorDatos {
         }
 
         List<Map<String, String>> todosPersonajes = PersonajeCSVManager.leerTodosLosPersonajes();
-
         Optional<Map<String, String>> personajeEncontrado = todosPersonajes.stream()
                 .filter(p -> slug.equalsIgnoreCase(p.getOrDefault("slug", "")))
                 .findFirst();
@@ -170,11 +154,10 @@ public class ControladorDatos {
      * Rellena las etiquetas FXML con los valores del mapa del personaje.
      *
      * @param p mapa con los datos del personaje
-     * @author Nizam
+     * @author Telmo
      */
     private void rellenarInterfaz(Map<String, String> p) {
         personajeActual = p;
-        String nombre = p.getOrDefault("name", "");
         String slug = p.getOrDefault("slug", "").trim();
         String imageName = p.getOrDefault("image", "").trim();
 
@@ -182,7 +165,6 @@ public class ControladorDatos {
 
         if (imagen != null) {
             Image img = null;
-            // Si es WebP, usar ImageIO para cargarlo
             if (imagen.getName().toLowerCase().endsWith(".webp")) {
                 try {
                     BufferedImage bi = ImageIO.read(imagen);
@@ -194,7 +176,6 @@ public class ControladorDatos {
                 }
             }
 
-            // Si no es WebP o falló la carga anterior, intentar carga nativa estándar
             if (img == null) {
                 img = new Image(imagen.toURI().toString());
             }
@@ -212,80 +193,78 @@ public class ControladorDatos {
                         logger.info("Imagen renderizada: {}", imagen.getName());
                     }
                 });
-                imageView.setImage(finalImg); // Asignar para que el listener funcione o se muestre loading
+                imageView.setImage(finalImg);
             }
-            imageView.setVisible(true);
-
         } else {
-            cargarImagenPorDefecto();
+            imageView.setImage(new Image(Objects.requireNonNull(
+                    getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
             logger.warn("Imagen no encontrada para slug {}", slug);
         }
 
         datosGrid.getChildren().clear();
-        filaActual = 0;
+        int filaActual = 0;
+        String[][] campos = {
+                {"nombre.label", "name"},
+                {"alias.label", "alias_names"}, {"animagus.label", "animagus"},
+                {"bloodStatus.label", "blood_status"}, {"boggart.label", "boggart"},
+                {"nacido.label", "born"}, {"fallecido.label", "died"},
+                {"colorOjos.label", "eye_color"}, {"familiares.label", "family_members"},
+                {"genero.label", "gender"}, {"colorPelo.label", "hair_color"},
+                {"altura.label", "height"}, {"casa.label", "house"},
+                {"imagen.label", "image"}, {"trabajos.label", "jobs"},
+                {"estadoCivil.label", "marital_status"}, {"nacionalidad.label", "nationality"},
+                {"patronus.label", "patronus"}, {"romances.label", "romances"},
+                {"colorPiel.label", "skin_color"}, {"especie.label", "species"},
+                {"titulos.label", "titles"}, {"varitas.label", "wands"}, {"peso.label", "weight"}
+        };
 
-        actualizarCampo("nombre.label", nombre);
-        actualizarCampo("alias.label", formatearListaJSON(p.get("alias_names")));
-        actualizarCampo("animagus.label", p.get("animagus"));
-        actualizarCampo("bloodStatus.label", p.get("blood_status"));
-        actualizarCampo("boggart.label", p.get("boggart"));
-        actualizarCampo("nacido.label", p.get("born"));
-        actualizarCampo("fallecido.label", p.get("died"));
-        actualizarCampo("colorOjos.label", p.get("eye_color"));
-        actualizarCampo("familiares.label", formatearListaJSON(p.get("family_members")));
-        actualizarCampo("genero.label", p.get("gender"));
-        actualizarCampo("colorPelo.label", p.get("hair_color"));
-        actualizarCampo("altura.label", p.get("height"));
-        actualizarCampo("casa.label", p.get("house"));
-        actualizarCampo("imagen.label", imageName);
-        actualizarCampo("trabajos.label", formatearListaJSON(p.get("jobs")));
-        actualizarCampo("estadoCivil.label", p.get("marital_status"));
-        actualizarCampo("nacionalidad.label", p.get("nationality"));
-        actualizarCampo("patronus.label", p.get("patronus"));
-        actualizarCampo("romances.label", formatearListaJSON(p.get("romances")));
-        actualizarCampo("colorPiel.label", p.get("skin_color"));
-        actualizarCampo("especie.label", p.get("species"));
-        actualizarCampo("titulos.label", formatearListaJSON(p.get("titles")));
-        actualizarCampo("varitas.label", p.get("wands"));
-        actualizarCampo("peso.label", p.get("weight"));
+        for (String[] campo : campos) {
+            String valor = p.getOrDefault(campo[1], "");
+            if (esListaJSON(campo[1])) {
+                valor = formatearListaJSON(valor);
+            }
+            if (esValorValido(valor)) {
+                Label tituloLabel = new Label(getStringSafe(campo[0]));
+                tituloLabel.getStyleClass().add("label-titulo");
+
+                Label datoLabel = new Label(valor);
+                datoLabel.getStyleClass().add("label-dato");
+                datoLabel.setWrapText(false);
+                datoLabel.setMinWidth(0);
+                datoLabel.setTooltip(new Tooltip(valor));
+                GridPane.setHgrow(datoLabel, Priority.ALWAYS);
+                datoLabel.setMaxWidth(Double.MAX_VALUE);
+
+                datosGrid.add(tituloLabel, 0, filaActual);
+                datosGrid.add(datoLabel, 1, filaActual);
+                filaActual++;
+            }
+        }
 
         personajeSlug = p.get("slug");
     }
 
     /**
-     * Añade una fila de información al VBox si el valor es válido.
+     * Verifica si un campo contiene una lista JSON que necesita formateo.
+     *
+     * @param clave nombre del campo a verificar
+     * @return {@code true} si es una lista JSON, {@code false} en caso contrario
+     * @author Erlantz
      */
-    private void actualizarCampo(String keyClave, String valor) {
-        if (valor == null || valor.isBlank() || valor.equalsIgnoreCase("unknown") || valor.equalsIgnoreCase("[]")) {
-            return;
-        }
-
-        Label tituloLabel = new Label(getStringSafe(keyClave));
-        tituloLabel.getStyleClass().add("label-titulo");
-
-        Label datoLabel = new Label(valor);
-        datoLabel.getStyleClass().add("label-dato");
-
-        datoLabel.setWrapText(false);
-        datoLabel.setMinWidth(0);
-        datoLabel.setTooltip(new Tooltip(valor));
-        GridPane.setHgrow(datoLabel, Priority.ALWAYS);
-        datoLabel.setMaxWidth(Double.MAX_VALUE);
-
-        datosGrid.add(tituloLabel, 0, filaActual);
-        datosGrid.add(datoLabel, 1, filaActual);
-
-        filaActual++;
+    private boolean esListaJSON(String clave) {
+        return Arrays.asList("alias_names", "family_members", "jobs", "romances", "titles").contains(clave);
     }
 
     /**
-     * Carga la imagen por defecto del proyecto.
+     * Verifica si un valor es válido para mostrar en la interfaz.
      *
-     * @author Nizam
+     * @param valor valor a validar
+     * @return {@code true} si debe mostrarse, {@code false} si debe omitirse
+     * @author Erlantz
      */
-    private void cargarImagenPorDefecto() {
-        imageView.setImage(new Image(Objects
-                .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
+    private boolean esValorValido(String valor) {
+        return valor != null && !valor.isBlank() &&
+                !valor.equalsIgnoreCase("unknown") && !valor.equalsIgnoreCase("[]");
     }
 
     /**
@@ -296,8 +275,7 @@ public class ControladorDatos {
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null)
-            return key;
+        if (resources == null) return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -306,9 +284,47 @@ public class ControladorDatos {
     }
 
     /**
+     * Formatea una lista JSON eliminando corchetes y comillas.
+     *
+     * @param jsonLista string JSON con la lista a formatear
+     * @return lista formateada para mostrar o cadena vacía si es nula/vacía
+     * @author Erlantz
+     */
+    private String formatearListaJSON(String jsonLista) {
+        if (jsonLista == null || jsonLista.isEmpty()) return "";
+        return jsonLista.replaceAll("[\\[\\]\"]", "").trim();
+    }
+
+    /**
+     * Obtiene un File de imagen local probando múltiples candidatos.
+     *
+     * @param imageName nombre original de la imagen desde CSV
+     * @param slug slug del personaje para generar nombres alternativos
+     * @return {@link File} válido si existe y es legible, {@code null} si no se encuentra
+     * @author Erlantz
+     */
+    private File obtenerImagenLocal(String imageName, String slug) {
+        String[] candidatos = { imageName, slug + ".png", slug + ".jpg", slug + ".jpeg", slug + ".webp" };
+        for (String nombre : candidatos) {
+            if (nombre == null || nombre.isBlank()) continue;
+            File f = Paths.get(RUTA_LOCAL_IMAGENES, nombre).toFile();
+            if (f.exists()) {
+                try {
+                    BufferedImage test = ImageIO.read(f);
+                    if (test != null) return f;
+                } catch (Exception e) {
+                    logger.warn("Imagen corrupta o ilegible: {}", f.getName());
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Cierra la ventana actual de la aplicación.
      *
-     * @author Marco
+     * @param event evento de acción del botón
+     * @author Erlantz
      */
     @FXML
     private void cerrarVentana(ActionEvent event) {
@@ -318,7 +334,7 @@ public class ControladorDatos {
     /**
      * Abre la ventana de edición del personaje actual.
      *
-     * @author Nizam
+     * @author Telmo
      */
     @FXML
     public void handleActualizar() {
@@ -333,14 +349,13 @@ public class ControladorDatos {
                     .findFirst();
 
             if (personaje.isEmpty()) {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.datos.editar"));
+                mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.datos.editar"));
                 return;
             }
 
             ResourceBundle bundle = resources != null ? resources
                     : ResourceBundle.getBundle("es.potersitos.mensaje", Locale.getDefault());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"),
-                    bundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/nuevoPersonaje.fxml"), bundle);
             Parent root = loader.load();
 
             ControladorNuevoPersonaje controller = loader.getController();
@@ -348,7 +363,6 @@ public class ControladorDatos {
 
             Stage stage = new Stage();
             stage.setTitle(getStringSafe("menu.archivo.editar"));
-
             Scene scene = new Scene(root);
 
             try {
@@ -373,8 +387,8 @@ public class ControladorDatos {
 
         } catch (Exception e) {
             logger.error("Error al abrir ventana de edición", e);
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), getStringSafe("fallo.abrir.editor"),
-                    e.getMessage());
+            mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"),
+                    getStringSafe("fallo.abrir.editor"), e.getMessage());
         }
     }
 
@@ -387,21 +401,25 @@ public class ControladorDatos {
     public void handleExportar() {
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.encuentra.jrxml"));
+                mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("no.encuentra.jrxml"));
                 return;
             }
 
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put("Nombre", personajeActual.getOrDefault("name", ""));
-            parameters.put("Alias", formatearListaJSON(personajeActual.getOrDefault("alias_names", "")));
-            parameters.put("Casa", personajeActual.getOrDefault("house", ""));
-            parameters.put("Genero", personajeActual.getOrDefault("gender", ""));
-            parameters.put("Especie", personajeActual.getOrDefault("species", ""));
-            parameters.put("Ojos", personajeActual.getOrDefault("eye_color", ""));
-            parameters.put("Pelo", personajeActual.getOrDefault("hair_color", ""));
-            parameters.put("Piel", personajeActual.getOrDefault("skin_color", ""));
-            parameters.put("Patronus", personajeActual.getOrDefault("patronus", ""));
+
+            String[][] paramsReporte = {
+                    {"Nombre", "name"}, {"Alias", "alias_names"}, {"Casa", "house"},
+                    {"Genero", "gender"}, {"Especie", "species"}, {"Ojos", "eye_color"},
+                    {"Pelo", "hair_color"}, {"Piel", "skin_color"}, {"Patronus", "patronus"}
+            };
+
+            for (String[] param : paramsReporte) {
+                String valor = "alias_names".equals(param[1]) ?
+                        formatearListaJSON(personajeActual.getOrDefault(param[1], "")) :
+                        personajeActual.getOrDefault(param[1], "");
+                parameters.put(param[0], valor);
+            }
             parameters.put("Imagen", obtenerStreamImagen(personajeActual));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
@@ -410,29 +428,8 @@ public class ControladorDatos {
 
         } catch (Exception e) {
             logger.error("Error al exportar el jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
+            mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"), "", e.getMessage());
         }
-    }
-
-    private File obtenerImagenLocal(String imageName, String slug) {
-        String[] candidatos = { imageName, slug + ".png", slug + ".jpg", slug + ".jpeg", slug + ".webp" };
-        for (String nombre : candidatos) {
-            if (nombre == null || nombre.isBlank())
-                continue;
-            File f = Paths.get(RUTA_LOCAL_IMAGENES, nombre).toFile();
-            if (f.exists()) {
-                // Validar que la imagen se puede leer
-                try {
-                    BufferedImage test = ImageIO.read(f);
-                    if (test != null) {
-                        return f;
-                    }
-                } catch (Exception e) {
-                    logger.warn("Imagen corrupta o ilegible: {}", f.getName());
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -452,27 +449,23 @@ public class ControladorDatos {
         confirmAlert.setTitle(getStringSafe("eliminar.confirm.titulo"));
         confirmAlert.setHeaderText(getStringSafe("eliminar.confirm.header"));
         confirmAlert.setContentText(getStringSafe("eliminar.confirm.contenido"));
-
-        Stage stage = (Stage) confirmAlert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+        configurarIconoAlerta(confirmAlert);
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
-
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean exito = false;
             try {
-                exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+                boolean exito = PersonajeCSVManager.eliminarPersonajePorSlug(personajeSlug);
+                if (exito) {
+                    mostrarAlerta(Alert.AlertType.INFORMATION, getStringSafe("exito"), "",
+                            getStringSafe("eliminar.exito"));
+                    ((Stage) ((Button) event.getSource()).getScene().getWindow()).close();
+                } else {
+                    mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"), "",
+                            getStringSafe("eliminar.error"));
+                }
             } catch (Exception e) {
                 logger.error("Error real al eliminar el personaje.", e);
-            }
-
-            if (exito) {
-                mandarAlertas(Alert.AlertType.INFORMATION, getStringSafe("exito"), "", getStringSafe("eliminar.exito"));
-                Stage mainStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                mainStage.close();
-            } else {
-                mandarAlertas(Alert.AlertType.ERROR, getStringSafe("error"), "", getStringSafe("eliminar.error"));
+                mostrarAlerta(Alert.AlertType.ERROR, getStringSafe("error"), "", "Error inesperado");
             }
         }
     }
@@ -486,27 +479,34 @@ public class ControladorDatos {
      * @param mensaje       Contenido del mensaje
      * @author Erlantz
      */
-    private void mandarAlertas(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensajeTitulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);
         alerta.setHeaderText(mensajeTitulo);
         alerta.setContentText(mensaje);
-
-        Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
-
+        configurarIconoAlerta(alerta);
         alerta.showAndWait();
     }
 
     /**
-     * Obtiene un {@link InputStream} de la imagen del personaje probando varias
-     * fuentes.
-     * Prioriza archivos locales, luego URLs y finalmente la imagen por defecto.
+     * Configura el icono de la aplicación en una alerta.
+     *
+     * @param alerta alerta a la que se le configurará el icono
+     * @author Erlantz
+     */
+    private void configurarIconoAlerta(Alert alerta) {
+        Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(
+                getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+    }
+
+    /**
+     * Obtiene un {@link InputStream} de la imagen del personaje probando varias fuentes.
+     * Prioriza archivos locales, luego imagen por defecto.
      *
      * @param p Mapa con los datos del personaje.
      * @return {@link InputStream} de la imagen.
-     * @author Nizam
+     * @author Erlantz
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
         if (p == null) {
@@ -515,7 +515,6 @@ public class ControladorDatos {
 
         String slug = p.getOrDefault("slug", "").trim();
         String imageName = p.getOrDefault("image", "").trim();
-
         File img = obtenerImagenLocal(imageName, slug);
 
         try {
@@ -527,11 +526,5 @@ public class ControladorDatos {
         }
 
         return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
-    }
-
-    private String formatearListaJSON(String jsonLista) {
-        if (jsonLista == null || jsonLista.isEmpty())
-            return "";
-        return jsonLista.replaceAll("[\\[\\]\"]", "").trim();
     }
 }

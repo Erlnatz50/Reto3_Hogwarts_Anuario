@@ -254,25 +254,25 @@ def descargar_imagen(image_url: str, slug: str) -> str:
         nombre_archivo = f"{slug}.jpg"
         ruta_final = os.path.join(base_dir, nombre_archivo)
 
-        # 🎯 ESCRIBE IMAGEN JAVA FX READY
         with open(ruta_final, 'wb') as f:
             f.write(resp.content)
 
-        # ✅ VERIFICACIÓN JAVA FX
         file_size = os.path.getsize(ruta_final)
-        if file_size > 500 and file_size < 10_000_000:  # 0.5KB - 10MB
-            logging.info(f"✅ JavaFX OK: {nombre_archivo} ({file_size:,} bytes)")
+        if 500 < file_size < 10_000_000:
+            logging.info(f"JavaFX OK: {nombre_archivo} ({file_size:,} bytes)")
             return nombre_archivo
         else:
-            logging.warning(f"❌ Tamaño inválido {nombre_archivo}: {file_size} bytes")
+            logging.warning(f"Tamaño inválido {nombre_archivo}: {file_size} bytes")
             try:
                 os.remove(ruta_final)
-            except:
-                pass
+                logging.info(f"Archivo inválido eliminado: {nombre_archivo}")
+            except OSError as e:
+                logging.error(f"no se pudo eliminar archivo inválido {ruta_final}: {e}")
+                raise
             return ""
 
     except Exception as e:
-        logging.error(f"❌ Error {image_url}: {str(e)[:100]}")
+        logging.error(f"Error {image_url}: {str(e)[:100]}")
         return ""
 
 

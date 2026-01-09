@@ -60,8 +60,8 @@ public class ControladorVisualizarPersonajes {
 
     /** Elementos del menú superior. */
     @FXML
-    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera, menuIngles, menuEspaniol,
-            menuVideoManual;
+    private MenuItem menuSalir, menuNuevo, menuGuardar, menuAcercaDe, menuManual, menuEuskera,
+            menuIngles, menuEspaniol, menuVideoManual;
 
     /** Contenedor que aloja las fichas de los personajes. */
     @FXML
@@ -107,6 +107,7 @@ public class ControladorVisualizarPersonajes {
     /** Mensaje de error si no hay personajes importados. */
     private Label mensaje;
 
+    /** Flag que indica si está en proceso de importación de archivos */
     private boolean importando = false;
 
     /** Indica si el modo selección está activo. */
@@ -116,8 +117,7 @@ public class ControladorVisualizarPersonajes {
     private final Set<String> selectedSlugs = new HashSet<>();
 
     /** Ruta local donde se buscan imágenes de personajes */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
-            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Metodo de inicialización automática FXML.
@@ -174,7 +174,7 @@ public class ControladorVisualizarPersonajes {
     /**
      * Activa filtrado automático al seleccionar/des seleccionar cualquier opción.
      *
-     * @author Marco
+     * @author Erlantz
      */
     private void configurarListenersFiltros() {
         if (accordionFiltros != null) {
@@ -192,10 +192,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Calcula el número total de páginas basándose en personajesPorPagina y el
-     * tamaño de la lista.
+     * Calcula el número total de páginas basándose en personajesPorPagina y el tamaño de la lista.
      *
-     * @author Nizam
+     * @author Erlantz
      */
     private void calcularTotalPaginas() {
         int total = Math.max(1, listaPersonajesMapeados.size());
@@ -252,8 +251,7 @@ public class ControladorVisualizarPersonajes {
             logger.info("Idioma cambiado a: {}", nuevoLocale);
         } catch (Exception e) {
             logger.error("Error cambiando idioma", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
-                    resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("error.cambiar.idioma.mensaje") + e.getMessage());
         }
     }
 
@@ -363,7 +361,7 @@ public class ControladorVisualizarPersonajes {
      * @param pane Contenedor que aloja los CheckBoxes.
      * @param keys Claves del {@link ResourceBundle} correspondientes a los textos.
      *
-     * @author Telmo
+     * @author Marco
      */
     private void actualizarCheckBoxesDelPanel(TitledPane pane, String[] keys) {
         Node content = pane.getContent();
@@ -386,8 +384,7 @@ public class ControladorVisualizarPersonajes {
      * @author Nizam
      */
     private void cargarPersonajes(List<Map<String, String>> personajes) {
-        if (tilePanePersonajes == null)
-            return;
+        if (tilePanePersonajes == null) return;
 
         tilePanePersonajes.getChildren().clear();
         listaControladores = new ArrayList<>();
@@ -407,8 +404,7 @@ public class ControladorVisualizarPersonajes {
         int indiceFin = Math.min(indiceInicio + personajesPorPagina, totalPersonajes);
         List<Map<String, String>> personajesPagina = personajes.subList(indiceInicio, indiceFin);
 
-        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})",
-                paginaActual, indiceInicio, indiceFin, personajesPagina.size());
+        logger.info("Cargando Página {}: Personajes de índice {} a {}. (Total: {})", paginaActual, indiceInicio, indiceFin, personajesPagina.size());
 
         for (Map<String, String> p : personajesPagina) {
             try {
@@ -462,8 +458,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private void toggleSelectionMode() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
-                    resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -488,23 +483,23 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Habilita o deshabilita el botón de exportar según si hay personajes
-     * seleccionados.
+     * Habilita o deshabilita el botón de exportar según si hay personajes seleccionados.
      *
      * @author Telmo
      */
     private void actualizarEstadoBotonExportar() {
-        if (btnExportar != null)
+        if (btnExportar != null){
             btnExportar.setDisable(selectedSlugs.isEmpty());
-        if (btnEliminarSeleccionados != null)
+        }
+        if (btnEliminarSeleccionados != null) {
             btnEliminarSeleccionados.setDisable(selectedSlugs.isEmpty());
+        }
     }
 
     /**
      * Gestiona los cambios en la selección de personajes.
      *
-     * @param controller Instancia del controlador {@link ControladorFichaPersonaje}
-     *                   cuyo estado de selección ha cambiado.
+     * @param controller Instancia del controlador {@link ControladorFichaPersonaje} cuyo estado de selección ha cambiado.
      * @author Telmo
      */
     private void handleSelectionChange(ControladorFichaPersonaje controller) {
@@ -525,23 +520,20 @@ public class ControladorVisualizarPersonajes {
     @FXML
     private void exportarSeleccionados() {
         if (selectedSlugs.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    resources.getString("no.personaje.select"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.personaje.select"));
             return;
         }
 
         JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                        resources.getString("no.encuentra.jrxml"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.encuentra.jrxml"));
                 return;
             }
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
             return;
         }
 
@@ -549,8 +541,7 @@ public class ControladorVisualizarPersonajes {
         int exportados = 0;
 
         for (String slug : selectedSlugs) {
-            Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream()
-                    .filter(map -> slug.equals(map.get("slug"))).findFirst();
+            Optional<Map<String, String>> datosOpt = listaPersonajesMapeados.stream().filter(map -> slug.equals(map.get("slug"))).findFirst();
 
             if (datosOpt.isPresent()) {
                 Map<String, String> p = datosOpt.get();
@@ -568,8 +559,7 @@ public class ControladorVisualizarPersonajes {
 
                     parameters.put("Imagen", obtenerStreamImagen(p));
 
-                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-                            new JREmptyDataSource(1));
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
 
                     jasperPrints.add(jasperPrint);
                     exportados++;
@@ -581,8 +571,7 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    resources.getString("no.generar.ningun.reporte"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.generar.ningun.reporte"));
             return;
         }
 
@@ -599,15 +588,12 @@ public class ControladorVisualizarPersonajes {
             JasperViewer.viewReport(mergedPrint, false);
 
             if (exportados > 0) {
-                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
-                        resources.getString("se.han.exportado") + " " + exportados + " "
-                                + resources.getString("fichas.en.documento"));
+                mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", resources.getString("se.han.exportado") + " " + exportados + " " + resources.getString("fichas.en.documento"));
             }
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    resources.getString("error.mostrar.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.mostrar.reporte") + " " + e.getMessage());
         }
     }
 
@@ -615,7 +601,7 @@ public class ControladorVisualizarPersonajes {
      * Elimina los personajes seleccionados de la lista y del CSV.
      * Muestra alerta de confirmación antes de proceder.
      *
-     * @author Erlantz
+     * @author Telmo
      */
     @FXML
     private void eliminarSeleccionados() {
@@ -625,12 +611,12 @@ public class ControladorVisualizarPersonajes {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(resources.getString("eliminar.confirm.titulo"));
         alert.setHeaderText(null);
-        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " "
-                + resources.getString("personajes.seleccionados"));
+        alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " " + resources.getString("personajes.seleccionados"));
 
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -654,14 +640,12 @@ public class ControladorVisualizarPersonajes {
                 }
                 recargarListaCompleta();
 
-                String msg = resources.getString("se.han.eliminado") + " " + eliminados + " "
-                        + resources.getString("personaje.correctamente");
+                String msg = resources.getString("se.han.eliminado") + " " + eliminados + " " + resources.getString("personaje.correctamente");
                 if (algunError)
                     msg += "\n" + resources.getString("algunos.personajes.no.se.comprobaron");
                 mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", msg);
             } else {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                        resources.getString("no.se.pudo.eliminar.ninguno"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.se.pudo.eliminar.ninguno"));
             }
         }
     }
@@ -688,8 +672,7 @@ public class ControladorVisualizarPersonajes {
      * @author Erlantz
      */
     private void actualizarControlesPaginacion() {
-        if (paginationContainer == null)
-            return;
+        if (paginationContainer == null) return;
 
         paginationContainer.getChildren().clear();
 
@@ -747,11 +730,9 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Crea y agrega dinámicamente un botón de paginación para una página
-     * específica.
+     * Crea y agrega dinámicamente un botón de paginación para una página específica.
      *
-     * @param numeroPagina Número de página que representa este botón. Debe estar
-     *                     dentro del rango válido de paginación.
+     * @param numeroPagina Número de página que representa este botón. Debe estar dentro del rango válido de paginación.
      * @author Erlantz
      */
     private void agregarBotonPagina(int numeroPagina) {
@@ -778,7 +759,7 @@ public class ControladorVisualizarPersonajes {
     /**
      * Alterna la visibilidad del panel lateral de filtros.
      *
-     * @author Telmo
+     * @author Erlantz
      */
     @FXML
     private void toggleFilterPanel() {
@@ -807,23 +788,21 @@ public class ControladorVisualizarPersonajes {
                 }
             }
         }
-        if (searchField != null)
+        if (searchField != null) {
             searchField.setText("");
+        }
         paginaActual = 1;
         cargarPersonajes(listaPersonajesMapeados);
     }
 
     /**
-     * Ejecuta el algoritmo de filtrado combinado de texto (Nombre) + CheckBox de
-     * múltiples
-     * categorías.
+     * Ejecuta el algoritmo de filtrado combinado de texto (Nombre) + CheckBox de múltiples categorías.
      *
      * @author Telmo
      */
     private void filtrarPersonajes() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
-                    resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -851,8 +830,7 @@ public class ControladorVisualizarPersonajes {
                                 case 3 -> selectedGenderIndices.add(checkBoxIndex);
                             }
                         }
-                        if (node instanceof CheckBox)
-                            checkBoxIndex++;
+                        if (node instanceof CheckBox) checkBoxIndex++;
                     }
                 }
             }
@@ -862,16 +840,12 @@ public class ControladorVisualizarPersonajes {
                 .filter(p -> {
                     String nombrePersonaje = p.getOrDefault("name", "").toLowerCase();
 
-                    if (!searchText.isEmpty() && !nombrePersonaje.contains(searchText)) {
-                        return false;
-                    }
+                    if (!searchText.isEmpty() && !nombrePersonaje.contains(searchText)) return false;
 
                     if (!selectedHousesIndices.isEmpty()) {
                         String house = p.getOrDefault("house", "").toLowerCase();
-                        boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"),
-                                house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
-                        if (!match)
-                            return false;
+                        boolean match = isMatch(selectedHousesIndices, house.contains("gryffindor"), house.contains("slytherin"), house.contains("hufflepuff"), house.contains("ravenclaw"));
+                        if (!match) return false;
                     }
 
                     if (!selectedNationalityIndices.isEmpty()) {
@@ -882,8 +856,7 @@ public class ControladorVisualizarPersonajes {
                                 (nac.contains("irish") || nac.contains("ireland")),
                                 (nac.contains("french") || nac.contains("france")),
                                 (nac.contains("bulgar") || nac.contains("bulgaria")));
-                        if (!match)
-                            return false;
+                        if (!match) return false;
                     }
 
                     if (!selectedSpeciesIndices.isEmpty()) {
@@ -891,15 +864,13 @@ public class ControladorVisualizarPersonajes {
                         boolean match = isMatch(selectedSpeciesIndices, species.equals("human"),
                                 (species.contains("half") || species.contains("mixed")), (species.contains("elf")),
                                 (species.contains("giant")));
-                        if (!match)
-                            return false;
+                        if (!match) return false;
                     }
 
                     if (!selectedGenderIndices.isEmpty()) {
                         String gender = p.getOrDefault("gender", "").toLowerCase();
                         boolean match = selectedGenderIndices.contains(0) && gender.equals("male");
-                        if (selectedGenderIndices.contains(1) && gender.equals("female"))
-                            match = true;
+                        if (selectedGenderIndices.contains(1) && gender.equals("female")) match = true;
                         return match;
                     }
 
@@ -916,8 +887,18 @@ public class ControladorVisualizarPersonajes {
         cargarPersonajes(filtrados);
     }
 
-    private static boolean isMatch(Set<Integer> selectedSpeciesIndices, boolean species, boolean species1,
-            boolean species2, boolean species3) {
+    /**
+     * Determina si algún filtro seleccionado coincide con las condiciones booleanas del personaje.
+     *
+     * @param selectedSpeciesIndices conjunto de índices de filtros activos (0-3)
+     * @param species primer filtro booleano
+     * @param species1 segundo filtro booleano
+     * @param species2 tercer filtro booleano
+     * @param species3 cuarto filtro booleano
+     * @return true si al menos un filtro seleccionado coincide
+     * @author Erlantz
+     */
+    private static boolean isMatch(Set<Integer> selectedSpeciesIndices, boolean species, boolean species1, boolean species2, boolean species3) {
         boolean match = selectedSpeciesIndices.contains(0) && species;
         if (selectedSpeciesIndices.contains(1) && species1) {
             match = true;
@@ -932,8 +913,10 @@ public class ControladorVisualizarPersonajes {
     }
 
     /**
-     * Recarga toda la lista desde CSV y replica filtros.
-     * Usado cuando se elimina un personaje desde la ficha.
+     * Recarga toda la lista de personajes desde CSV y replica filtros actuales.
+     * Mantiene página actual si es válida, usado tras eliminar personajes.
+     *
+     * @author Telmo
      */
     private void recargarListaCompleta() {
         logger.info("Recargando lista completa de personajes desde disco...");
@@ -956,8 +939,7 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void onNuevo() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
-                    resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
@@ -1008,8 +990,7 @@ public class ControladorVisualizarPersonajes {
 
         } catch (Exception e) {
             logger.error("Error al abrir el formulario de nuevo personaje", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"),
-                    resources.getString("fallo.abrir.ventana"), e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), resources.getString("fallo.abrir.ventana"), e.getMessage());
         }
     }
 
@@ -1021,8 +1002,7 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     public void crearArchivos() {
-        if (importando)
-            return;
+        if (importando) return;
         importando = true;
 
         botonImportar.setDisable(true);
@@ -1047,8 +1027,7 @@ public class ControladorVisualizarPersonajes {
 
                 File exeFile = new File(exePath);
                 if (!exeFile.exists()) {
-                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                            resources.getString("exe.no.encontrado")));
+                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("exe.no.encontrado")));
                     return null;
                 }
 
@@ -1059,8 +1038,7 @@ public class ControladorVisualizarPersonajes {
                     proceso.waitFor();
                 } catch (Exception e) {
                     logger.error("Error ejecutando el EXE", e);
-                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                            e.getMessage()));
+                    Platform.runLater(() -> mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", e.getMessage()));
                 }
 
                 return null;
@@ -1096,23 +1074,20 @@ public class ControladorVisualizarPersonajes {
     @FXML
     public void exportarPersonajes() {
         if (listaPersonajesMapeados == null || listaPersonajesMapeados.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null,
-                    resources.getString("no.importado.alerta.mensaje"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), null, resources.getString("no.importado.alerta.mensaje"));
             return;
         }
 
         JasperReport jasperReport;
         try (InputStream reportStream = getClass().getResourceAsStream("/es/potersitos/jasper/ficha_personaje.jrxml")) {
             if (reportStream == null) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                        resources.getString("no.encuentra.jrxml"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("no.encuentra.jrxml"));
                 return;
             }
             jasperReport = JasperCompileManager.compileReport(reportStream);
         } catch (Exception e) {
             logger.error("Error compilando reporte Jasper", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.cargar.plantilla.reporte") + " " + e.getMessage());
             return;
         }
 
@@ -1134,8 +1109,7 @@ public class ControladorVisualizarPersonajes {
 
                 parameters.put("Imagen", obtenerStreamImagen(p));
 
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-                        new JREmptyDataSource(1));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource(1));
 
                 jasperPrints.add(jasperPrint);
                 exportados++;
@@ -1146,8 +1120,7 @@ public class ControladorVisualizarPersonajes {
         }
 
         if (jasperPrints.isEmpty()) {
-            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "",
-                    resources.getString("no.generar.ningun.reporte"));
+            mandarAlertas(Alert.AlertType.WARNING, resources.getString("advertencia"), "", resources.getString("no.generar.ningun.reporte"));
             return;
         }
 
@@ -1161,16 +1134,13 @@ public class ControladorVisualizarPersonajes {
             }
 
             JasperViewer.viewReport(mergedPrint, false);
-            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "",
-                    resources.getString("exportados") + " " + exportados + " "
-                            + resources.getString("personajes.unico.pdf"));
+            mandarAlertas(Alert.AlertType.INFORMATION, resources.getString("exito"), "", resources.getString("exportados") + " " + exportados + " " + resources.getString("personajes.unico.pdf"));
 
             logger.info("Exportados {} personajes completos", exportados);
 
         } catch (Exception e) {
             logger.error("Error al unificar reportes", e);
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "",
-                    resources.getString("error.mostrar.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), "", resources.getString("error.mostrar.pdf") + " " + e.getMessage());
         }
     }
 
@@ -1191,16 +1161,14 @@ public class ControladorVisualizarPersonajes {
             }
 
             if (!Files.exists(manualPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, "Error", null,
-                        resources.getString("no.se.encontro.manual") + " " + manualPath);
+                mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.encontro.manual") + " " + manualPath);
                 return;
             }
 
             Desktop.getDesktop().open(manualPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, "Error", null,
-                    resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, "Error", null, resources.getString("no.se.puede.abrir.pdf") + " " + e.getMessage());
         }
     }
 
@@ -1221,22 +1189,19 @@ public class ControladorVisualizarPersonajes {
             }
 
             if (!Files.exists(videoPath)) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
-                        resources.getString("no.se.encuentra.videoTutorial"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.encuentra.videoTutorial"));
                 return;
             }
 
             if (!Desktop.isDesktopSupported()) {
-                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
-                        resources.getString("no.soporta.apertura.videoTutorial"));
+                mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.soporta.apertura.videoTutorial"));
                 return;
             }
 
             Desktop.getDesktop().open(videoPath.toFile());
 
         } catch (Exception e) {
-            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null,
-                    resources.getString("no.se.puede.abrir.videoTutorial") + " " + e.getMessage());
+            mandarAlertas(Alert.AlertType.ERROR, resources.getString("error"), null, resources.getString("no.se.puede.abrir.videoTutorial") + " " + e.getMessage());
         }
     }
 
@@ -1280,7 +1245,8 @@ public class ControladorVisualizarPersonajes {
 
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
 
         if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
             if (menuBar != null && menuBar.getScene() != null) {
@@ -1313,7 +1279,8 @@ public class ControladorVisualizarPersonajes {
 
         Stage stage = (Stage) alerta.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
+        );
 
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
@@ -1325,10 +1292,10 @@ public class ControladorVisualizarPersonajes {
      *
      * @param p Mapa con los datos del personaje.
      * @return {@link InputStream} de la imagen.
+     * @author Telmo
      */
     private InputStream obtenerStreamImagen(Map<String, String> p) {
-        if (p == null)
-            return imagenPorDefecto();
+        if (p == null) return imagenPorDefecto();
 
         String slug = p.getOrDefault("slug", "").trim();
         String nombreImagen = p.getOrDefault("image", "").trim();
@@ -1361,8 +1328,13 @@ public class ControladorVisualizarPersonajes {
         return imagenPorDefecto();
     }
 
+    /**
+     * Devuelve InputStream de la imagen por defecto embebida en resources.
+     *
+     * @return InputStream de imagen PNG por defecto
+     * @author Erlantz
+     */
     private InputStream imagenPorDefecto() {
-        return getClass().getResourceAsStream(
-                "/es/potersitos/img/persona_predeterminado.png");
+        return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
     }
 }

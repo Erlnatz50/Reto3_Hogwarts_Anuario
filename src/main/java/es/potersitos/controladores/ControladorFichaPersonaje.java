@@ -8,6 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.slf4j.Logger;
@@ -66,8 +67,7 @@ public class ControladorFichaPersonaje {
     private Runnable onRefresh;
 
     /** Ruta local donde se buscan imágenes de personajes */
-    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator
-            + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
+    private static final String RUTA_LOCAL_IMAGENES = System.getProperty("user.home") + File.separator + "Reto3_Hogwarts_Anuario" + File.separator + "imagenes" + File.separator;
 
     /**
      * Inicializa el controlador y asigna el {@link ResourceBundle} de idioma.
@@ -107,43 +107,58 @@ public class ControladorFichaPersonaje {
     public void setData(String nombre, String casa, String imagenArchivo) {
         labelNombre.setText(formatearTexto(nombre));
         labelCasa.setText(formatearTexto(casa));
-        aplicarEstiloCasa(casa);
 
-        cargarImagen(imagenArchivo);
-    }
+        if (casa != null) {
+            String estiloBase = "-fx-font-weight: bold; -fx-text-fill: ";
+            switch (casa.toLowerCase().trim()) {
+                case "gryffindor" -> labelCasa.setStyle(estiloBase + "#740001;");
+                case "slytherin" -> labelCasa.setStyle(estiloBase + "#1a472a;");
+                case "ravenclaw" -> labelCasa.setStyle(estiloBase + "#0e1a40;");
+                case "hufflepuff" -> labelCasa.setStyle(estiloBase + "#ecb939;");
+                default -> labelCasa.setStyle(estiloBase + "#555555;");
+            }
+        }
 
-    private void cargarImagen(String nombreArchivo) {
-        logger.info("=== DEBUG CARGA IMAGEN: {} ===", nombreArchivo);
+        logger.info("=== DEBUG CARGA IMAGEN: {} ===", imagenArchivo);
 
-        if (nombreArchivo != null && !nombreArchivo.isBlank()) {
-            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-            if (cargarArchivoImagen(archivo, nombreArchivo))
-                return;
+        if (imagenArchivo != null && !imagenArchivo.isBlank()) {
+            File archivo = Paths.get(RUTA_LOCAL_IMAGENES, imagenArchivo).toFile();
+            if (cargarArchivoImagen(archivo, imagenArchivo)) return;
         }
 
         if (personajeSlug != null && !personajeSlug.isBlank()) {
             String[] extensiones = { ".jpg", ".png", ".jpeg", ".webp", ".JPG", ".PNG", ".JPEG", ".WEBP" };
             for (String ext : extensiones) {
                 File archivo = Paths.get(RUTA_LOCAL_IMAGENES, personajeSlug + ext).toFile();
-                if (cargarArchivoImagen(archivo, personajeSlug + ext))
-                    return;
+                if (cargarArchivoImagen(archivo, personajeSlug + ext)) return;
             }
         }
 
-        logger.warn("Cargando imagen por defecto");
-        cargarImagenPorDefecto();
+        try (InputStream stream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png")) {
+            if (stream != null) {
+                imagePersonaje.setImage(new Image(stream));
+            }
+        } catch (Exception e) {
+            logger.warn("No se ha podido cargar la imagen por defecto", e);
+        }
+
     }
 
+    /**
+     * Intenta cargar un archivo de imagen local con soporte WebP.
+     *
+     * @param archivo archivo de imagen a cargar
+     * @param nombreDebug nombre para logging/debugging
+     * @return {@code true} si se cargó exitosamente, {@code false} si falló
+     * @author Telmo
+     */
     private boolean cargarArchivoImagen(File archivo, String nombreDebug) {
         logger.info("Probando: {} ({} bytes)", archivo.getAbsolutePath(), archivo.length());
 
-        if (!archivo.exists()) {
-            return false;
-        }
+        if (!archivo.exists()) return false;
 
         try {
             Image imagen = null;
-            // Si es WebP, intentamos cargar con ImageIO + Plugin
             if (archivo.getName().toLowerCase().endsWith(".webp")) {
                 try {
                     BufferedImage bi = ImageIO.read(archivo);
@@ -155,10 +170,7 @@ public class ControladorFichaPersonaje {
                 }
             }
 
-            // Fallback / Standard load
             if (imagen == null) {
-                // Carga estándar (asíncrona) para no bloquear y permitir compatibilidad visual
-                // automática
                 imagen = new Image(archivo.toURI().toString());
             }
 
@@ -173,27 +185,11 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Carga una imagen por defecto si no se encuentra imagen específica del
-     * personaje.
-     *
-     * @author Nizam
-     */
-    private void cargarImagenPorDefecto() {
-        try (InputStream stream = getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png")) {
-            if (stream != null) {
-                imagePersonaje.setImage(new Image(stream));
-            }
-        } catch (Exception e) {
-            logger.warn("No se ha podido cargar la imagen por defecto", e);
-        }
-    }
-
-    /**
      * Formatea el texto recibido, capitalizando la primera letra de cada palabra.
      *
      * @param texto Texto original.
      * @return Texto formateado en estilo “Título”.
-     * @author Nizam
+     * @author Erlantz
      */
     private String formatearTexto(String texto) {
         if (texto == null || texto.isEmpty()) {
@@ -207,31 +203,10 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Aplica un color distintivo a la etiqueta de casa según la casa del personaje.
-     *
-     * @param casa Nombre de la casa (Gryffindor, Slytherin, Ravenclaw y
-     *             Hufflepuff).
-     * @author Nizam
-     */
-    private void aplicarEstiloCasa(String casa) {
-        if (casa == null)
-            return;
-        String estiloBase = "-fx-font-weight: bold; -fx-text-fill: ";
-        switch (casa.toLowerCase().trim()) {
-            case "gryffindor" -> labelCasa.setStyle(estiloBase + "#740001;");
-            case "slytherin" -> labelCasa.setStyle(estiloBase + "#1a472a;");
-            case "ravenclaw" -> labelCasa.setStyle(estiloBase + "#0e1a40;");
-            case "hufflepuff" -> labelCasa.setStyle(estiloBase + "#ecb939;");
-            default -> labelCasa.setStyle(estiloBase + "#555555;");
-        }
-    }
-
-    /**
      * Maneja el clic sobre la tarjeta del personaje.
-     * Si el modo selección está activo, activa el checkbox,
-     * de lo contrario, abre la vista de detalles del personaje.
+     * Si modo selección activo → toggle checkbox, sino → abrir detalles.
      *
-     * @author Marco
+     * @author Erlantz
      */
     @FXML
     private void handleCardClick() {
@@ -251,8 +226,8 @@ public class ControladorFichaPersonaje {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/potersitos/fxml/ventanaDatos.fxml"));
             loader.setResources(resources);
-
             Parent root = loader.load();
+
             ControladorDatos cd = loader.getController();
             cd.setPersonajeSlug(personajeSlug);
 
@@ -261,15 +236,13 @@ public class ControladorFichaPersonaje {
             if (css != null) {
                 scene.getStylesheets().add(css.toExternalForm());
             }
-            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            scene.setFill(Color.TRANSPARENT);
 
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.initStyle(StageStyle.TRANSPARENT);
             stage.setOnHidden(e -> {
-                if (onRefresh != null) {
-                    onRefresh.run();
-                }
+                if (onRefresh != null) onRefresh.run();
             });
             stage.show();
 
@@ -281,16 +254,13 @@ public class ControladorFichaPersonaje {
     /**
      * Activa o desactiva el modo selección de la tarjeta.
      *
-     * @param active {@code true} para mostrar el checkbox, {@code false} para
-     *               ocultarlo.
+     * @param active {@code true} para mostrar el checkbox, {@code false} para ocultarlo.
      * @author Telmo
      */
     public void setSelectionMode(boolean active) {
         isSelectionMode = active;
         checkBoxSeleccionar.setVisible(active);
-        if (!active) {
-            checkBoxSeleccionar.setSelected(false);
-        }
+        if (!active) checkBoxSeleccionar.setSelected(false);
     }
 
     /**
@@ -303,9 +273,7 @@ public class ControladorFichaPersonaje {
     public void setOnSelectionChanged(Runnable listener) {
         onSelectionChanged = listener;
         checkBoxSeleccionar.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (onSelectionChanged != null) {
-                onSelectionChanged.run();
-            }
+            if (onSelectionChanged != null) onSelectionChanged.run();
         });
     }
 
@@ -313,7 +281,7 @@ public class ControladorFichaPersonaje {
      * Comprueba si el personaje está seleccionado.
      *
      * @return {@code true} si el checkbox está marcado.
-     * @author Marco
+     * @author Erlantz
      */
     public boolean isSelected() {
         return checkBoxSeleccionar.isSelected();
@@ -323,7 +291,7 @@ public class ControladorFichaPersonaje {
      * Devuelve el identificador único asociado al personaje.
      *
      * @return Slug del personaje.
-     * @author Marco
+     * @author Erlantz
      */
     public String getPersonajeSlug() {
         return personajeSlug;
@@ -340,11 +308,10 @@ public class ControladorFichaPersonaje {
     }
 
     /**
-     * Establece un listener que se ejecutará al cerrar la ventana de detalles
-     * para refrescar la vista principal.
+     * Establece un listener que se ejecutará al cerrar la ventana de detalles para refrescar la vista principal.
      *
      * @param recargarListaCompleta acción de refresco
-     * @author Telmo
+     * @author Erlantz
      */
     public void setOnRefreshListener(Runnable recargarListaCompleta) {
         onRefresh = recargarListaCompleta;
