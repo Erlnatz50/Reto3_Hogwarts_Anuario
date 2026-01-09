@@ -7,10 +7,11 @@ module es.potersitos {
     requires java.net.http;
     requires java.sql;
     requires jasperreports;
+    requires javafx.swing;
 
     opens es.potersitos.controladores to javafx.fxml;
 
-
     opens es.potersitos to javafx.fxml;
+
     exports es.potersitos;
 }

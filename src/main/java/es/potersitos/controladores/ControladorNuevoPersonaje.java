@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import javax.imageio.ImageIO;
+import javafx.embed.swing.SwingFXUtils;
+import java.awt.image.BufferedImage;
 
 import java.io.*;
 import java.net.URL;
@@ -122,25 +125,25 @@ public class ControladorNuevoPersonaje {
             // 2. Intenta cargar como ruta absoluta local
             File archivo = new File(urlImagen);
             if (archivo.isAbsolute() && archivo.exists()) {
-                imageView.setImage(new Image(archivo.toURI().toString()));
+                cargarImagenConSoporteWebP(archivo);
                 return;
             }
 
             // 3. Intenta buscar en la carpeta de imagenes local
             File pathLocal = new File(RUTA_LOCAL_IMAGENES, urlImagen);
             if (pathLocal.exists()) {
-                imageView.setImage(new Image(pathLocal.toURI().toString()));
+                cargarImagenConSoporteWebP(pathLocal);
                 return;
             }
 
             // 4. Si no se encuentra, intentar con el slug (si está disponible)
             String slug = slugField.getText().trim();
             if (!slug.isEmpty()) {
-                String[] extensiones = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+                String[] extensiones = { ".jpg", ".png", ".jpeg", ".webp", ".JPG", ".PNG", ".JPEG", ".WEBP" };
                 for (String ext : extensiones) {
                     File pathSlug = new File(RUTA_LOCAL_IMAGENES, slug + ext);
                     if (pathSlug.exists()) {
-                        imageView.setImage(new Image(pathSlug.toURI().toString()));
+                        cargarImagenConSoporteWebP(pathSlug);
                         return;
                     }
                 }
@@ -149,6 +152,29 @@ public class ControladorNuevoPersonaje {
             cargarImagenPorDefecto();
         } catch (Exception e) {
             logger.warn("Error en previsualización de imagen: {}", urlImagen);
+            cargarImagenPorDefecto();
+        }
+    }
+
+    private void cargarImagenConSoporteWebP(File archivo) {
+        try {
+            Image img = null;
+            if (archivo.getName().toLowerCase().endsWith(".webp")) {
+                try {
+                    BufferedImage bi = ImageIO.read(archivo);
+                    if (bi != null) {
+                        img = SwingFXUtils.toFXImage(bi, null);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Fallo carga WebP: " + e.getMessage());
+                }
+            }
+            if (img == null) {
+                img = new Image(archivo.toURI().toString());
+            }
+            imageView.setImage(img);
+        } catch (Exception e) {
+            logger.warn("Error cargando imagen: " + archivo.getAbsolutePath());
             cargarImagenPorDefecto();
         }
     }

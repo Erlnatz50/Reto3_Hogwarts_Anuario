@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javax.imageio.ImageIO;
+import javafx.embed.swing.SwingFXUtils;
+import java.awt.image.BufferedImage;
 
 /**
  * Controlador asociado a la vista de una ficha de personaje individual.
@@ -115,14 +117,16 @@ public class ControladorFichaPersonaje {
 
         if (nombreArchivo != null && !nombreArchivo.isBlank()) {
             File archivo = Paths.get(RUTA_LOCAL_IMAGENES, nombreArchivo).toFile();
-            if (cargarArchivoImagen(archivo, nombreArchivo)) return;
+            if (cargarArchivoImagen(archivo, nombreArchivo))
+                return;
         }
 
         if (personajeSlug != null && !personajeSlug.isBlank()) {
-            String[] extensiones = {".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG"};
+            String[] extensiones = { ".jpg", ".png", ".jpeg", ".webp", ".JPG", ".PNG", ".JPEG", ".WEBP" };
             for (String ext : extensiones) {
                 File archivo = Paths.get(RUTA_LOCAL_IMAGENES, personajeSlug + ext).toFile();
-                if (cargarArchivoImagen(archivo, personajeSlug + ext)) return;
+                if (cargarArchivoImagen(archivo, personajeSlug + ext))
+                    return;
             }
         }
 
@@ -133,23 +137,35 @@ public class ControladorFichaPersonaje {
     private boolean cargarArchivoImagen(File archivo, String nombreDebug) {
         logger.info("Probando: {} ({} bytes)", archivo.getAbsolutePath(), archivo.length());
 
-        if (!archivo.exists() || archivo.length() < 500) {
-            logger.warn("Archivo inválido: {}", nombreDebug);
+        if (!archivo.exists()) {
             return false;
         }
 
         try {
-            try (FileInputStream fis = new FileInputStream(archivo)) {
-                Image imagen = new Image(fis, 120, 120, true, true);
-                if (!imagen.isError()) {
-                    imagePersonaje.setImage(imagen);
-                    logger.info("IMAGEN CARGADA: {}", nombreDebug);
-                    return true;
-                } else {
-                    logger.error("Image.error(): {}", imagen.getException());
+            Image imagen = null;
+            // Si es WebP, intentamos cargar con ImageIO + Plugin
+            if (archivo.getName().toLowerCase().endsWith(".webp")) {
+                try {
+                    BufferedImage bi = ImageIO.read(archivo);
+                    if (bi != null) {
+                        imagen = SwingFXUtils.toFXImage(bi, null);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Fallo carga WebP con ImageIO: {}", e.getMessage());
                 }
             }
-            return false;
+
+            // Fallback / Standard load
+            if (imagen == null) {
+                // Carga estándar (asíncrona) para no bloquear y permitir compatibilidad visual
+                // automática
+                imagen = new Image(archivo.toURI().toString());
+            }
+
+            imagePersonaje.setImage(imagen);
+            logger.info("IMAGEN ASIGNADA (o intentando cargar): {}", nombreDebug);
+            return true;
+
         } catch (Exception e) {
             logger.error("Error cargando {}: {}", nombreDebug, e.getMessage());
             return false;

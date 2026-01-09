@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.*;
+import javafx.embed.swing.SwingFXUtils;
 
 /**
  * Controlador para la ventana de datos de personajes.
@@ -180,21 +181,41 @@ public class ControladorDatos {
         File imagen = obtenerImagenLocal(imageName, slug);
 
         if (imagen != null) {
-            Image img = new Image(imagen.toURI().toString());
-
-            img.progressProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal.doubleValue() >= 1.0 && !img.isError()) {
-                    imageView.setImage(img);
-                    imageView.setVisible(true);
-                    logger.info("Imagen renderizada: {}", imagen.getName());
+            Image img = null;
+            // Si es WebP, usar ImageIO para cargarlo
+            if (imagen.getName().toLowerCase().endsWith(".webp")) {
+                try {
+                    BufferedImage bi = ImageIO.read(imagen);
+                    if (bi != null) {
+                        img = SwingFXUtils.toFXImage(bi, null);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Error cargando WebP con ImageIO: {}", imagen.getName());
                 }
-            });
+            }
 
-            if (img.getProgress() >= 1.0 && !img.isError()) {
-                imageView.setImage(img);
+            // Si no es WebP o falló la carga anterior, intentar carga nativa estándar
+            if (img == null) {
+                img = new Image(imagen.toURI().toString());
+            }
+
+            final Image finalImg = img;
+            if (finalImg.getProgress() >= 1.0 && !finalImg.isError()) {
+                imageView.setImage(finalImg);
                 imageView.setVisible(true);
                 logger.info("Imagen cargada localmente: {}", imagen.getName());
+            } else {
+                finalImg.progressProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal.doubleValue() >= 1.0 && !finalImg.isError()) {
+                        imageView.setImage(finalImg);
+                        imageView.setVisible(true);
+                        logger.info("Imagen renderizada: {}", imagen.getName());
+                    }
+                });
+                imageView.setImage(finalImg); // Asignar para que el listener funcione o se muestre loading
             }
+            imageView.setVisible(true);
+
         } else {
             cargarImagenPorDefecto();
             logger.warn("Imagen no encontrada para slug {}", slug);
@@ -263,7 +284,8 @@ public class ControladorDatos {
      * @author Nizam
      */
     private void cargarImagenPorDefecto() {
-        imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
+        imageView.setImage(new Image(Objects
+                .requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png"))));
     }
 
     /**
@@ -274,7 +296,8 @@ public class ControladorDatos {
      * @author Marco
      */
     private String getStringSafe(String key) {
-        if (resources == null) return key;
+        if (resources == null)
+            return key;
         try {
             return resources.getString(key);
         } catch (Exception e) {
@@ -392,9 +415,10 @@ public class ControladorDatos {
     }
 
     private File obtenerImagenLocal(String imageName, String slug) {
-        String[] candidatos = {imageName, slug + ".png", slug + ".jpg", slug + ".jpeg"};
+        String[] candidatos = { imageName, slug + ".png", slug + ".jpg", slug + ".jpeg", slug + ".webp" };
         for (String nombre : candidatos) {
-            if (nombre == null || nombre.isBlank()) continue;
+            if (nombre == null || nombre.isBlank())
+                continue;
             File f = Paths.get(RUTA_LOCAL_IMAGENES, nombre).toFile();
             if (f.exists()) {
                 // Validar que la imagen se puede leer
@@ -410,7 +434,6 @@ public class ControladorDatos {
         }
         return null;
     }
-
 
     /**
      * Elimina el personaje actual tras confirmación del usuario.
@@ -505,7 +528,6 @@ public class ControladorDatos {
 
         return getClass().getResourceAsStream("/es/potersitos/img/persona_predeterminado.png");
     }
-
 
     private String formatearListaJSON(String jsonLista) {
         if (jsonLista == null || jsonLista.isEmpty())
