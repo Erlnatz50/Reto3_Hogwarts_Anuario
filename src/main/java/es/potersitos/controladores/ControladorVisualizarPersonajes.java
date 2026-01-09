@@ -937,8 +937,15 @@ public class ControladorVisualizarPersonajes {
      */
     private void recargarListaCompleta() {
         logger.info("Recargando lista completa de personajes desde disco...");
+        int paginaGuardada = this.paginaActual;
         listaPersonajesMapeados = PersonajeCSVManager.leerTodosLosPersonajes();
         filtrarPersonajes();
+
+        if (paginaGuardada <= totalPaginas) {
+            setPaginaActual(paginaGuardada);
+        } else {
+            setPaginaActual(Math.max(1, totalPaginas));
+        }
     }
 
     /**
