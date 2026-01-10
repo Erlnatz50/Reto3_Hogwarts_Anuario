@@ -62,18 +62,29 @@ public class PersonajeCSVManager {
     /**
      * Lee todos los personajes desde el CSV.
      *
-     * @return Lista de mapas, donde cada mapa representa un personaje con claves de
-     *         CLAVES_PERSONAJE.
+     * @return Lista de mapas, donde cada mapa representa un personaje con claves de CLAVES_PERSONAJE.
      * @author Nizam
      */
     public static List<Map<String, String>> leerTodosLosPersonajes() {
-        List<Map<String, String>> personajes = new ArrayList<>();
         String rutaCompleta = obtenerRutaCompletaCSV();
-        File archivo = new File(rutaCompleta);
+        List<Map<String, String>> personajes = leerPersonajesCSV(rutaCompleta);
+        return personajes.isEmpty() ? Collections.emptyList() : personajes;
+    }
+
+    /**
+     * Lee todos los personajes desde el CSV omitiendo el encabezado.
+     *
+     * @param rutaCSV ruta completa del archivo CSV
+     * @return lista de mapas de personajes
+     * @author Nizam
+     */
+    private static List<Map<String, String>> leerPersonajesCSV(String rutaCSV) {
+        List<Map<String, String>> personajes = new ArrayList<>();
+        File archivo = new File(rutaCSV);
 
         if (!archivo.exists()) {
-            logger.warn("Archivo CSV no encontrado en: {}", rutaCompleta);
-            return Collections.emptyList();
+            logger.warn("Archivo CSV no encontrado en: {}", rutaCSV);
+            return personajes;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
@@ -136,12 +147,9 @@ public class PersonajeCSVManager {
             return false;
         }
         String rutaCSV = obtenerRutaCompletaCSV();
-        List<Map<String, String>> personajes = leerTodosLosPersonajes();
+        List<Map<String, String>> personajes = leerPersonajesCSV(rutaCSV);
         boolean eliminado = personajes.removeIf(p -> slug.equalsIgnoreCase(p.getOrDefault("slug", "")));
-        if (eliminado) {
-            return reescribirCSV(personajes, rutaCSV);
-        }
-        return false;
+        return eliminado && reescribirCSV(personajes, rutaCSV);
     }
 
     /**
@@ -161,30 +169,19 @@ public class PersonajeCSVManager {
         }
 
         String rutaCSV = obtenerRutaCompletaCSV();
-        List<Map<String, String>> personajes = leerTodosLosPersonajes();
-        boolean encontrado = false;
+        List<Map<String, String>> personajes = leerPersonajesCSV(rutaCSV);
 
         for (int i = 0; i < personajes.size(); i++) {
             Map<String, String> p = personajes.get(i);
-
-            if (id != null && !id.isEmpty() && id.equalsIgnoreCase(p.get("id"))) {
+            if ((id != null && !id.isEmpty() && id.equalsIgnoreCase(p.get("id"))) ||
+                    (slug != null && !slug.isEmpty() && slug.equalsIgnoreCase(p.get("slug")))) {
                 personajes.set(i, nuevosDatos);
-                encontrado = true;
-                break;
+                return reescribirCSV(personajes, rutaCSV);
             }
-
-            if (slug != null && !slug.isEmpty() && slug.equalsIgnoreCase(p.get("slug"))) {
-                personajes.set(i, nuevosDatos);
-                encontrado = true;
-                break;
-            }
-        }
-
-        if (encontrado) {
-            return reescribirCSV(personajes, rutaCSV);
         }
         return false;
     }
+
 
     /**
      * Reescribe el CSV a partir de la lista de personajes.

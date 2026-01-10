@@ -1,4 +1,3 @@
-<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
 <jasperReport name="ficha_personaje" language="java" columnCount="1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
     <parameter name="Nombre" class="java.lang.String"/>
     <parameter name="Alias" class="java.lang.String"/>
@@ -14,7 +13,6 @@
     <detail>
         <band height="770">
 
-            <!-- Rectángulo de fondo marrón -->
             <rectangle>
                 <reportElement x="0" y="0" width="555" height="770" backcolor="#8d8469"/>
                 <graphicElement>
@@ -22,7 +20,6 @@
                 </graphicElement>
             </rectangle>
 
-            <!-- Imagen de fondo -->
             <image onErrorType="Blank">
                 <reportElement x="-20" y="-120" width="594" height="802"/>
                 <imageExpression class="java.io.InputStream"><![CDATA[
@@ -30,15 +27,11 @@
             ]]></imageExpression>
             </image>
 
-
-
-            <!-- Imagen del personaje -->
             <image onErrorType="Blank">
                 <reportElement x="50" y="150" width="130" height="180"/>
                 <imageExpression class="java.io.InputStream"><![CDATA[$P{Imagen}]]></imageExpression>
             </image>
 
-            <!-- Nombre -->
             <textField>
                 <reportElement x="215" y="150" width="340" height="30"/>
                 <textElement>
@@ -47,7 +40,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Nombre: " + $P{Nombre}]]></textFieldExpression>
             </textField>
 
-            <!-- Alias -->
             <textField>
                 <reportElement x="215" y="190" width="340" height="20"/>
                 <textElement>
@@ -56,7 +48,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Alias: " + $P{Alias}]]></textFieldExpression>
             </textField>
 
-            <!-- Casa -->
             <textField>
                 <reportElement x="215" y="220" width="340" height="20"/>
                 <textElement>
@@ -65,7 +56,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Casa: " + $P{Casa}]]></textFieldExpression>
             </textField>
 
-            <!-- Género -->
             <textField>
                 <reportElement x="215" y="250" width="340" height="20"/>
                 <textElement>
@@ -74,7 +64,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Género: " + $P{Genero}]]></textFieldExpression>
             </textField>
 
-            <!-- Especie -->
             <textField>
                 <reportElement x="215" y="280" width="340" height="20"/>
                 <textElement>
@@ -83,7 +72,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Especie: " + $P{Especie}]]></textFieldExpression>
             </textField>
 
-            <!-- Ojos -->
             <textField>
                 <reportElement x="45" y="340" width="239" height="20"/>
                 <textElement>
@@ -92,7 +80,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Color de Ojos: " + $P{Ojos}]]></textFieldExpression>
             </textField>
 
-            <!-- Pelo -->
             <textField>
                 <reportElement x="285" y="340" width="239" height="20"/>
                 <textElement>
@@ -101,7 +88,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Color de Pelo: " + $P{Pelo}]]></textFieldExpression>
             </textField>
 
-            <!-- Piel -->
             <textField>
                 <reportElement x="45" y="370" width="239" height="20"/>
                 <textElement>
@@ -110,7 +96,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Color de Piel: " + $P{Piel}]]></textFieldExpression>
             </textField>
 
-            <!-- Patronus -->
             <textField>
                 <reportElement x="285" y="370" width="239" height="20"/>
                 <textElement>
@@ -119,13 +104,6 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["Patronus: " + $P{Patronus}]]></textFieldExpression>
             </textField>
 
-            <!-- Fecha
-            <textField pattern="MMMMM dd, yyyy">
-                <reportElement x="45" y="710" width="100" height="30"/>
-            <textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
-            </textField>-->
-
-            <!-- Logo de Hogwarts -->
             <image>
                 <reportElement x="213" y="420" width="190" height="190"/>
                 <imageExpression class="java.io.InputStream"><![CDATA[
@@ -133,22 +111,12 @@
             ]]></imageExpression>
             </image>
 
-            <!-- Logo de Potersitos (footer centrado)
-            <image>
-                <reportElement x="250" y="650" width="100" height="100"/>
-                <imageExpression class="java.io.InputStream"><![CDATA[
-                this.getClass().getResourceAsStream("/es/potersitos/img/potersitos-logo-modified.png")
-            ]]></imageExpression>
-            </image>-->
-
-            <!-- Nº de página (alineado a la derecha) -->
             <textField>
                 <reportElement x="490" y="710" width="60" height="30"/>
                 <textElement textAlignment="Right"/>
                 <textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
             </textField>
 
-            <!-- Título -->
             <staticText>
                 <reportElement x="0" y="60" width="555" height="79"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">

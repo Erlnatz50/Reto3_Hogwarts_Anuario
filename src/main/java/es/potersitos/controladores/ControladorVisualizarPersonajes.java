@@ -20,6 +20,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
@@ -605,18 +606,12 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     private void eliminarSeleccionados() {
-        if (selectedSlugs.isEmpty())
-            return;
+        if (selectedSlugs.isEmpty()) return;
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = crearAlertaConIcono();
         alert.setTitle(resources.getString("eliminar.confirm.titulo"));
         alert.setHeaderText(null);
         alert.setContentText(resources.getString("seguro.eliminar") + " " + selectedSlugs.size() + " " + resources.getString("personajes.seleccionados"));
-
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -962,7 +957,7 @@ public class ControladorVisualizarPersonajes {
             });
 
             Scene scene = new Scene(root);
-            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            scene.setFill(Color.TRANSPARENT);
 
             try {
                 var archivoCSS = getClass().getResource("/es/potersitos/css/estiloNuevo.css");
@@ -1237,16 +1232,11 @@ public class ControladorVisualizarPersonajes {
      */
     @FXML
     private void salir() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = crearAlertaConIcono();
         alert.setTitle(resources.getString("salir"));
         alert.setHeaderText(resources.getString("cerrar.aplicacion"));
         alert.setContentText(resources.getString("deseas.salir.aplicacion"));
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(
-                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/es/potersitos/img/icono-app.png")))
-        );
 
         if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
             if (menuBar != null && menuBar.getScene() != null) {
@@ -1256,9 +1246,9 @@ public class ControladorVisualizarPersonajes {
             } else {
                 logger.error("No se pudo obtener el Stage para cerrar la ventana.");
             }
-        } else {
-            logger.info("Usuario canceló la salida de la aplicación.");
         }
+
+        logger.info("Usuario canceló la salida de la aplicación.");
     }
 
     /**
@@ -1284,6 +1274,25 @@ public class ControladorVisualizarPersonajes {
 
         alerta.showAndWait();
         logger.debug("Alerta mostrada: tipo={}, mensaje={}", tipo, mensaje);
+    }
+
+    /**
+     * Crea una alerta con el icono de la aplicación ya configurado.
+     *
+     * @return instancia de Alert con icono aplicado
+     * @author Erlantz
+     */
+    private Alert crearAlertaConIcono() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        try {
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(
+                    new Image(Objects.requireNonNull(
+                            getClass().getResourceAsStream("/es/potersitos/img/icono-app.png"))));
+        } catch (Exception e) {
+            logger.warn("No se pudo cargar el icono de la ventana de alerta");
+        }
+        return alert;
     }
 
     /**
